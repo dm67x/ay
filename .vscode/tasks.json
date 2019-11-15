@@ -1,0 +1,17 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "CMake",
+            "type": "shell",
+            "command": "cmake.exe -Bbuild -G 'MinGW Makefiles' ."
+        },
+        {
+            "label": "Build",
+            "type": "shell",
+            "command": "cd build; mingw32-make; cd .."
+        }
+    ]
+}
