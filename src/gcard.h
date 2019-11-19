@@ -9,16 +9,26 @@
 class GCard
 {
     std::vector<Strand> m_strands;
-    std::vector<Strand> m_phi1;
-    std::vector<Strand> m_phi2;
+    std::vector<Strand> m_alpha0;
+    std::vector<Strand> m_alpha1;
+    std::vector<Strand> m_alpha2;
 
 public:
     GCard();
     ~GCard() = default;
 
     Strand newStrand();
-    void phi1Sew(Strand, Strand);
-    void phi1Unsew(Strand);
-    void phi2Sew(Strand, Strand);
-    void phi2Unsew(Strand);
+    Strand alpha0(Strand) const;
+    Strand alpha1(Strand) const;
+    Strand alpha2(Strand) const;
+
+    void alpha0(Strand, Strand);
+    void alpha1(Strand, Strand);
+    void alpha2(Strand, Strand);
+
+    std::vector<std::vector<Strand>> a2oa1() const;
+    std::vector<std::vector<Strand>> a0oa2() const;
+    std::vector<std::vector<Strand>> a1oa0() const;
+
+    int euler() const;
 };
