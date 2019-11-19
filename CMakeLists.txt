@@ -43,7 +43,7 @@ source_group(TREE ${SRC_PATH} FILES ${SRC_FILES})
 source_group(TREE ${INC_PATH} FILES ${INC_FILES})
 
 add_executable(ay ${SRC_FILES} ${INC_FILES})
-target_include_directories(ay PUBLIC ${INC_FILES})
+target_include_directories(ay PUBLIC ${INC_PATH})
 target_link_libraries(ay ${AY_LIB})
 set_target_properties(ay PROPERTIES
     SOVERSION ${PROJECT_VERSION_MAJOR}
