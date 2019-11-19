@@ -53,6 +53,14 @@ int main()
         tore.alpha2(b8, b3);
 
         std::cout << tore.euler() << std::endl;
+        std::cout << tore.vertices().size() << std::endl;
+
+        for (auto vert : tore.vertices()) {
+            for (auto v : vert) {
+                std::cout << v << ", ";
+            }
+            std::cout << std::endl;
+        }
 
         device.Run();
     }

@@ -18,6 +18,7 @@ public:
     ~GCard() = default;
 
     Strand newStrand();
+    Strand newFace(size_t);
     Strand alpha0(Strand) const;
     Strand alpha1(Strand) const;
     Strand alpha2(Strand) const;
@@ -29,6 +30,7 @@ public:
     std::vector<std::vector<Strand>> a2oa1() const;
     std::vector<std::vector<Strand>> a0oa2() const;
     std::vector<std::vector<Strand>> a1oa0() const;
+    std::vector<std::vector<Strand>> vertices() const;
 
     int euler() const;
 };
