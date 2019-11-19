@@ -7,8 +7,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin)
 
 # Defines paths
 set(SRC_PATH ${CMAKE_CURRENT_SOURCE_DIR}/src)
-set(INC_PATH ${CMAKE_CURRENT_SOURCE_DIR}/inc)
-set(3RD_PATH ${CMAKE_CURRENT_SOURCE_DIR}/3rd)
+set(3RD_PATH ${CMAKE_CURRENT_SOURCE_DIR}/third_party)
 
 # Remove GLFW documentation, tests and examples build
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
