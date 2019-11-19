@@ -6,7 +6,7 @@
 
 #include "strand.h"
 
-class GCard final
+class GCard
 {
     std::vector<Strand> m_strands;
     std::vector<Strand> m_phi1;

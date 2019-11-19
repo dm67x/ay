@@ -11,8 +11,14 @@ struct Texture2DParameter
     GLint mag;
 };
 
-struct Texture2D final
+class Texture2D final
 {
+    GLuint m_id;
+    GLuint m_width;
+    GLuint m_height;
+    Texture2DParameter m_parameter;
+
+public:
     Texture2D(const Texture2DParameter&);
     ~Texture2D();
 
@@ -20,10 +26,4 @@ struct Texture2D final
     bool Load(const std::string&) const;
     void Bind(GLuint = 0) const;
     void Unbind() const;
-
-private:
-    GLuint m_id;
-    GLuint m_width;
-    GLuint m_height;
-    Texture2DParameter m_parameter;
 };
