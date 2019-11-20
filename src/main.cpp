@@ -1,31 +1,63 @@
 #include "device.h"
 #include "gcard.h"
+#include "gcard_renderer.h"
 
 #include <stdexcept>
 #include <iostream>
+
+GCard cube()
+{
+    GCard result;
+
+    Strand d1, d2, d3, d4, d5, d6;
+    d1 = result.newFace(4);
+    d2 = result.newFace(4);
+    d3 = result.newFace(4);
+    d4 = result.newFace(4);
+    d5 = result.newFace(4);
+    d6 = result.newFace(4);
+
+    glm::vec3 P[8] = {
+        {-1, 1, -1},
+        {1, 1, -1},
+        {1, -1, -1},
+        {-1, -1, -1},
+        {-1, 1, 1},
+        {1, 1, 1},
+        {1, -1, 1},
+        {-1, -1, 1}
+    };
+
+    result.phi2(d1, d4);
+    result.phi2(d3, result.phi1(d1));
+    result.phi2(d2, result.phi1(result.phi1(result.phi1(d1))));
+    result.phi2(d5, result.phi1(result.phi1(d1)));
+    result.phi2(d6, result.phi1(result.phi1(d5)));
+    result.phi2(result.phi1(d5), result.phi1(result.phi1(result.phi1(d3))));
+    result.phi2(result.phi1(result.phi1(result.phi1(d5))), result.phi1(d2));
+    result.phi2(result.phi1(d6), result.phi1(result.phi1(d3)));
+    result.phi2(result.phi1(result.phi1(result.phi1(d6))), result.phi1(result.phi1(d2)));
+    result.phi2(result.phi1(result.phi1(d6)), result.phi1(result.phi1(d4)));
+    result.phi2(result.phi1(result.phi1(result.phi1(d2))), result.phi1(d4));
+    result.phi2(result.phi1(d3), result.phi1(result.phi1(result.phi1(d4))));
+
+    return result;
+}
 
 int main()
 {
     try {
         Device device{ 800, 800 };
 
-        GCard tore;
-        Strand base;
+        GCard c = cube();
 
-        base = tore.newFace(4);
-
-        // Alpha2
-        tore.alpha2(base, tore.alpha1(tore.alpha0(tore.alpha1(base))));
-        tore.alpha2(tore.alpha1(base), tore.alpha1(tore.alpha0(base)));
-        tore.alpha2(tore.alpha0(tore.alpha1(base)), tore.alpha0(tore.alpha1(tore.alpha0(base))));
-        tore.alpha2(tore.alpha0(base), tore.alpha0(tore.alpha1(tore.alpha0(tore.alpha1(base)))));
-
-        std::cout << "Euler characteristics: " << tore.euler() << std::endl
-            << "Number of vertices: " << tore.vertices().size() << std::endl
-            << "Number of edges: " << tore.edges().size() << std::endl;
+        std::cout << "Euler characteristics: " << c.euler() << std::endl
+            << "Number of vertices: " << c.vertices().size() << std::endl
+            << "Number of edges: " << c.edges().size() << std::endl
+            << "Number of faces: " << c.faces().size() << std::endl;
 
         std::cout << "Vertices: " << std::endl;
-        for (auto vert : tore.vertices()) {
+        for (auto vert : c.vertices()) {
             for (auto v : vert) {
                 std::cout << v << ", ";
             }
@@ -33,12 +65,29 @@ int main()
         }
 
         std::cout << "Edges: " << std::endl;
-        for (auto edge : tore.edges()) {
+        for (auto edge : c.edges()) {
             for (auto e : edge) {
                 std::cout << e << ", ";
             }
             std::cout << std::endl;
         }
+
+        std::cout << "Faces: " << std::endl;
+        for (auto face : c.faces()) {
+            for (auto f : face) {
+                std::cout << f << ", ";
+            }
+            std::cout << std::endl;
+        }
+
+        // Try to draw object (WIP)
+        /*GCardRenderer tore_renderer{tore, {
+            { glm::vec3(-1, -1, 0) },
+            { glm::vec3(1, -1, 0) },
+            { glm::vec3(1, 1, 0) },
+            { glm::vec3(-1, 1, 0) }
+        }};
+        tore_renderer.render();*/
 
         device.Run();
     }
