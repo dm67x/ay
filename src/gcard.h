@@ -31,6 +31,7 @@ public:
     std::vector<std::vector<Strand>> a0oa2() const;
     std::vector<std::vector<Strand>> a1oa0() const;
     std::vector<std::vector<Strand>> vertices() const;
+    std::vector<std::vector<Strand>> edges() const;
 
     int euler() const;
 };

@@ -201,6 +201,39 @@ std::vector<std::vector<Strand>> GCard::vertices() const
     return result;
 }
 
+std::vector<std::vector<Strand>> GCard::edges() const
+{
+    std::vector<std::vector<Strand>> result = {};
+    std::vector<Strand> markeds = {};
+
+    size_t i = 0;
+    while (markeds.size() != m_strands.size()) {
+        Strand src = m_strands[i];
+        Strand current = alpha0(src);
+
+        auto findResult = std::find(markeds.begin(), markeds.end(), src);
+        if (findResult == markeds.end()) {
+            std::vector<Strand> vstrand = {};
+            vstrand.push_back(src);
+            markeds.push_back(src);
+
+            while (current != src) {
+                auto ns = alpha0(current);
+                vstrand.push_back(current);
+                markeds.push_back(current);
+                current = ns;
+            }
+
+            result.push_back(vstrand);
+        }
+        else {
+            src = m_strands[++i];
+        }
+    }
+
+    return result;
+}
+
 int GCard::euler() const
 {
     return (int)((a2oa1().size() + 
