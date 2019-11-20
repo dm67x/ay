@@ -22,14 +22,15 @@ Strand GCard::newFace(size_t side)
 {
     Strand* strands = new Strand[side * 2];
 
+    // Create strands
     for (size_t i = 0; i < side * 2; i++) {
         strands[i] = newStrand();
     }
 
-    // Alpha0
-    for (size_t i = 0; i < side * 2; i += 2) {
-        alpha0(strands[i], strands[i + 1]);
-        alpha0(strands[i + 1], strands[i]);
+    // Alpha0 and Alpha1
+    for (size_t i = 1; i < side * 2; i += 2) {
+        alpha0(strands[i-1], strands[i]);
+        alpha1(strands[i], strands[(i + 1) % (side * 2)]);
     }
 
     return strands[0];
@@ -53,16 +54,19 @@ Strand GCard::alpha2(Strand src) const
 void GCard::alpha0(Strand src, Strand dest)
 {
     m_alpha0[src] = dest;
+    m_alpha0[dest] = src;
 }
 
 void GCard::alpha1(Strand src, Strand dest)
 {
     m_alpha1[src] = dest;
+    m_alpha1[dest] = src;
 }
 
 void GCard::alpha2(Strand src, Strand dest)
 {
     m_alpha2[src] = dest;
+    m_alpha2[dest] = src;
 }
 
 std::vector<std::vector<Strand>> GCard::a2oa1() const
