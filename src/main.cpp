@@ -80,6 +80,9 @@ int main()
             std::cout << std::endl;
         }
 
+        // DOT file
+        c.graph("cube_graph.dot");
+
         // Try to draw object (WIP)
         /*GCardRenderer tore_renderer{tore, {
             { glm::vec3(-1, -1, 0) },

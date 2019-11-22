@@ -30,4 +30,5 @@ public:
     std::vector<std::vector<Strand>> faces() const;
 
     int euler() const;
+    void graph(const std::string&) const;
 };

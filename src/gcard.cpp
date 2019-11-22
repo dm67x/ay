@@ -1,5 +1,7 @@
 #include "gcard.h"
 
+#include <fstream>
+
 GCard::GCard()
     : m_strands{},
     m_phi1{},
@@ -158,4 +160,57 @@ int GCard::euler() const
     return static_cast<int>(vertices().size() 
         - edges().size() 
         + faces().size());
+}
+
+void GCard::graph(const std::string& filename) const
+{
+    std::ofstream file(filename);
+    if (file.is_open()) {
+        file << "digraph gcard_graph {\n";
+
+        auto faces = this->faces();
+        auto vertices = this->vertices();
+        auto edges = this->edges();
+
+        // Faces
+        int face_id = 0;
+        for (auto face : faces) {
+            file << "\tS -> face_" << face_id << ";\n";
+            face_id++;
+        }
+
+        // Edges
+        int edge_id = 0;
+        for (auto edge : edges) {
+            for (auto e : edge) {
+
+                // Face
+                face_id = 0;
+                for (auto face : faces) {
+                    for (auto strand : face) {
+                        if (strand == e) {
+                            file << "\tface_" << face_id << " -> edge_" << edge_id << ";\n";
+                        }
+                    }
+                    face_id++;
+                }
+
+                // Vertex
+                int vertex_id = 0;
+                for (auto vertex : vertices) {
+                    for (auto strand : vertex) {
+                        if (strand == e) {
+                            file << "\tedge_" << edge_id << " -> " << "vertex_" << vertex_id << ";\n";
+                        }
+                    }
+                    vertex_id++;
+                }
+            }
+            edge_id++;
+        }
+
+        file << "}\n";
+
+        file.close();
+    }
 }
