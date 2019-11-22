@@ -172,36 +172,36 @@ void GCard::graph(const std::string& filename) const
         auto vertices = this->vertices();
         auto edges = this->edges();
 
-        // Faces
-        int face_id = 0;
-        for (auto face : faces) {
-            file << "\tS -> face_" << face_id << ";\n";
-            face_id++;
-        }
+        std::vector<int> face_ids = {};
 
-        // Edges
+        // Edge
         int edge_id = 0;
         for (auto edge : edges) {
             for (auto e : edge) {
-
                 // Face
-                face_id = 0;
-                for (auto face : faces) {
-                    for (auto strand : face) {
-                        if (strand == e) {
-                            file << "\tface_" << face_id << " -> edge_" << edge_id << ";\n";
-                        }
+                int face_id = 0;
+                for (auto f : faces) {
+                    if (std::find(f.begin(), f.end(), e) != f.end()) {
+                        file << "\tface_" << face_id << 
+                            " -> edge_" << edge_id << ";\n";
                     }
+
+                    if (std::find(face_ids.begin(), 
+                        face_ids.end(), face_id) == face_ids.end()) 
+                    {
+                        file << "\tS -> face_" << face_id << ";\n";
+                        face_ids.push_back(face_id);
+                    }
+
                     face_id++;
                 }
 
                 // Vertex
                 int vertex_id = 0;
-                for (auto vertex : vertices) {
-                    for (auto strand : vertex) {
-                        if (strand == e) {
-                            file << "\tedge_" << edge_id << " -> " << "vertex_" << vertex_id << ";\n";
-                        }
+                for (auto v : vertices) {
+                    if (std::find(v.begin(), v.end(), e) != v.end()) {
+                        file << "\tedge_" << edge_id << 
+                            " -> vertex_" << vertex_id << ";\n";
                     }
                     vertex_id++;
                 }
