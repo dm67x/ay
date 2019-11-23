@@ -6,16 +6,20 @@
 #include "vertex.h"
 
 class GCard;
+class Embedding;
 
 class GCardRenderer final
 {
     const GCard& m_gcard;
+    const Embedding& m_embedding;
     std::vector<Vertex> m_vertices;
+    std::vector<GLuint> m_indices;
     GLuint m_vbo;
     GLuint m_vao;
+    GLuint m_ebo;
 
 public:
-    GCardRenderer(const GCard&, const std::vector<Vertex>&);
+    GCardRenderer(const GCard&, const Embedding&);
     ~GCardRenderer();
 
     void render() const;
