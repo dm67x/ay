@@ -16,7 +16,7 @@ class Embedding final
 
 public:
     Embedding(const GCard&);
-    ~Embedding() = default;
+    ~Embedding();
 
     Vertex& operator[](Strand);
     void reload();

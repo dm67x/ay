@@ -8,6 +8,13 @@ Embedding::Embedding(const GCard& card)
     reload();
 }
 
+Embedding::~Embedding()
+{
+    for (auto vertex : m_vertices) {
+        delete vertex.second;
+    }
+}
+
 Vertex& Embedding::operator[](Strand strand)
 {
     for (auto vertex : m_vertices) {
