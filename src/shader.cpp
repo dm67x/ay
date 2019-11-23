@@ -1,4 +1,5 @@
 #include "shader.h"
+#include "log.h"
 
 #include <vector>
 #include <iostream>
@@ -10,11 +11,13 @@ Shader::Shader(GLenum type)
     m_type{ type }
 {
     m_id = glCreateShader(type);
+    glCheckError();
 }
 
 Shader::~Shader()
 {
     glDeleteShader(m_id);
+    glCheckError();
 }
 
 void Shader::FromFile(const std::string& source) const
@@ -33,15 +36,20 @@ void Shader::FromMemory(const std::string& source) const
     const GLchar* src = static_cast<const GLchar*>(source.data());
     const GLint size = static_cast<const GLint>(source.size());
     glShaderSource(m_id, 1, &src, &size);
+    glCheckError();
     glCompileShader(m_id);
+    glCheckError();
     GLint status = 0;
     glGetShaderiv(m_id, GL_COMPILE_STATUS, &status);
+    glCheckError();
     if (status == GL_FALSE) {
         std::vector<GLchar> log;
         GLint logSize;
         glGetShaderiv(m_id, GL_INFO_LOG_LENGTH, &logSize);
+        glCheckError();
         log.resize(logSize);
         glGetShaderInfoLog(m_id, logSize, nullptr, &log[0]);
+        glCheckError();
         std::string logStr(log.begin(), log.end());
         std::cerr << logStr << std::endl;
     }
@@ -53,46 +61,58 @@ ShaderProgram::ShaderProgram(const Shader& vert, const Shader& frag)
     m_fragment{ frag }
 {
     m_id = glCreateProgram();
-    Build();
+    glCheckError();
 }
 
 ShaderProgram::~ShaderProgram()
 {
     glDeleteProgram(m_id);
+    glCheckError();
 }
 
 bool ShaderProgram::Build() const
 {
     glAttachShader(m_id, m_vertex.m_id);
+    glCheckError();
     glAttachShader(m_id, m_fragment.m_id);
+    glCheckError();
 
     glLinkProgram(m_id);
+    glCheckError();
     GLint status = 0;
     glGetProgramiv(m_id, GL_LINK_STATUS, &status);
+    glCheckError();
     if (status == GL_FALSE) {
         std::vector<GLchar> log;
         GLint logSize;
         glGetProgramiv(m_id, GL_INFO_LOG_LENGTH, &logSize);
+        glCheckError();
         log.resize(logSize);
         glGetProgramInfoLog(m_id, logSize, nullptr, &log[0]);
+        glCheckError();
         std::string logStr(log.begin(), log.end());
         std::cerr << logStr << std::endl;
         return false;
     }
 
     glDetachShader(m_id, m_vertex.m_id);
+    glCheckError();
     glDetachShader(m_id, m_fragment.m_id);
+    glCheckError();
+
     return true;
 }
 
 void ShaderProgram::Use() const
 {
     glUseProgram(m_id);
+    glCheckError();
 }
 
 void ShaderProgram::Reset() const
 {
     glUseProgram(0);
+    glCheckError();
 }
 
 void ShaderProgram::Uniform(
@@ -100,5 +120,6 @@ void ShaderProgram::Uniform(
     std::function<void(GLint)> function) const
 {
     GLint location = glGetUniformLocation(m_id, name.c_str());
+    glCheckError();
     function(location);
 }

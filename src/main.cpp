@@ -2,6 +2,7 @@
 #include "gcard.h"
 #include "gcard_renderer.h"
 #include "embedding.h"
+#include "shader.h"
 
 #include <stdexcept>
 #include <iostream>
@@ -91,9 +92,40 @@ int main()
 
         // Draw object
         GCardRenderer cubeRenderer{cube, cubeEmbedding};
+
+        // Shader
+        Shader baseVertexShader{ GL_VERTEX_SHADER };
+        Shader baseFragmentShader{ GL_FRAGMENT_SHADER };
+        ShaderProgram baseProgram{ baseVertexShader, baseFragmentShader };
+
+        baseVertexShader.FromMemory(
+            "#version 330\n"
+            "layout(location = 0) in vec3 position;\n"
+            "layout(location = 1) in vec3 normal;\n"
+            "layout(location = 2) in vec2 uv;\n"
+            "layout(location = 3) in vec4 color;\n"
+            "out vec4 colorOut;\n"
+            "void main() {\n"
+            "gl_Position = vec4(position, 1.0);\n"
+            "colorOut = color;\n"
+            "}"
+        );
+
+        baseFragmentShader.FromMemory(
+            "#version 330\n"
+            "in vec4 colorOut;\n"
+            "out vec4 fragOut;\n"
+            "void main() {\n"
+            "fragOut = colorOut;\n"
+            "}"
+        );
+
+        baseProgram.Build();
         
         while (device.Run()) {
+            baseProgram.Use();
             cubeRenderer.render();
+            baseProgram.Reset();
         }
     }
     catch (const std::runtime_error& e) {
