@@ -42,28 +42,31 @@ Device::~Device()
     glfwTerminate();
 }
 
-void Device::Run()
+bool Device::Run()
 {
     double oldTime = glfwGetTime();
     double currentTime = 0;
     double deltaTime = 0;
 
-    while (!glfwWindowShouldClose(m_window)) {
-        glfwPollEvents();
+    if (glfwWindowShouldClose(m_window))
+        return false;
 
-        // ips calculation
-        currentTime = glfwGetTime();
-        deltaTime = currentTime - oldTime;
-        oldTime = currentTime;
+    glfwPollEvents();
 
-        // window title
-        std::stringstream title;
-        title << "OpenGL ";
-        title << glGetString(GL_VERSION);
-        title << " [" << std::fixed << std::setprecision(2);
-        title << deltaTime * 1000.f << "ms]";
-        glfwSetWindowTitle(m_window, title.str().c_str());
+    // ips calculation
+    currentTime = glfwGetTime();
+    deltaTime = currentTime - oldTime;
+    oldTime = currentTime;
 
-        glfwSwapBuffers(m_window);
-    }
+    // window title
+    std::stringstream title;
+    title << "OpenGL ";
+    title << glGetString(GL_VERSION);
+    title << " [" << std::fixed << std::setprecision(2);
+    title << deltaTime * 1000.f << "ms]";
+    glfwSetWindowTitle(m_window, title.str().c_str());
+
+    glfwSwapBuffers(m_window);
+    
+    return true;
 }

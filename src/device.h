@@ -11,5 +11,5 @@ public:
     Device(GLuint, GLuint);
     ~Device();
 
-    void Run();
+    bool Run();
 };
