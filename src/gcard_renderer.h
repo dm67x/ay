@@ -11,7 +11,7 @@ class Embedding;
 class GCardRenderer final
 {
     const GCard& m_gcard;
-    const Embedding& m_embedding;
+    Embedding& m_embedding;
     std::vector<Vertex> m_vertices;
     std::vector<GLuint> m_indices;
     GLuint m_vbo;
@@ -19,7 +19,7 @@ class GCardRenderer final
     GLuint m_ebo;
 
 public:
-    GCardRenderer(const GCard&, const Embedding&);
+    GCardRenderer(const GCard&, Embedding&);
     ~GCardRenderer();
 
     void render() const;

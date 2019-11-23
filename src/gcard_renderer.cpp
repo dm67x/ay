@@ -3,7 +3,7 @@
 #include "embedding.h"
 #include "log.h"
 
-GCardRenderer::GCardRenderer(const GCard& card, const Embedding& embedding)
+GCardRenderer::GCardRenderer(const GCard& card, Embedding& embedding)
     : m_gcard{ card },
     m_embedding{ embedding },
     m_vertices{},
@@ -26,20 +26,30 @@ GCardRenderer::GCardRenderer(const GCard& card, const Embedding& embedding)
 
     // Get all faces
     for (auto face : m_gcard.faces()) {
-        int vid = 0;
-        for (auto vertex : m_embedding.vertices()) {
-            if (std::find(face.begin(),
-                face.end(), vertex.first[0]) != face.end())
-            {
-                // if face's contains the vertex
-                m_indices.push_back(vid);
-            }
-            vid++;
+        // Get each time 3 vertices (triangle)
+        size_t i = 0;
+        while (i < face.size() - 2) {
+            Strand b1 = face[0];
+            Strand b2 = face[i + 1];
+            Strand b3 = face[i + 2];
+
+            Vertex v1 = m_embedding[b1];
+            Vertex v2 = m_embedding[b2];
+            Vertex v3 = m_embedding[b3];
+
+            // Find vertices indexes
+            auto it = std::find(m_vertices.begin(), m_vertices.end(), v1);
+            m_indices.push_back(static_cast<GLuint>(it - m_vertices.begin()));
+
+            it = std::find(m_vertices.begin(), m_vertices.end(), v2);
+            m_indices.push_back(static_cast<GLuint>(it - m_vertices.begin()));
+
+            it = std::find(m_vertices.begin(), m_vertices.end(), v3);
+            m_indices.push_back(static_cast<GLuint>(it - m_vertices.begin()));
+
+            i++;
         }
     }
-
-    // Get indices
-    
 
     glBindVertexArray(m_vao);
     glCheckError();
