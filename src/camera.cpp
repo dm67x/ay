@@ -51,6 +51,6 @@ void Camera::update(float time)
     float radius = 10.0f;
     float camX = sin(time) * radius;
     float camZ = cos(time) * radius;
-    //float camY = cos(time) * sin(time) * radius;
-    m_view = glm::lookAt(glm::vec3(camX, 0, camZ), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
+    m_view = glm::lookAt(glm::vec3(camX, 0, camZ), 
+        glm::vec3(0), glm::vec3(0, 1, 0));
 }

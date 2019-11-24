@@ -27,7 +27,7 @@ GCardRenderer::GCardRenderer(const GCard& card, Embedding& embedding)
     // Get all faces
     for (auto face : m_gcard.faces()) {
         // Get each time 3 vertices (triangle)
-        /*size_t i = 0;
+        size_t i = 0;
         while (i < face.size() - 2) {
             Strand b1 = face[0];
             Strand b2 = face[i + 1];
@@ -45,21 +45,6 @@ GCardRenderer::GCardRenderer(const GCard& card, Embedding& embedding)
             m_indices.push_back(static_cast<GLuint>(it - m_vertices.begin()));
 
             it = std::find(m_vertices.begin(), m_vertices.end(), v3);
-            m_indices.push_back(static_cast<GLuint>(it - m_vertices.begin()));
-
-            i++;
-        }*/
-
-        size_t i = 0;
-        while (i < face.size() - 1) {
-            Strand b1 = face[i];
-            Strand b2 = face[i + 1];
-            Vertex v1 = m_embedding[b1];
-            Vertex v2 = m_embedding[b2];
-            auto it = std::find(m_vertices.begin(), m_vertices.end(), v1);
-            m_indices.push_back(static_cast<GLuint>(it - m_vertices.begin()));
-
-            it = std::find(m_vertices.begin(), m_vertices.end(), v2);
             m_indices.push_back(static_cast<GLuint>(it - m_vertices.begin()));
 
             i++;
@@ -136,7 +121,7 @@ void GCardRenderer::render() const
     glCheckError();
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo);
     glCheckError();
-    glDrawElements(GL_LINES, 
+    glDrawElements(GL_TRIANGLES, 
         (GLsizei)m_indices.size(), GL_UNSIGNED_INT, 0);
     glCheckError();
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
