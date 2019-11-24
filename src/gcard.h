@@ -16,6 +16,8 @@ public:
     GCard();
     ~GCard() = default;
 
+    GCard& operator=(const GCard&);
+
     Strand newStrand();
     Strand newFace(size_t);
 

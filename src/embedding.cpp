@@ -1,6 +1,8 @@
 #include "embedding.h"
 #include "gcard.h"
 
+#include <stdexcept>
+
 Embedding::Embedding(const GCard& card)
     : m_card{ card },
     m_vertices{}

@@ -9,6 +9,17 @@ GCard::GCard()
 {
 }
 
+GCard& GCard::operator=(const GCard& card)
+{
+    if (this == &card) 
+        return *this;
+    
+    m_strands = card.m_strands;
+    m_phi1 = card.m_phi1;
+    m_phi2 = card.m_phi2;
+    return *this;
+}
+
 Strand GCard::newStrand()
 {
     Strand ns = m_strands.size();
