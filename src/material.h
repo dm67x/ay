@@ -16,7 +16,7 @@ public:
     Material();
     virtual ~Material() = default;
 
-    void Diffuse(const std::shared_ptr<Texture2D>&);
-    void Specular(const std::shared_ptr<Texture2D>&);
-    void Use(const ShaderProgram&) const;
+    void diffuse(const std::shared_ptr<Texture2D>&);
+    void specular(const std::shared_ptr<Texture2D>&);
+    void use(const ShaderProgram&) const;
 };

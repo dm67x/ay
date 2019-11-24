@@ -5,7 +5,10 @@
 #include <iomanip>
 
 Device::Device(GLuint width, GLuint height)
-    : m_window{ nullptr }
+    : m_window{ nullptr },
+    m_deltaTime{ 0 },
+    m_width{ width },
+    m_height{ height }
 {
     if (!glfwInit()) {
         throw std::runtime_error("cannot initialized glfw");
@@ -42,11 +45,10 @@ Device::~Device()
     glfwTerminate();
 }
 
-bool Device::Run()
+bool Device::run()
 {
     double oldTime = glfwGetTime();
     double currentTime = 0;
-    double deltaTime = 0;
 
     if (glfwWindowShouldClose(m_window))
         return false;
@@ -55,7 +57,7 @@ bool Device::Run()
 
     // ips calculation
     currentTime = glfwGetTime();
-    deltaTime = currentTime - oldTime;
+    m_deltaTime = currentTime - oldTime;
     oldTime = currentTime;
 
     // window title
@@ -63,10 +65,16 @@ bool Device::Run()
     title << "OpenGL ";
     title << glGetString(GL_VERSION);
     title << " [" << std::fixed << std::setprecision(2);
-    title << deltaTime * 1000.f << "ms]";
+    title << m_deltaTime * 1000.f << "ms]";
     glfwSetWindowTitle(m_window, title.str().c_str());
 
     glfwSwapBuffers(m_window);
     
     return true;
+}
+
+void Device::resize(GLuint w, GLuint h)
+{
+    m_width = w;
+    m_height = h;
 }

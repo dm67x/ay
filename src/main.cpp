@@ -3,14 +3,17 @@
 #include "gcard_renderer.h"
 #include "embedding.h"
 #include "shader.h"
+#include "camera.h"
 
 #include <stdexcept>
 #include <iostream>
+#include <glm/gtx/transform.hpp>
 
 int main()
 {
     try {
         Device device{ 800, 800 };
+        Camera mainCamera;
 
         GCard cube;
         Strand d1, d2, d3, d4, d5, d6;
@@ -24,14 +27,14 @@ int main()
         d6 = cube.newFace(4);
 
         Vertex P[8] = {
-            { glm::vec3(-1, 1, -1) },
-            { glm::vec3(1, 1, -1) },
-            { glm::vec3(1, -1, -1) },
-            { glm::vec3(-1, -1, -1) },
-            { glm::vec3(-1, 1, 1) },
-            { glm::vec3(1, 1, 1) },
-            { glm::vec3(1, -1, 1) },
-            { glm::vec3(-1, -1, 1) }
+            { glm::vec3(-1, 1, -1), glm::vec3(0), glm::vec2(0), glm::vec4(0.5) },
+            { glm::vec3(1, 1, -1), glm::vec3(0), glm::vec2(0), glm::vec4(0.5) },
+            { glm::vec3(1, -1, -1), glm::vec3(0), glm::vec2(0), glm::vec4(0.5) },
+            { glm::vec3(-1, -1, -1), glm::vec3(0), glm::vec2(0), glm::vec4(0.5) },
+            { glm::vec3(-1, 1, 1), glm::vec3(0), glm::vec2(0), glm::vec4(0.5) },
+            { glm::vec3(1, 1, 1), glm::vec3(0), glm::vec2(0), glm::vec4(0.5) },
+            { glm::vec3(1, -1, 1), glm::vec3(0), glm::vec2(0), glm::vec4(0.5) },
+            { glm::vec3(-1, -1, 1), glm::vec3(0), glm::vec2(0), glm::vec4(0.5) }
         };
 
         cube.phi2(d1, d4);
@@ -98,20 +101,21 @@ int main()
         Shader baseFragmentShader{ GL_FRAGMENT_SHADER };
         ShaderProgram baseProgram{ baseVertexShader, baseFragmentShader };
 
-        baseVertexShader.FromMemory(
+        baseVertexShader.fromMemory(
             "#version 330\n"
             "layout(location = 0) in vec3 position;\n"
             "layout(location = 1) in vec3 normal;\n"
             "layout(location = 2) in vec2 uv;\n"
             "layout(location = 3) in vec4 color;\n"
+            "uniform mat4 MVP;\n"
             "out vec4 colorOut;\n"
             "void main() {\n"
-            "gl_Position = vec4(position, 1.0);\n"
+            "gl_Position = MVP * vec4(position, 1.0);\n"
             "colorOut = color;\n"
             "}"
         );
 
-        baseFragmentShader.FromMemory(
+        baseFragmentShader.fromMemory(
             "#version 330\n"
             "in vec4 colorOut;\n"
             "out vec4 fragOut;\n"
@@ -120,12 +124,23 @@ int main()
             "}"
         );
 
-        baseProgram.Build();
+        baseProgram.build();
+
+        glm::mat4 projection = glm::perspective(70.f, 1.f, 0.f, 100.f);
         
-        while (device.Run()) {
-            baseProgram.Use();
+        while (device.run()) {
+            glClear(GL_COLOR_BUFFER_BIT);
+
+            mainCamera.update(static_cast<float>(glfwGetTime()));
+
+            glm::mat4 MVP = projection * mainCamera.view();
+
+            baseProgram.use();
+            baseProgram.uniform("MVP", [&](GLint l) {
+                glUniformMatrix4fv(l, 1, GL_FALSE, &MVP[0][0]);
+            });
             cubeRenderer.render();
-            baseProgram.Reset();
+            baseProgram.reset();
         }
     }
     catch (const std::runtime_error& e) {

@@ -20,9 +20,9 @@ Texture2D::~Texture2D()
     glCheckError();
 }
 
-void Texture2D::Create(const GLuint width, const GLuint height) const
+void Texture2D::create(const GLuint width, const GLuint height) const
 {
-    Bind();
+    bind();
 
     glTexParameteri(
         GL_TEXTURE_2D,
@@ -57,10 +57,10 @@ void Texture2D::Create(const GLuint width, const GLuint height) const
         nullptr);
     glCheckError();
 
-    Unbind();
+    unbind();
 }
 
-bool Texture2D::Load(const std::string& filename) const
+bool Texture2D::load(const std::string& filename) const
 {
     int width, height;
     stbi_set_flip_vertically_on_load(true);
@@ -75,7 +75,7 @@ bool Texture2D::Load(const std::string& filename) const
         return false;
     }
 
-    Bind();
+    bind();
 
     glTexParameteri(
         GL_TEXTURE_2D,
@@ -110,13 +110,13 @@ bool Texture2D::Load(const std::string& filename) const
         image);
     glCheckError();
 
-    Unbind();
+    unbind();
 
     stbi_image_free(image);
     return true;
 }
 
-void Texture2D::Bind(GLuint unit) const
+void Texture2D::bind(GLuint unit) const
 {
     glActiveTexture(unit);
     glCheckError();
@@ -124,7 +124,7 @@ void Texture2D::Bind(GLuint unit) const
     glCheckError();
 }
 
-void Texture2D::Unbind() const
+void Texture2D::unbind() const
 {
     glBindTexture(GL_TEXTURE_2D, 0);
     glCheckError();

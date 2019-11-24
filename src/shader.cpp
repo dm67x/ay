@@ -20,18 +20,18 @@ Shader::~Shader()
     glCheckError();
 }
 
-void Shader::FromFile(const std::string& source) const
+void Shader::fromFile(const std::string& source) const
 {
     std::ifstream file(source);
     if (file.is_open()) {
         std::string str((std::istreambuf_iterator<char>(file)),
             std::istreambuf_iterator<char>());
-        FromMemory(str);
+        fromMemory(str);
         file.close();
     }
 }
 
-void Shader::FromMemory(const std::string& source) const
+void Shader::fromMemory(const std::string& source) const
 {
     const GLchar* src = static_cast<const GLchar*>(source.data());
     const GLint size = static_cast<const GLint>(source.size());
@@ -70,7 +70,7 @@ ShaderProgram::~ShaderProgram()
     glCheckError();
 }
 
-bool ShaderProgram::Build() const
+bool ShaderProgram::build() const
 {
     glAttachShader(m_id, m_vertex.m_id);
     glCheckError();
@@ -103,19 +103,19 @@ bool ShaderProgram::Build() const
     return true;
 }
 
-void ShaderProgram::Use() const
+void ShaderProgram::use() const
 {
     glUseProgram(m_id);
     glCheckError();
 }
 
-void ShaderProgram::Reset() const
+void ShaderProgram::reset() const
 {
     glUseProgram(0);
     glCheckError();
 }
 
-void ShaderProgram::Uniform(
+void ShaderProgram::uniform(
     const std::string& name,
     std::function<void(GLint)> function) const
 {

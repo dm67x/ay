@@ -11,8 +11,8 @@ struct Shader final
     Shader(GLenum);
     ~Shader();
 
-    void FromFile(const std::string&) const;
-    void FromMemory(const std::string&) const;
+    void fromFile(const std::string&) const;
+    void fromMemory(const std::string&) const;
 
 private:
     GLuint m_id;
@@ -24,10 +24,10 @@ struct ShaderProgram final
     ShaderProgram(const Shader&, const Shader&);
     ~ShaderProgram();
 
-    bool Build() const;
-    void Use() const;
-    void Reset() const;
-    void Uniform(const std::string&, std::function<void(GLint)>) const;
+    bool build() const;
+    void use() const;
+    void reset() const;
+    void uniform(const std::string&, std::function<void(GLint)>) const;
 
 private:
     GLuint m_id;

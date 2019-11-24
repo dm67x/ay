@@ -22,8 +22,8 @@ public:
     Texture2D(const Texture2DParameter&);
     ~Texture2D();
 
-    void Create(const GLuint, const GLuint) const;
-    bool Load(const std::string&) const;
-    void Bind(GLuint = 0) const;
-    void Unbind() const;
+    void create(const GLuint, const GLuint) const;
+    bool load(const std::string&) const;
+    void bind(GLuint = 0) const;
+    void unbind() const;
 };
