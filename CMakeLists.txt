@@ -5,36 +5,23 @@ project(Ay LANGUAGES CXX VERSION 0.1.0)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin)
 
-# Defines paths
+# Defines
 set(SRC_PATH ${CMAKE_CURRENT_SOURCE_DIR}/src)
-set(3RD_PATH ${CMAKE_CURRENT_SOURCE_DIR}/third_party)
 
-# Remove GLFW documentation, tests and examples build
-set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
-set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
-set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
-
-# Remove GLM tests
-set(GLM_TEST_ENABLE OFF CACHE BOOL "" FORCE)
+if(DEFINED ENV{VCPKG_DEFAULT_TRIPLET} AND NOT DEFINED VCPKG_TARGET_TRIPLET)
+  set(VCPKG_TARGET_TRIPLET "$ENV{VCPKG_DEFAULT_TRIPLET}" CACHE STRING "")
+endif()
 
 # Third parties
-add_subdirectory(${3RD_PATH}/glfw)
-add_subdirectory(${3RD_PATH}/glad)
-add_subdirectory(${3RD_PATH}/stb)
-add_subdirectory(${3RD_PATH}/glm)
-
-include_directories(
-    ${3RD_PATH}/glfw/include
-    ${3RD_PATH}/glad/include
-    ${3RD_PATH}/stb
-    ${3RD_PATH}/glm)
-
-# OpenGL
 find_package(OpenGL REQUIRED)
+find_package(glfw3 CONFIG REQUIRED)
+find_package(glm CONFIG REQUIRED)
+find_package(glad CONFIG REQUIRED)
+
 include_directories(${OPENGL_INCLUDE_DIR})
 
 # Libraries
-set(AY_LIB "glfw;glad;glm_static;stb;${OPENGL_gl_LIBRARY}")
+set(AY_LIB "glfw;glad::glad;glm;${OPENGL_gl_LIBRARY}")
 
 if (MINGW)
     list(APPEND AY_LIB mingw32)

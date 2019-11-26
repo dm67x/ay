@@ -2,6 +2,8 @@
 #include "log.h"
 
 #include <iostream>
+
+#define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
 Texture2D::Texture2D(const Texture2DParameter& params)
