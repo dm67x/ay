@@ -1,9 +1,9 @@
-#include "device.h"
-#include "gcard.h"
-#include "gcard_renderer.h"
-#include "embedding.h"
-#include "shader.h"
-#include "camera.h"
+#include "render/device.h"
+#include "render/gcard.h"
+#include "render/gcard_renderer.h"
+#include "render/embedding.h"
+#include "render/shader.h"
+#include "render/camera.h"
 
 #include <stdexcept>
 #include <iostream>

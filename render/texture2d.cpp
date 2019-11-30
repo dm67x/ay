@@ -1,5 +1,5 @@
 #include "texture2d.h"
-#include "log.h"
+#include "main/log.h"
 
 #include <iostream>
 

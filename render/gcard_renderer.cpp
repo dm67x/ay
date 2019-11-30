@@ -1,7 +1,7 @@
 #include "gcard_renderer.h"
 #include "gcard.h"
 #include "embedding.h"
-#include "log.h"
+#include "main/log.h"
 
 GCardRenderer::GCardRenderer(const GCard& card, Embedding& embedding)
     : m_gcard{ card },

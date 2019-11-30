@@ -1,5 +1,5 @@
 #include "shader.h"
-#include "log.h"
+#include "main/log.h"
 
 #include <vector>
 #include <iostream>

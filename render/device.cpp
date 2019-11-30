@@ -68,6 +68,8 @@ bool Device::run()
     title << m_deltaTime * 1000.f << "ms]";
     glfwSetWindowTitle(m_window, title.str().c_str());
 
+    glViewport(0, 0, m_width, m_height);
+
     glfwSwapBuffers(m_window);
     
     return true;
