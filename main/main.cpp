@@ -9,8 +9,11 @@
 #include <iostream>
 #include <glm/gtx/transform.hpp>
 
-int main()
+int main(int argc, char** argv)
 {
+    (void)argc;
+    (void)argv;
+
     try {
         Device device{ 800, 800 };
         Camera mainCamera;
@@ -73,19 +76,30 @@ int main()
 
         GCardRenderer pyramideRenderer{ pyramide, pyramideEmbedding };
 
-        glm::mat4 projection = glm::perspective(70.f, 
-            static_cast<float>(device.width() / device.height()), 
-            1.f, 100.f);
-
         // Enable depth test
         glEnable(GL_DEPTH_TEST);
         // Accept fragment if it closer to the camera than the former one
         glDepthFunc(GL_LESS);
         
         while (device.run()) {
+            float width = static_cast<float>(device.width());
+            float height = static_cast<float>(device.height());
+            glm::mat4 projection = glm::mat4();
+
+            if (width > height) {
+                projection = glm::perspective(70.f,
+                    width / height,
+                    1.f, 50.f);
+            }
+            else {
+                projection = glm::perspective(70.f,
+                    height / width,
+                    1.f, 50.f);
+            }
+
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-            mainCamera.update(static_cast<float>(glfwGetTime()));
+            mainCamera.update(device.systemClock().elapsedTime() * 1000.0);
 
             glm::mat4 MVP = projection * mainCamera.view();
 
@@ -99,8 +113,9 @@ int main()
             baseProgram.reset();
         }
     }
-    catch (const std::runtime_error& e) {
+    catch (const std::exception& e) {
         std::cerr << "ERROR: " << e.what() << std::endl;
+        return 1;
     }
     
     return 0;

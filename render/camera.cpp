@@ -46,11 +46,16 @@ void Camera::move(CameraMovementType type)
     }
 }
 
-void Camera::update(float time)
+void Camera::update(double time)
 {
-    float radius = 10.0f;
-    float camX = sin(time) * radius;
-    float camZ = cos(time) * radius;
-    m_view = glm::lookAt(glm::vec3(camX, 0, camZ), 
+    static float incr = 10.f;
+    static float speed = .25f;
+
+    float camX = cos(glm::radians(incr)) * 10.f;
+    float camY = cos(glm::radians(incr)) * 10.f;
+    float camZ = sin(glm::radians(incr)) * 10.f;
+    m_view = glm::lookAt(glm::vec3(camX, camY, camZ),
         glm::vec3(0), glm::vec3(0, 1, 0));
+
+    incr += (float)time * speed;
 }

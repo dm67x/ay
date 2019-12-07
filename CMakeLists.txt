@@ -7,9 +7,10 @@ set(SCENE_FOLDER ${CMAKE_CURRENT_SOURCE_DIR}/scene)
 set(SHADER_FOLDER ${CMAKE_CURRENT_SOURCE_DIR}/shader)
 set(RENDER_FOLDER ${CMAKE_CURRENT_SOURCE_DIR}/render)
 
-# Conan
-include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
-conan_basic_setup()
+# Libraries
+find_package(glm CONFIG REQUIRED)
+find_package(glad CONFIG REQUIRED)
+find_package(SDL2 CONFIG REQUIRED)
 
 # Get files
 file(GLOB_RECURSE MAIN_SOURCES ${MAIN_FOLDER}/**.cpp ${MAIN_FOLDER}/**.h)
@@ -26,7 +27,7 @@ source_group("Render" FILES ${RENDER_SOURCES})
 
 add_executable(ay ${MAIN_SOURCES} ${SCENE_SOURCES} ${SHADER_SOURCES} ${RENDER_SOURCES})
 target_include_directories(ay PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(ay ${CONAN_LIBS})
+target_link_libraries(ay PRIVATE SDL2::SDL2 SDL2::SDL2main glm glad::glad)
 set_target_properties(ay PROPERTIES
     SOVERSION ${PROJECT_VERSION_MAJOR}
     VERSION ${PROJECT_VERSION}

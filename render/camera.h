@@ -25,7 +25,7 @@ public:
     void rotate(float, const glm::vec3&);
     void move(const glm::vec3&);
     void move(CameraMovementType);
-    void update(float);
+    void update(double);
 
     inline glm::mat4 view() const { return m_view; }
     inline glm::vec3 position() const { return m_position; }
