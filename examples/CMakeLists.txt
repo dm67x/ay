@@ -5,7 +5,10 @@ find_package(glad CONFIG REQUIRED)
 find_package(SDL2 CONFIG REQUIRED)
 find_package(OpenGL REQUIRED)
 
-add_executable(01_example ${CMAKE_CURRENT_SOURCE_DIR}/01/main.cpp)
+add_executable(01_example 
+    ${CMAKE_CURRENT_SOURCE_DIR}/01/main.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/01/scene.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/01/scene.h)
 target_include_directories(01_example PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/01)
 target_link_libraries(01_example PRIVATE ay SDL2::SDL2 SDL2::SDL2main glm glad::glad OpenGL::GL)
 set_target_properties(01_example PROPERTIES CXX_STANDARD 17)
