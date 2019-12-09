@@ -30,6 +30,19 @@ Vertex& Embedding::operator[](Strand strand)
     throw std::runtime_error("Strand didn't exist inside vertices");
 }
 
+const Vertex& Embedding::operator[](Strand strand) const
+{
+    for (auto vertex : m_vertices) {
+        if (std::find(vertex.first.begin(),
+            vertex.first.end(), strand) != vertex.first.end())
+        {
+            return *vertex.second;
+        }
+    }
+
+    throw std::runtime_error("Strand didn't exist inside vertices");
+}
+
 void Embedding::reload()
 {
     m_vertices.clear();

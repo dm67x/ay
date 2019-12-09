@@ -19,6 +19,7 @@ public:
     ~Embedding();
 
     Vertex& operator[](Strand);
+    const Vertex& operator[](Strand) const;
     void reload();
 
     inline std::map<std::vector<Strand>, Vertex*> vertices() const { 

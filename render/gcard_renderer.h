@@ -4,14 +4,15 @@
 #include <vector>
 
 #include "vertex.h"
+#include "scene/entity.h"
 
 class GCard;
 class Embedding;
 
-class GCardRenderer final
+class GCardRenderer final : public SceneEntity
 {
     const GCard& m_gcard;
-    Embedding& m_embedding;
+    const Embedding& m_embedding;
     std::vector<Vertex> m_vertices;
     std::vector<GLuint> m_indices;
     GLuint m_vbo;
@@ -19,8 +20,8 @@ class GCardRenderer final
     GLuint m_ebo;
 
 public:
-    GCardRenderer(const GCard&, Embedding&);
+    GCardRenderer(const GCard&, const Embedding&);
     ~GCardRenderer();
 
-    void render() const;
+    void draw() const override;
 };

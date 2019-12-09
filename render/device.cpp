@@ -68,10 +68,7 @@ bool Device::run()
     title << m_sysClock.elapsedTime() * 1000.0 << "ms]";
     SDL_SetWindowTitle(m_window, title.str().c_str());
 
-    glViewport(0, 0, m_width, m_height);
-
     SDL_GL_SwapWindow(m_window);
-    
     return true;
 }
 

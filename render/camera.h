@@ -1,5 +1,7 @@
 #pragma once
 
+#include "scene/entity.h"
+
 #include <glm/glm.hpp>
 
 enum CameraMovementType
@@ -10,7 +12,7 @@ enum CameraMovementType
     STRAFE_RIGHT
 };
 
-class Camera
+class Camera : public SceneEntity
 {
     glm::vec3 m_direction;
     glm::vec3 m_position;
@@ -26,6 +28,7 @@ public:
     void move(const glm::vec3&);
     void move(CameraMovementType);
     void update(double);
+    void draw() const override {}
 
     inline glm::mat4 view() const { return m_view; }
     inline glm::vec3 position() const { return m_position; }

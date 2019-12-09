@@ -3,7 +3,7 @@
 #include "embedding.h"
 #include "main/log.h"
 
-GCardRenderer::GCardRenderer(const GCard& card, Embedding& embedding)
+GCardRenderer::GCardRenderer(const GCard& card, const Embedding& embedding)
     : m_gcard{ card },
     m_embedding{ embedding },
     m_vertices{},
@@ -115,7 +115,7 @@ GCardRenderer::~GCardRenderer()
     glCheckError();
 }
 
-void GCardRenderer::render() const
+void GCardRenderer::draw() const
 {
     glBindVertexArray(m_vao);
     glCheckError();
