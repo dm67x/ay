@@ -23,14 +23,14 @@ int main(int argc, char** argv)
         Shader baseFragmentShader{ GL_FRAGMENT_SHADER };
         ShaderProgram baseProgram{ baseVertexShader, baseFragmentShader };
 
-        baseVertexShader.fromFile("shader/base_vert.glsl");
-        baseFragmentShader.fromFile("shader/base_frag.glsl");
+        baseVertexShader.fromFile("../shaders/base_vert.glsl");
+        baseFragmentShader.fromFile("../shaders/base_frag.glsl");
         baseProgram.build();
 
         // Create objects (pyramide)
         GCard pyramide;
         Embedding pyramideEmbed{ pyramide };
-        
+
         Strand base, t1, t2, t3, t4;
         base = pyramide.newFace(4);
         t1 = pyramide.newFace(3);
@@ -52,9 +52,9 @@ int main(int argc, char** argv)
         pyramideEmbed[pyramide.phi1(base)] = { {-1, 1, -1} };
         pyramideEmbed[pyramide.phi1(pyramide.phi1(base))] = { {1, 1, -1} };
         pyramideEmbed[pyramide.phi1(pyramide.phi1(pyramide.phi1(base)))] =
-            { {1, -1, -1} };
+        { {1, -1, -1} };
         pyramideEmbed[pyramide.phi1(pyramide.phi1(t1))] =
-            { {0, 0, 1}, glm::vec3(0), glm::vec2(0), { 1, 0, 0, 1 } };
+        { {0, 0, 1}, glm::vec3(0), glm::vec2(0), { 1, 0, 0, 1 } };
 
         GCardRenderer pyramideRender{ pyramide, pyramideEmbed };
 
@@ -63,18 +63,13 @@ int main(int argc, char** argv)
 
         // Create scene nodes
         auto cameraNode = SceneManager::instance().getRoot()->create();
-        auto pyramideNode = 
+        auto pyramideNode =
             SceneManager::instance().getRoot()->create();
 
         // Attach objects
         cameraNode->attach(&mainCamera);
         pyramideNode->attach(&pyramideRender);
 
-        // Enable depth test
-        glEnable(GL_DEPTH_TEST);
-        // Accept fragment if it closer to the camera than the former one
-        glDepthFunc(GL_LESS);
-        
         while (device.run()) {
             float width = static_cast<float>(device.width());
             float height = static_cast<float>(device.height());
@@ -91,26 +86,24 @@ int main(int argc, char** argv)
                     1.f, 50.f);
             }
 
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            device.clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
             mainCamera.update(device.systemClock().elapsedTime() * 1000.0);
 
             glm::mat4 MVP = projection * mainCamera.view();
 
             baseProgram.use();
-            baseProgram.uniform("MVP", [&](GLint l) {
-                glUniformMatrix4fv(l, 1, GL_FALSE, &MVP[0][0]);
-            });
+            baseProgram.uniform("MVP", MVP);
 
             SceneManager::instance().render();
 
             baseProgram.reset();
         }
     }
-    catch (const std::exception& e) {
+    catch (const std::exception & e) {
         std::cerr << "ERROR: " << e.what() << std::endl;
         return 1;
     }
-    
+
     return 0;
 }
