@@ -12,9 +12,17 @@ SceneNode::SceneNode()
 
 SceneNode::~SceneNode()
 {
+    if (m_entity)
+        delete m_entity;
+
     for (auto node : m_nodes) {
         delete node;
     }
+}
+
+SceneNode* SceneNode::operator[](int index) const
+{
+    return m_nodes[index];
 }
 
 SceneNode* SceneNode::create()

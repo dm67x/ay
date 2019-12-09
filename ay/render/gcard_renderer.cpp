@@ -18,7 +18,18 @@ GCardRenderer::GCardRenderer(const GCard& card, const Embedding& embedding)
     glCheckError();
     glGenBuffers(1, &m_ebo);
     glCheckError();
+}
 
+GCardRenderer::~GCardRenderer()
+{
+    glDeleteBuffers(1, &m_vbo);
+    glCheckError();
+    glDeleteVertexArrays(1, &m_vao);
+    glCheckError();
+}
+
+void GCardRenderer::build()
+{
     // Get vertices
     for (auto vertex : m_embedding.vertices()) {
         m_vertices.push_back(*vertex.second);
@@ -57,8 +68,8 @@ GCardRenderer::GCardRenderer(const GCard& card, const Embedding& embedding)
     glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
     glCheckError();
 
-    glBufferData(GL_ARRAY_BUFFER, 
-        m_vertices.size() * sizeof(Vertex), 
+    glBufferData(GL_ARRAY_BUFFER,
+        m_vertices.size() * sizeof(Vertex),
         m_vertices.data(), GL_STATIC_DRAW);
     glCheckError();
 
@@ -104,14 +115,6 @@ GCardRenderer::GCardRenderer(const GCard& card, const Embedding& embedding)
     glCheckError();
 
     glBindVertexArray(0);
-    glCheckError();
-}
-
-GCardRenderer::~GCardRenderer()
-{
-    glDeleteBuffers(1, &m_vbo);
-    glCheckError();
-    glDeleteVertexArrays(1, &m_vao);
     glCheckError();
 }
 

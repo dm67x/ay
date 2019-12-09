@@ -16,6 +16,7 @@ class SceneNode
 public:
     AY_API SceneNode();
     AY_API virtual ~SceneNode();
+    AY_API SceneNode* operator[](int) const;
 
     AY_API SceneNode* create();
     AY_API void attach(SceneEntity*);
@@ -23,4 +24,5 @@ public:
     AY_API void draw() const;
 
     inline AY_API glm::vec3 position() const { return m_position; }
+    inline AY_API SceneEntity* entity() const { return m_entity; }
 };

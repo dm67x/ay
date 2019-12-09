@@ -24,5 +24,6 @@ public:
     AY_API GCardRenderer(const GCard&, const Embedding&);
     AY_API ~GCardRenderer();
 
+    AY_API void build();
     AY_API void draw() const override;
 };
