@@ -10,14 +10,13 @@ class Texture2D;
 
 class Material
 {
-    Shader m_vertexShader;
-    Shader m_fragmentShader;
     ShaderProgram m_program;
     std::vector<std::shared_ptr<Texture2D>> m_diffuseTextures;
     std::vector<std::shared_ptr<Texture2D>> m_specularTextures;
 
 public:
-    AY_API Material(const std::string&, const std::string&);
+    AY_API Material(const Shader<GL_VERTEX_SHADER>&, 
+        const Shader<GL_FRAGMENT_SHADER>&);
     AY_API virtual ~Material() = default;
 
     AY_API void diffuse(const std::shared_ptr<Texture2D>&);

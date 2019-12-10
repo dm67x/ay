@@ -3,15 +3,14 @@
 
 #include <iostream>
 
-Material::Material(const std::string& vert, const std::string& frag)
+Material::Material(
+    const Shader<GL_VERTEX_SHADER>& vert, 
+    const Shader<GL_FRAGMENT_SHADER>& frag
+)
     : m_diffuseTextures{},
     m_specularTextures{},
-    m_vertexShader{ GL_VERTEX_SHADER },
-    m_fragmentShader{ GL_FRAGMENT_SHADER },
-    m_program{ m_vertexShader, m_fragmentShader }
+    m_program{ vert, frag }
 {
-    m_vertexShader.fromFile(vert);
-    m_fragmentShader.fromFile(frag);
     m_program.build();
 }
 

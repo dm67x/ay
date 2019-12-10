@@ -6,21 +6,23 @@
 #include <fstream>
 #include <streambuf>
 
-Shader::Shader(GLenum type)
-    : m_id{ 0 },
-    m_type{ type }
+template<GLenum T>
+Shader<T>::Shader()
+    : m_id{ 0 }
 {
-    m_id = glCreateShader(type);
+    m_id = glCreateShader(T);
     glCheckError();
 }
 
-Shader::~Shader()
+template<GLenum T>
+Shader<T>::~Shader()
 {
     glDeleteShader(m_id);
     glCheckError();
 }
 
-void Shader::fromFile(const std::string& source) const
+template<GLenum T>
+void Shader<T>::fromFile(const std::string& source) const
 {
     std::ifstream file(source);
     if (file.is_open()) {
@@ -31,7 +33,8 @@ void Shader::fromFile(const std::string& source) const
     }
 }
 
-void Shader::fromMemory(const std::string& source) const
+template<GLenum T>
+void Shader<T>::fromMemory(const std::string& source) const
 {
     const GLchar* src = static_cast<const GLchar*>(source.data());
     const GLint size = static_cast<const GLint>(source.size());
@@ -55,7 +58,21 @@ void Shader::fromMemory(const std::string& source) const
     }
 }
 
-ShaderProgram::ShaderProgram(const Shader& vert, const Shader& frag)
+// Instantiations for export
+template Shader<GL_VERTEX_SHADER>::Shader();
+template Shader<GL_FRAGMENT_SHADER>::Shader();
+template Shader<GL_VERTEX_SHADER>::~Shader();
+template Shader<GL_FRAGMENT_SHADER>::~Shader();
+template void Shader<GL_VERTEX_SHADER>::fromFile(const std::string&) const;
+template void Shader<GL_FRAGMENT_SHADER>::fromFile(const std::string&) const;
+template void Shader<GL_VERTEX_SHADER>::fromMemory(const std::string&) const;
+template void Shader<GL_FRAGMENT_SHADER>::fromMemory(const std::string&) const;
+
+// Shader program
+ShaderProgram::ShaderProgram(
+    const Shader<GL_VERTEX_SHADER>& vert, 
+    const Shader<GL_FRAGMENT_SHADER>& frag
+)
     : m_id{ 0 },
     m_vertex{ vert },
     m_fragment{ frag }

@@ -7,15 +7,15 @@
 #include <functional>
 #include <glm/glm.hpp>
 
+template<GLenum T>
 class Shader final
 {
     GLuint m_id;
-    GLenum m_type;
 
-public:
     friend class ShaderProgram;
 
-    AY_API Shader(GLenum);
+public:
+    AY_API Shader();
     AY_API ~Shader();
 
     AY_API void fromFile(const std::string&) const;
@@ -25,13 +25,14 @@ public:
 class ShaderProgram final
 {
     GLuint m_id;
-    const Shader& m_vertex;
-    const Shader& m_fragment;
+    const Shader<GL_VERTEX_SHADER>& m_vertex;
+    const Shader<GL_FRAGMENT_SHADER>& m_fragment;
 
     friend class Material;
 
 public:
-    AY_API ShaderProgram(const Shader&, const Shader&);
+    AY_API ShaderProgram(const Shader<GL_VERTEX_SHADER>&, 
+        const Shader<GL_FRAGMENT_SHADER>&);
     AY_API ~ShaderProgram();
 
     AY_API bool build() const;

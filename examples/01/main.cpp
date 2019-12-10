@@ -18,10 +18,12 @@ int main(int argc, char** argv)
         MainScene mainScene;
 
         // Base material
-        Material baseMaterial{ 
-            "../shaders/base_vert.glsl", 
-            "../shaders/base_frag.glsl" 
-        };
+        Shader<GL_VERTEX_SHADER> vertex;
+        Shader<GL_FRAGMENT_SHADER> fragment;
+        vertex.fromFile("../shaders/base_vert.glsl");
+        fragment.fromFile("../shaders/base_frag.glsl");
+
+        Material baseMaterial{ vertex, fragment };
 
         // get camera
         SceneNode* cameraNode = (*mainScene.getNode())[0];
