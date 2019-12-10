@@ -1,5 +1,5 @@
 #include "render/device.h"
-#include "render/shader.h"
+#include "render/material.h"
 #include "scene/manager.h"
 #include "scene.h"
 #include "render/camera.h"
@@ -17,14 +17,11 @@ int main(int argc, char** argv)
         Device device{ 800, 800 };
         MainScene mainScene;
 
-        // Shader
-        Shader baseVertexShader{ GL_VERTEX_SHADER };
-        Shader baseFragmentShader{ GL_FRAGMENT_SHADER };
-        ShaderProgram baseProgram{ baseVertexShader, baseFragmentShader };
-
-        baseVertexShader.fromFile("../shaders/base_vert.glsl");
-        baseFragmentShader.fromFile("../shaders/base_frag.glsl");
-        baseProgram.build();
+        // Base material
+        Material baseMaterial{ 
+            "../shaders/base_vert.glsl", 
+            "../shaders/base_frag.glsl" 
+        };
 
         // get camera
         SceneNode* cameraNode = (*mainScene.getNode())[0];
@@ -56,12 +53,12 @@ int main(int argc, char** argv)
 
             glm::mat4 MVP = projection * mainCamera->view();
 
-            baseProgram.use();
-            baseProgram.uniform("MVP", MVP);
+            baseMaterial.use();
+            baseMaterial.program().uniform("MVP", MVP);
 
             SceneManager::instance().render();
 
-            baseProgram.reset();
+            baseMaterial.reset();
         }
     }
     catch (const std::exception & e) {

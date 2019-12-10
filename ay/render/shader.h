@@ -28,6 +28,8 @@ class ShaderProgram final
     const Shader& m_vertex;
     const Shader& m_fragment;
 
+    friend class Material;
+
 public:
     AY_API ShaderProgram(const Shader&, const Shader&);
     AY_API ~ShaderProgram();
