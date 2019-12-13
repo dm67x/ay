@@ -23,7 +23,7 @@ set_target_properties(ay PROPERTIES
     CXX_STANDARD 17)
 
 if (MSVC)
-    target_compile_options(ay PRIVATE /W4 /WX)
+    target_compile_options(ay PRIVATE /W3 /WX)
 else ()
     target_compile_options(ay PRIVATE -Wall -Wextra -pedantic -Werror)
 endif ()

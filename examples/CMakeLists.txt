@@ -14,7 +14,7 @@ target_link_libraries(01_example PRIVATE ay SDL2::SDL2 SDL2::SDL2main glm glad::
 set_target_properties(01_example PROPERTIES CXX_STANDARD 17)
 
 if (MSVC)
-    target_compile_options(01_example PRIVATE /W4 /WX)
+    target_compile_options(01_example PRIVATE /W3 /WX)
 else ()
     target_compile_options(01_example PRIVATE -Wall -Wextra -pedantic -Werror)
 endif ()

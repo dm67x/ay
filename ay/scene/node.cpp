@@ -12,9 +12,6 @@ SceneNode::SceneNode()
 
 SceneNode::~SceneNode()
 {
-    if (m_entity)
-        delete m_entity;
-
     for (auto node : m_nodes) {
         delete node;
     }

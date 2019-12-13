@@ -1,61 +1,30 @@
 #include "camera.h"
 
-#include <glm/gtx/rotate_vector.hpp>
-
-Camera::Camera(const glm::vec3& position)
-    : m_direction{ glm::vec3(1, 0, 0) },
-    m_position{ position },
-    m_view{},
-    m_speed{ 0.2f }
+Camera::Camera(const glm::vec3& position, const glm::quat& rotation)
+    : m_position{ position },
+    m_rotation{ rotation }
 {
 }
 
 Camera::Camera()
-    : Camera(glm::vec3(0))
+    : Camera(glm::vec3(0), glm::identity<glm::quat>())
 {
 }
 
-void Camera::rotate(float amount, const glm::vec3& axis)
+void Camera::rotate(const glm::quat& rotation)
 {
-    m_direction = glm::rotate(m_direction, amount * m_speed, axis);
+    m_rotation = rotation;
 }
 
-void Camera::move(const glm::vec3& direction)
+void Camera::translate(const glm::vec3& position)
 {
-    m_position += direction;
+    m_position = position;
 }
 
-void Camera::move(CameraMovementType type)
+glm::mat4 Camera::view() const
 {
-    switch (type) {
-    case FORWARD:
-        m_position += m_direction;
-        break;
-
-    case BACKWARD:
-        m_position -= m_direction;
-        break;
-
-    case STRAFE_LEFT:
-        m_position += glm::cross(m_direction, glm::vec3(0, 1, 0));
-        break;
-
-    case STRAFE_RIGHT:
-        m_position -= glm::cross(m_direction, glm::vec3(0, 1, 0));
-        break;
-    }
-}
-
-void Camera::update(double time)
-{
-    static float incr = 10.f;
-    static float speed = .25f;
-
-    float camX = cos(glm::radians(incr)) * 10.f;
-    float camY = cos(glm::radians(incr)) * 10.f;
-    float camZ = sin(glm::radians(incr)) * 10.f;
-    m_view = glm::lookAt(glm::vec3(camX, camY, camZ),
-        glm::vec3(0), glm::vec3(0, 1, 0));
-
-    incr += (float)time * speed;
+    return glm::lookAt(
+        m_position, 
+        m_position + glm::vec3(0, 0, 1), 
+        glm::vec3(0, 1, 0));
 }

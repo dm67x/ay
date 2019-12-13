@@ -1,4 +1,4 @@
-#include "render/device.h"
+#include "device.h"
 #include "render/material.h"
 #include "scene/manager.h"
 #include "scene.h"
@@ -31,6 +31,8 @@ int main(int argc, char** argv)
         if (!mainCamera) {
             throw std::runtime_error("not a camera");
         }
+        mainCamera->translate(glm::vec3(0, 0, -5));
+        //mainCamera->rotate(glm::rotation())
 
         // run
         while (device.run()) {
@@ -50,8 +52,6 @@ int main(int argc, char** argv)
             }
 
             device.clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-            mainCamera->update(device.systemClock().elapsedTime() * 1000.0);
 
             glm::mat4 MVP = projection * mainCamera->view();
 

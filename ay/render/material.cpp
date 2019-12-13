@@ -14,14 +14,14 @@ Material::Material(
     m_program.build();
 }
 
-void Material::diffuse(const std::shared_ptr<Texture2D>& texture)
+void Material::diffuse(const Texture2D& texture)
 {
-    m_diffuseTextures.push_back(texture);
+    m_diffuseTextures.push_back(std::ref(texture));
 }
 
-void Material::specular(const std::shared_ptr<Texture2D>& texture)
+void Material::specular(const Texture2D& texture)
 {
-    m_specularTextures.push_back(texture);
+    m_specularTextures.push_back(std::ref(texture));
 }
 
 void Material::use() const
@@ -31,13 +31,13 @@ void Material::use() const
     size_t i = 0;
 
     for (; i < m_diffuseTextures.size(); i++) {
-        m_diffuseTextures[i]->bind(static_cast<GLuint>(i));
+        m_diffuseTextures[i].get().bind(static_cast<GLuint>(i));
         m_program.uniform("diffuse_" + std::to_string(i + 1), 
             static_cast<GLint>(i));
     }
 
     for (size_t j = 0; j < m_specularTextures.size(); j++) {
-        m_specularTextures[j]->bind(static_cast<GLuint>(i+j));
+        m_specularTextures[j].get().bind(static_cast<GLuint>(i+j));
         m_program.uniform("specular_" + std::to_string(j + 1), 
             static_cast<GLint>(i + j));
     }

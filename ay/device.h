@@ -14,6 +14,8 @@ class Device final
     Timer m_sysClock;
     GLuint m_width;
     GLuint m_height;
+    std::function<void(Uint32, SDL_KeyboardEvent)> m_keyEventFunc;
+    std::function<void(Uint32)> m_mouseEventFunc;
 
 public:
     AY_API explicit Device(GLuint, GLuint);

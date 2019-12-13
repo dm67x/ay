@@ -10,7 +10,9 @@ Device::Device(GLuint width, GLuint height)
     m_context{ },
     m_sysClock{},
     m_width{ width },
-    m_height{ height }
+    m_height{ height },
+    m_keyEventFunc{ [](Uint32, SDL_KeyboardEvent) {} },
+    m_mouseEventFunc{ [](Uint32) {} }
 {
     if (SDL_Init(SDL_INIT_VIDEO) != 0) {
         throw std::runtime_error("cannot initialized SDL2");
@@ -63,6 +65,15 @@ bool Device::run()
             if (evt.window.event == SDL_WINDOWEVENT_RESIZED) {
                 resize(evt.window.data1, evt.window.data2);
             }
+        }
+        else if (evt.type == SDL_KEYDOWN || evt.type == SDL_KEYUP) {
+            m_keyEventFunc(evt.type, evt.key);
+        }
+        else if (evt.type == SDL_MOUSEBUTTONDOWN 
+            || evt.type == SDL_MOUSEBUTTONUP
+            || evt.type == SDL_MOUSEMOTION) 
+        {
+            m_mouseEventFunc(evt.type);
         }
     }
 
