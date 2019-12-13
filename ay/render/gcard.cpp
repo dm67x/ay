@@ -51,6 +51,19 @@ Strand GCard::phi1(Strand src) const
     return m_phi1[src];
 }
 
+Strand GCard::phi_1(Strand src) const
+{
+    Strand it = phi1(src);
+    Strand result = src;
+
+    while (it != src) {
+        result = it;
+        it = phi1(it);
+    }
+
+    return result;
+}
+
 Strand GCard::phi2(Strand src) const
 {
     return m_phi2[src];

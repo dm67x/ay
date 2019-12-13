@@ -25,7 +25,7 @@ MainScene::MainScene()
     pyramide->phi2(base, t1);
     pyramide->phi2(pyramide->phi1(base), t2);
     pyramide->phi2(pyramide->phi1(pyramide->phi1(base)), t3);
-    pyramide->phi2(pyramide->phi1(pyramide->phi1(pyramide->phi1(base))), t4);
+    pyramide->phi2(pyramide->phi_1(base), t4);
     pyramide->phi2(pyramide->phi1(t1), pyramide->phi1(pyramide->phi1(t4)));
     pyramide->phi2(pyramide->phi1(pyramide->phi1(t1)), pyramide->phi1(t2));
     pyramide->phi2(pyramide->phi1(t3), pyramide->phi1(pyramide->phi1(t2)));
@@ -35,8 +35,7 @@ MainScene::MainScene()
     (*pyramideEmbed)[base] = { { -1, -1, -1} };
     (*pyramideEmbed)[pyramide->phi1(base)] = { {-1, 1, -1} };
     (*pyramideEmbed)[pyramide->phi1(pyramide->phi1(base))] = { {1, 1, -1} };
-    (*pyramideEmbed)[pyramide->phi1(pyramide->phi1(pyramide->phi1(base)))] =
-        { {1, -1, -1} };
+    (*pyramideEmbed)[pyramide->phi_1(base)] = { {1, -1, -1} };
     (*pyramideEmbed)[pyramide->phi1(pyramide->phi1(t1))] =
         { {0, 0, 1}, glm::vec3(0), glm::vec2(0), { 1, 0, 0, 1 } };
 

@@ -23,6 +23,7 @@ public:
     AY_API Strand newFace(size_t);
 
     AY_API Strand phi1(Strand) const;
+    AY_API Strand phi_1(Strand) const;
     AY_API Strand phi2(Strand) const;
 
     AY_API void phi1(Strand, Strand);
