@@ -30,25 +30,27 @@ GCardRenderer::~GCardRenderer()
 
 void GCardRenderer::build()
 {
+    auto vertices = m_embedding.vertices();
+    auto faces = m_gcard.faces();
+
     // Get vertices
-    for (auto vertex : m_embedding.vertices()) {
+    for (auto vertex : vertices) {
         m_vertices.push_back(*vertex.second);
     }
 
-    // Get all faces
-    for (auto face : m_gcard.faces()) {
-        // Get each time 3 vertices (triangle)
-        size_t i = 0;
-        while (i < face.size() - 2) {
+    // Get faces
+    for (auto face : faces) {
+        size_t numberOfTriangles = face.size() / 3 + face.size() % 3;
+        for (size_t t = 0; t < numberOfTriangles; t++) {
             Strand b1 = face[0];
-            Strand b2 = face[i + 1];
-            Strand b3 = face[i + 2];
+            Strand b2 = face[(t + 1) % face.size()];
+            Strand b3 = face[(t + 2) % face.size()];
 
             Vertex v1 = m_embedding[b1];
             Vertex v2 = m_embedding[b2];
             Vertex v3 = m_embedding[b3];
 
-            // Find vertices indexes
+            // Find vertices indexes and add them
             auto it = std::find(m_vertices.begin(), m_vertices.end(), v1);
             m_indices.push_back(static_cast<GLuint>(it - m_vertices.begin()));
 
@@ -57,8 +59,6 @@ void GCardRenderer::build()
 
             it = std::find(m_vertices.begin(), m_vertices.end(), v3);
             m_indices.push_back(static_cast<GLuint>(it - m_vertices.begin()));
-
-            i++;
         }
     }
 
