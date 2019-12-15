@@ -1,9 +1,9 @@
-#include "scene.h"
-#include "scene/manager.h"
-#include "render/gcard.h"
-#include "render/gcard_renderer.h"
-#include "render/camera.h"
-#include "render/embedding.h"
+#include "Scene.hpp"
+#include "Scene/Manager.hpp"
+#include "Render/GCard.hpp"
+#include "Render/GCardRenderer.hpp"
+#include "Render/Camera.hpp"
+#include "Render/Embedding.hpp"
 
 MainScene::MainScene()
     : m_root { SceneManager::instance().getRoot()->create() }

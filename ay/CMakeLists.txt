@@ -8,13 +8,12 @@ find_package(OpenGL REQUIRED)
 
 file(GLOB_RECURSE 
     SRC_FILES 
-    ${CMAKE_CURRENT_SOURCE_DIR}/**.cpp 
-    ${CMAKE_CURRENT_SOURCE_DIR}/**.h)
+    ${CMAKE_CURRENT_SOURCE_DIR}/Source/**.cpp)
 
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${SRC_FILES})
 
 add_library(ay SHARED ${SRC_FILES})
-target_include_directories(ay PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(ay PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/Include)
 target_link_libraries(ay PRIVATE SDL2::SDL2 SDL2::SDL2main glm glad::glad OpenGL::GL)
 target_compile_definitions(ay PRIVATE ay_EXPORTS)
 set_target_properties(ay PROPERTIES

@@ -1,8 +1,8 @@
-#include "device.h"
-#include "render/material.h"
-#include "scene/manager.h"
-#include "scene.h"
-#include "render/camera.h"
+#include "Device.hpp"
+#include "Render/Material.hpp"
+#include "Scene/Manager.hpp"
+#include "Scene.hpp"
+#include "Render/Camera.hpp"
 
 #include <stdexcept>
 #include <iostream>

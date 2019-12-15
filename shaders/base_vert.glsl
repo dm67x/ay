@@ -5,7 +5,7 @@ layout(location = 1) in vec3 normal;
 layout(location = 2) in vec2 uv;
 layout(location = 3) in vec4 color;
 
-flat out vec4 colorOut;
+out vec4 colorOut;
 
 uniform mat4 MVP;
 
