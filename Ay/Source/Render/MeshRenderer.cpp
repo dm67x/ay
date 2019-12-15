@@ -1,12 +1,9 @@
-#include "Render/GCardRenderer.hpp"
-#include "Render/GCard.hpp"
-#include "Render/Embedding.hpp"
+#include "Render/MeshRenderer.hpp"
+#include "render/Mesh.hpp"
 #include "Log.hpp"
 
-GCardRenderer::GCardRenderer(const GCard& card, const Embedding& embedding)
-    : m_gcard{ card },
-    m_embedding{ embedding },
-    m_vertices{},
+MeshRenderer::MeshRenderer(const Mesh& mesh)
+    : m_mesh{ mesh },
     m_indices{},
     m_vbo{ 0 },
     m_vao{ 0 },
@@ -20,7 +17,7 @@ GCardRenderer::GCardRenderer(const GCard& card, const Embedding& embedding)
     glCheckError();
 }
 
-GCardRenderer::~GCardRenderer()
+MeshRenderer::~MeshRenderer()
 {
     glDeleteBuffers(1, &m_vbo);
     glCheckError();
@@ -28,37 +25,14 @@ GCardRenderer::~GCardRenderer()
     glCheckError();
 }
 
-void GCardRenderer::build()
+void MeshRenderer::build()
 {
-    auto vertices = m_embedding.vertices();
-    auto faces = m_gcard.faces();
+    auto vertices = m_mesh.vertices();
+    auto faces = m_mesh.faces();
 
-    // Get vertices
-    for (auto vertex : vertices) {
-        m_vertices.push_back(*vertex.second);
-    }
-
-    // Get faces
     for (auto face : faces) {
-        size_t numberOfTriangles = face.size() / 3 + face.size() % 3;
-        for (size_t t = 0; t < numberOfTriangles; t++) {
-            Strand* b1 = face[0];
-            Strand* b2 = face[(t + 1) % face.size()];
-            Strand* b3 = face[(t + 2) % face.size()];
-
-            Vertex v1 = m_embedding[b1];
-            Vertex v2 = m_embedding[b2];
-            Vertex v3 = m_embedding[b3];
-
-            // Find vertices indexes and add them
-            auto it = std::find(m_vertices.begin(), m_vertices.end(), v1);
-            m_indices.push_back(static_cast<GLuint>(it - m_vertices.begin()));
-
-            it = std::find(m_vertices.begin(), m_vertices.end(), v2);
-            m_indices.push_back(static_cast<GLuint>(it - m_vertices.begin()));
-
-            it = std::find(m_vertices.begin(), m_vertices.end(), v3);
-            m_indices.push_back(static_cast<GLuint>(it - m_vertices.begin()));
+        for (auto f : face) {
+            m_indices.push_back(static_cast<GLuint>(f));
         }
     }
 
@@ -69,8 +43,8 @@ void GCardRenderer::build()
     glCheckError();
 
     glBufferData(GL_ARRAY_BUFFER,
-        m_vertices.size() * sizeof(Vertex),
-        m_vertices.data(), GL_STATIC_DRAW);
+        vertices.size() * sizeof(Vertex),
+        vertices.data(), GL_STATIC_DRAW);
     glCheckError();
 
     // position
@@ -118,13 +92,13 @@ void GCardRenderer::build()
     glCheckError();
 }
 
-void GCardRenderer::draw() const
+void MeshRenderer::draw() const
 {
     glBindVertexArray(m_vao);
     glCheckError();
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo);
     glCheckError();
-    glDrawElements(GL_TRIANGLES, 
+    glDrawElements(GL_TRIANGLES,
         (GLsizei)m_indices.size(), GL_UNSIGNED_INT, 0);
     glCheckError();
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);

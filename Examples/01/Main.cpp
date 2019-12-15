@@ -25,14 +25,10 @@ int main(int argc, char** argv)
 
         Material baseMaterial{ vertex, fragment };
 
-        // get camera
-        SceneNode* cameraNode = (*mainScene.getNode())[0];
+        auto cameraNode = (*mainScene.getNode())[0];
         Camera* mainCamera = dynamic_cast<Camera*>(cameraNode->entity());
-        if (!mainCamera) {
-            throw std::runtime_error("not a camera");
-        }
-        mainCamera->translate(glm::vec3(0, 0, -5));
-        //mainCamera->rotate(glm::rotation())
+        if (!mainCamera)
+            throw std::exception("error camera not created");
 
         // run
         while (device.run()) {

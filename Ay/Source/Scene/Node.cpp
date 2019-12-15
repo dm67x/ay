@@ -1,6 +1,4 @@
 #include "Scene/Node.hpp"
-#include "Render/GCardRenderer.hpp"
-#include "Render/Camera.hpp"
 #include "Scene/Entity.hpp"
 
 SceneNode::SceneNode()
