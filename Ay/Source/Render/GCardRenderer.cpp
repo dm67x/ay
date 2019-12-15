@@ -42,9 +42,9 @@ void GCardRenderer::build()
     for (auto face : faces) {
         size_t numberOfTriangles = face.size() / 3 + face.size() % 3;
         for (size_t t = 0; t < numberOfTriangles; t++) {
-            Strand b1 = face[0];
-            Strand b2 = face[(t + 1) % face.size()];
-            Strand b3 = face[(t + 2) % face.size()];
+            Strand* b1 = face[0];
+            Strand* b2 = face[(t + 1) % face.size()];
+            Strand* b3 = face[(t + 2) % face.size()];
 
             Vertex v1 = m_embedding[b1];
             Vertex v2 = m_embedding[b2];

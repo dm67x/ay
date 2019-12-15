@@ -1,12 +1,18 @@
 #include "Render/GCard.hpp"
+#include "Render/Strand.hpp"
 
 #include <fstream>
 
 GCard::GCard()
-    : m_strands{},
-    m_phi1{},
-    m_phi2{}
+    : m_strands{}
 {
+}
+
+GCard::~GCard()
+{
+    for (auto strand : m_strands) {
+        delete strand;
+    }
 }
 
 GCard& GCard::operator=(const GCard& card)
@@ -15,23 +21,25 @@ GCard& GCard::operator=(const GCard& card)
         return *this;
     
     m_strands = card.m_strands;
-    m_phi1 = card.m_phi1;
-    m_phi2 = card.m_phi2;
     return *this;
 }
 
-Strand GCard::newStrand()
+Strand* GCard::operator[](int index)
 {
-    Strand ns = m_strands.size();
+    assert(index < m_strands.size());
+    return m_strands[index];
+}
+
+Strand* GCard::newStrand()
+{
+    Strand* ns = new Strand;
     m_strands.push_back(ns);
-    m_phi1.push_back(ns);
-    m_phi2.push_back(ns);
     return ns;
 }
 
-Strand GCard::newFace(size_t side)
+Strand* GCard::newFace(size_t side)
 {
-    Strand* strands = new Strand[side];
+    Strand** strands = new Strand*[side];
 
     // Create strands
     for (size_t i = 0; i < side; i++) {
@@ -39,65 +47,37 @@ Strand GCard::newFace(size_t side)
     }
 
     // Phi1
-    for (size_t i = 0; i < side; i++) {
-        phi1(strands[i], strands[(i+1) % side]);
+    for (size_t i = 1; i < side; i++) {
+        strands[i]->phi1 = strands[(i + 1) % side];
+        strands[i]->phi_1 = strands[i - 1];
+    }
+
+    if (side >= 2) {
+        strands[0]->phi1 = strands[1];
+        strands[0]->phi_1 = strands[side - 1];
     }
 
     return strands[0];
 }
 
-Strand GCard::phi1(Strand src) const
+std::vector<std::vector<Strand*>> GCard::vertices() const
 {
-    return m_phi1[src];
-}
-
-Strand GCard::phi_1(Strand src) const
-{
-    Strand it = phi1(src);
-    Strand result = src;
-
-    while (it != src) {
-        result = it;
-        it = phi1(it);
-    }
-
-    return result;
-}
-
-Strand GCard::phi2(Strand src) const
-{
-    return m_phi2[src];
-}
-
-void GCard::phi1(Strand src, Strand dest)
-{
-    m_phi1[src] = dest;
-}
-
-void GCard::phi2(Strand src, Strand dest)
-{
-    m_phi2[src] = dest;
-    m_phi2[dest] = src;
-}
-
-std::vector<std::vector<Strand>> GCard::vertices() const
-{
-    std::vector<std::vector<Strand>> result = {};
-    std::vector<Strand> markeds = {};
+    std::vector<std::vector<Strand*>> result = {};
+    std::vector<Strand*> markeds = {};
 
     size_t i = 0;
     while (markeds.size() != m_strands.size()) {
-        Strand src = m_strands[i];
-        Strand current = phi1(phi2(src));
+        Strand* src = m_strands[i];
+        Strand* current = src->phi2->phi1;
 
         auto findResult = std::find(markeds.begin(), markeds.end(), src);
         if (findResult == markeds.end()) {
-            std::vector<Strand> vstrand = {};
+            std::vector<Strand*> vstrand = {};
             vstrand.push_back(src);
             markeds.push_back(src);
 
             while (current != src) {
-                auto ns = phi1(phi2(current));
+                auto ns = current->phi2->phi1;
                 vstrand.push_back(current);
                 markeds.push_back(current);
                 current = ns;
@@ -113,24 +93,24 @@ std::vector<std::vector<Strand>> GCard::vertices() const
     return result;
 }
 
-std::vector<std::vector<Strand>> GCard::edges() const
+std::vector<std::vector<Strand*>> GCard::edges() const
 {
-    std::vector<std::vector<Strand>> result = {};
-    std::vector<Strand> markeds = {};
+    std::vector<std::vector<Strand*>> result = {};
+    std::vector<Strand*> markeds = {};
 
     size_t i = 0;
     while (markeds.size() != m_strands.size()) {
-        Strand src = m_strands[i];
-        Strand current = phi2(src);
+        Strand* src = m_strands[i];
+        Strand* current = src->phi2;
 
         auto findResult = std::find(markeds.begin(), markeds.end(), src);
         if (findResult == markeds.end()) {
-            std::vector<Strand> vstrand = {};
+            std::vector<Strand*> vstrand = {};
             vstrand.push_back(src);
             markeds.push_back(src);
 
             while (current != src) {
-                auto ns = phi2(current);
+                auto ns = current->phi2;
                 vstrand.push_back(current);
                 markeds.push_back(current);
                 current = ns;
@@ -146,24 +126,24 @@ std::vector<std::vector<Strand>> GCard::edges() const
     return result;
 }
 
-std::vector<std::vector<Strand>> GCard::faces() const
+std::vector<std::vector<Strand*>> GCard::faces() const
 {
-    std::vector<std::vector<Strand>> result = {};
-    std::vector<Strand> markeds = {};
+    std::vector<std::vector<Strand*>> result = {};
+    std::vector<Strand*> markeds = {};
 
     size_t i = 0;
     while (markeds.size() != m_strands.size()) {
-        Strand src = m_strands[i];
-        Strand current = phi1(src);
+        Strand* src = m_strands[i];
+        Strand* current = src->phi1;
 
         auto findResult = std::find(markeds.begin(), markeds.end(), src);
         if (findResult == markeds.end()) {
-            std::vector<Strand> vstrand = {};
+            std::vector<Strand*> vstrand = {};
             vstrand.push_back(src);
             markeds.push_back(src);
 
             while (current != src) {
-                auto ns = phi1(current);
+                auto ns = current->phi1;
                 vstrand.push_back(current);
                 markeds.push_back(current);
                 current = ns;

@@ -10,7 +10,7 @@
 class GCard;
 class Embedding;
 
-class GCardRenderer final : public SceneEntity
+class GCardRenderer : public SceneEntity
 {
     const GCard& m_gcard;
     const Embedding& m_embedding;
@@ -22,7 +22,7 @@ class GCardRenderer final : public SceneEntity
 
 public:
     AY_API GCardRenderer(const GCard&, const Embedding&);
-    AY_API ~GCardRenderer();
+    AY_API virtual ~GCardRenderer();
 
     AY_API void build();
     AY_API void draw() const override;

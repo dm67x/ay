@@ -8,7 +8,7 @@ find_package(OpenGL REQUIRED)
 add_executable(01_example 
     ${CMAKE_CURRENT_SOURCE_DIR}/01/Main.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/01/Scene.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/01/Scene.h)
+    ${CMAKE_CURRENT_SOURCE_DIR}/01/Scene.hpp)
 target_include_directories(01_example PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/01)
 target_link_libraries(01_example PRIVATE ay SDL2::SDL2 SDL2::SDL2main glm glad::glad OpenGL::GL)
 set_target_properties(01_example PROPERTIES CXX_STANDARD 17)

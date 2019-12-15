@@ -17,7 +17,7 @@ Embedding::~Embedding()
     }
 }
 
-Vertex& Embedding::operator[](Strand strand)
+Vertex& Embedding::operator[](Strand* strand)
 {
     for (auto vertex : m_vertices) {
         if (std::find(vertex.first.begin(), 
@@ -30,7 +30,7 @@ Vertex& Embedding::operator[](Strand strand)
     throw std::runtime_error("Strand didn't exist inside vertices");
 }
 
-const Vertex& Embedding::operator[](Strand strand) const
+const Vertex& Embedding::operator[](Strand* strand) const
 {
     for (auto vertex : m_vertices) {
         if (std::find(vertex.first.begin(),
