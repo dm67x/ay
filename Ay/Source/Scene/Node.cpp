@@ -37,12 +37,13 @@ void SceneNode::position(glm::vec3 position)
     m_position = position;
 }
 
-void SceneNode::draw() const 
+void SceneNode::draw(const ShaderProgram& program) const
 {
-    if (m_entity)
-        m_entity->draw();
+    if (m_entity) {
+        m_entity->draw(program);
+    }
 
     for (auto node : m_nodes) {
-        node->draw();
+        node->draw(program);
     }
 }

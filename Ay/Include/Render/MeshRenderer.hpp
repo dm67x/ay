@@ -20,5 +20,5 @@ public:
     AY_API MeshRenderer(const Mesh&);
     AY_API ~MeshRenderer();
     AY_API void build();
-    AY_API void draw() const override;
+    AY_API void draw(const ShaderProgram&) const override;
 };

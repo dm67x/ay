@@ -1,30 +1,26 @@
 #include "Render/Camera.hpp"
 
-Camera::Camera(const glm::vec3& position, const glm::quat& rotation)
-    : m_position{ position },
-    m_rotation{ rotation }
-{
-}
-
 Camera::Camera()
-    : Camera(glm::vec3(0), glm::identity<glm::quat>())
+    : m_target{ glm::vec3(0, 0, 1) }
 {
 }
 
-void Camera::rotate(const glm::quat& rotation)
+void Camera::target(const glm::vec3& target)
 {
-    m_rotation = rotation;
-}
-
-void Camera::translate(const glm::vec3& position)
-{
-    m_position = position;
+    m_target = target;
 }
 
 glm::mat4 Camera::view() const
 {
+    auto position = transform() * glm::vec4(1.f);
+
     return glm::lookAt(
-        m_position, 
-        m_position + glm::vec3(0, 0, 1), 
+        glm::vec3(position.x, position.y, position.z),
+        m_target,
         glm::vec3(0, 1, 0));
+}
+
+void Camera::draw(const ShaderProgram& program) const
+{
+    program.uniform("viewMatrix", view());
 }

@@ -17,7 +17,7 @@ public:
     AY_API ~SceneManager();
     AY_API static SceneManager& instance();
 
-    AY_API void render() const;
+    AY_API void render(const ShaderProgram&) const;
 
     inline SceneNode* getRoot() const { return m_rootNode; }
 };

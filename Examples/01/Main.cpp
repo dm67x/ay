@@ -1,8 +1,10 @@
 #include "Device.hpp"
-#include "Render/Material.hpp"
 #include "Scene/Manager.hpp"
-#include "Scene.hpp"
 #include "Render/Camera.hpp"
+#include "Render/MeshRenderer.hpp"
+#include "Render/Material.hpp"
+#include "Render/Shader.hpp"
+#include "Render/Mesh.hpp"
 
 #include <stdexcept>
 #include <iostream>
@@ -15,23 +17,51 @@ int main(int argc, char** argv)
 
     try {
         Device device{ 800, 800 };
-        MainScene mainScene;
+        auto mainScene = SceneManager::instance().getRoot()->create();
 
-        // Base material
+        // Shader
         Shader<GL_VERTEX_SHADER> vertex;
         Shader<GL_FRAGMENT_SHADER> fragment;
+        ShaderProgram program{ vertex, fragment };
+
         vertex.fromFile("../shaders/base_vert.glsl");
         fragment.fromFile("../shaders/base_frag.glsl");
+        program.build();
 
-        Material baseMaterial{ vertex, fragment };
+        // Node
+        auto cameraNode = mainScene->create();
+        auto toreNode = mainScene->create();
+        auto suzanneNode = mainScene->create();
 
-        auto cameraNode = (*mainScene.getNode())[0];
-        Camera* mainCamera = dynamic_cast<Camera*>(cameraNode->entity());
-        if (!mainCamera)
-            throw std::exception("error camera not created");
+        // Camera
+        auto mainCamera = new Camera;
+        mainCamera->translate(glm::vec3(0, 0, -5));
+        mainCamera->target(glm::vec3(0));
+        mainCamera->rotate(glm::radians(20.f), glm::vec3(1, 0, 0));
+        cameraNode->attach(mainCamera);
+
+        // Tore
+        Mesh* toreMesh = new Mesh;
+        toreMesh->load("../Models/tore.obj");
+        MeshRenderer* toreRenderer = new MeshRenderer{ *toreMesh };
+        toreRenderer->build();
+        toreNode->attach(toreRenderer);
+
+        // Suzanne
+        Mesh* suzanneMesh = new Mesh;
+        suzanneMesh->load("../Models/suzanne.obj");
+        MeshRenderer* suzanneRenderer = new MeshRenderer{ *suzanneMesh };
+        suzanneRenderer->build();
+        suzanneNode->attach(suzanneRenderer);
+        suzanneRenderer->translate(glm::vec3(0, 2, 0));
+
+        //std::vector<Material> materials = Material::load("../Models/tore.mtl");
+        float rotationAmount = 0;
 
         // run
         while (device.run()) {
+            device.clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
             float width = static_cast<float>(device.width());
             float height = static_cast<float>(device.height());
             glm::mat4 projection = glm::mat4();
@@ -47,16 +77,20 @@ int main(int argc, char** argv)
                     1.f, 50.f);
             }
 
-            device.clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            
+            mainCamera->rotate(glm::radians(rotationAmount++), glm::vec3(0, 1, 0));
 
-            glm::mat4 MVP = projection * mainCamera->view();
+            program.use();
 
-            baseMaterial.use();
-            baseMaterial.program().uniform("MVP", MVP);
+            /*for (auto material : materials) {
+                material.use(program);
+            }*/
 
-            SceneManager::instance().render();
+            program.uniform("projectionMatrix", projection);
 
-            baseMaterial.reset();
+            SceneManager::instance().render(program);
+
+            program.reset();
         }
     }
     catch (const std::exception & e) {

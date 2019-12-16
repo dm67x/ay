@@ -11,7 +11,7 @@ SceneManager& SceneManager::instance()
     return instance;
 }
 
-void SceneManager::render() const
+void SceneManager::render(const ShaderProgram& program) const
 {
-    m_rootNode->draw();
+    m_rootNode->draw(program);
 }

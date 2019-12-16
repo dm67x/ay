@@ -92,8 +92,10 @@ void MeshRenderer::build()
     glCheckError();
 }
 
-void MeshRenderer::draw() const
+void MeshRenderer::draw(const ShaderProgram& program) const
 {
+    program.uniform("modelMatrix", transform());
+
     glBindVertexArray(m_vao);
     glCheckError();
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo);
