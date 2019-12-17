@@ -30,7 +30,7 @@ int main(int argc, char** argv)
         // Node
         auto cameraNode = mainScene->create();
         auto lightNode = mainScene->create();
-        auto dodgeNode = mainScene->create();
+        auto objectNode = mainScene->create();
 
         // Camera
         auto mainCamera = new Camera;
@@ -39,15 +39,15 @@ int main(int argc, char** argv)
         mainCamera->rotate(glm::radians(20.f), glm::vec3(1, 0, 0));
         cameraNode->attach(mainCamera);
 
-        // Dodge challenger
-        Model dodge;
-        if (dodge.load("../Models/dodge")) {
-            dodgeNode->attach(&dodge);
+        // object
+        Model object;
+        if (object.load("../Models/dodge")) {
+            objectNode->attach(&object);
         }
 
         // Light
         Light* light = new Light;
-        light->position = glm::vec3(0, 10, 0);
+        light->position = glm::vec3(3, 3, 0);
         lightNode->attach(light);
 
         float rotationAmount = 0;
@@ -71,7 +71,7 @@ int main(int argc, char** argv)
                     1.f, 50.f);
             }
             
-            dodge.rotate(glm::radians(rotationAmount++), glm::vec3(0, 1, 0));
+            object.rotate(glm::radians(rotationAmount++), glm::vec3(0, 1, 0));
             program.use();
             program.uniform("projectionMatrix", projection);
             SceneManager::instance().render(program);

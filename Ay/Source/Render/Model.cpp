@@ -35,6 +35,10 @@ bool Model::loadMeshes(const std::string& filename)
                 m_meshes.push_back(new Mesh);
             }
             else if (line.substr(0, 7) == "usemtl ") {
+                if (m_meshes.size() == 0) {
+                    m_meshes.push_back(new Mesh);
+                }
+
                 std::stringstream ss(line.substr(7));
                 m_meshes.back()->m_materialName = ss.str();
             }

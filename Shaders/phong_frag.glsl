@@ -15,12 +15,12 @@ uniform vec3 Ke;
 uniform float Ns;
 uniform float Ni;
 uniform vec3 cameraPosition;
+uniform vec3 lightPosition;
 
 void main() {
     vec3 normal = normalize(normalOut);
-    vec3 lightPosition = vec3(0.0, 5.0, 0.0);
     vec3 lightDir = normalize(lightPosition - positionOut);
-    vec3 viewDir = normalize(-positionOut);
+    vec3 viewDir = normalize(cameraPosition - positionOut);
     vec3 reflectDir = reflect(-lightDir, normal);
 
     vec3 ambiant = colorOut.xyz * Kd;
