@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION 3.8)
 project(ay LANGUAGES CXX VERSION 0.1.0)
 
-find_package(glm CONFIG REQUIRED)
-find_package(glad CONFIG REQUIRED)
-find_package(SDL2 CONFIG REQUIRED)
+find_package(glm REQUIRED)
+find_package(glad REQUIRED)
+find_package(SDL2 REQUIRED)
 find_package(OpenGL REQUIRED)
 
 file(GLOB_RECURSE 

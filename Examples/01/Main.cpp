@@ -53,7 +53,8 @@ int main(int argc, char** argv)
         MeshRenderer* suzanneRenderer = new MeshRenderer{ *suzanneMesh };
         suzanneRenderer->build();
         suzanneNode->attach(suzanneRenderer);
-        suzanneRenderer->translate(glm::vec3(0, 2, 0));
+        suzanneRenderer->translate(glm::vec3(0, 0.5f, 0));
+        suzanneRenderer->rotate(glm::radians(-45.f), glm::vec3(1, 0, 0));
 
         //std::vector<Material> materials = Material::load("../Models/tore.mtl");
         float rotationAmount = 0;

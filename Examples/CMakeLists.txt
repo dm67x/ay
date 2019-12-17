@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.8)
 
-find_package(glm CONFIG REQUIRED)
-find_package(glad CONFIG REQUIRED)
-find_package(SDL2 CONFIG REQUIRED)
+find_package(glm REQUIRED)
+find_package(glad REQUIRED)
+find_package(SDL2 REQUIRED)
 find_package(OpenGL REQUIRED)
 
 add_executable(01_example ${CMAKE_CURRENT_SOURCE_DIR}/01/Main.cpp)
