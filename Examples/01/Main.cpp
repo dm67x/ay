@@ -24,8 +24,8 @@ int main(int argc, char** argv)
         Shader<GL_FRAGMENT_SHADER> fragment;
         ShaderProgram program{ vertex, fragment };
 
-        vertex.fromFile("../shaders/base_vert.glsl");
-        fragment.fromFile("../shaders/base_frag.glsl");
+        vertex.fromFile("../shaders/phong_vert.glsl");
+        fragment.fromFile("../shaders/phong_frag.glsl");
         program.build();
 
         // Node
@@ -40,23 +40,26 @@ int main(int argc, char** argv)
         mainCamera->rotate(glm::radians(20.f), glm::vec3(1, 0, 0));
         cameraNode->attach(mainCamera);
 
+        // Materials
+        auto toreMats = Material::load("../Models/tore.mtl");
+        auto suzanneMats = Material::load("../Models/suzanne.mtl");
+
         // Tore
         Mesh* toreMesh = new Mesh;
         toreMesh->load("../Models/tore.obj");
-        MeshRenderer* toreRenderer = new MeshRenderer{ *toreMesh };
+        MeshRenderer* toreRenderer = new MeshRenderer{ *toreMesh, toreMats };
         toreRenderer->build();
         toreNode->attach(toreRenderer);
 
         // Suzanne
         Mesh* suzanneMesh = new Mesh;
         suzanneMesh->load("../Models/suzanne.obj");
-        MeshRenderer* suzanneRenderer = new MeshRenderer{ *suzanneMesh };
+        MeshRenderer* suzanneRenderer = new MeshRenderer{ *suzanneMesh, suzanneMats };
         suzanneRenderer->build();
         suzanneNode->attach(suzanneRenderer);
         suzanneRenderer->translate(glm::vec3(0, 0.5f, 0));
         suzanneRenderer->rotate(glm::radians(-45.f), glm::vec3(1, 0, 0));
 
-        //std::vector<Material> materials = Material::load("../Models/tore.mtl");
         float rotationAmount = 0;
 
         // run
@@ -79,7 +82,9 @@ int main(int argc, char** argv)
             }
 
             
-            mainCamera->rotate(glm::radians(rotationAmount++), glm::vec3(0, 1, 0));
+            //mainCamera->rotate(glm::radians(rotationAmount++), glm::vec3(0, 1, 0));
+            suzanneRenderer->rotate(glm::radians(rotationAmount++), glm::vec3(0, 1, 0));
+            toreRenderer->rotate(glm::radians(rotationAmount++), glm::vec3(0, 1, 0));
 
             program.use();
 

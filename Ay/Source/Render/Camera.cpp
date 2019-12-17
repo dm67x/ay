@@ -22,5 +22,9 @@ glm::mat4 Camera::view() const
 
 void Camera::draw(const ShaderProgram& program) const
 {
+    auto position = transform() * glm::vec4(1.f);
+
     program.uniform("viewMatrix", view());
+    program.uniform("cameraPosition", 
+        glm::vec3(position.x, position.y, position.z));
 }

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Ay.hpp"
-#include "Scene/Entity.hpp"
 
 #include <vector>
 #include <memory>
@@ -11,11 +10,9 @@
 class Texture2D;
 class ShaderProgram;
 
-class Material : public SceneEntity
+class Material
 {
     std::string m_name;
-    std::vector<std::reference_wrapper<const Texture2D>> m_diffuseTextures;
-    std::vector<std::reference_wrapper<const Texture2D>> m_specularTextures;
     glm::vec3 m_Ka;
     glm::vec3 m_Kd;
     glm::vec3 m_Ks;
@@ -28,8 +25,5 @@ public:
     AY_API virtual ~Material() = default;
 
     AY_API static std::vector<Material> load(const std::string&);
-    AY_API void diffuse(const Texture2D&);
-    AY_API void specular(const Texture2D&);
     AY_API void use(const ShaderProgram&) const;
-    AY_API void draw(const ShaderProgram&) const override;
 }; 

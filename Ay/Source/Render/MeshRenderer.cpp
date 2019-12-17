@@ -2,12 +2,16 @@
 #include "render/Mesh.hpp"
 #include "Log.hpp"
 
-MeshRenderer::MeshRenderer(const Mesh& mesh)
+MeshRenderer::MeshRenderer(
+    const Mesh& mesh, 
+    const std::vector<Material>& materials
+)
     : m_mesh{ mesh },
     m_indices{},
     m_vbo{ 0 },
     m_vao{ 0 },
-    m_ebo{ 0 }
+    m_ebo{ 0 },
+    m_materials{ materials }
 {
     glGenVertexArrays(1, &m_vao);
     glCheckError();
@@ -95,6 +99,10 @@ void MeshRenderer::build()
 void MeshRenderer::draw(const ShaderProgram& program) const
 {
     program.uniform("modelMatrix", transform());
+
+    for (auto material : m_materials) {
+        material.use(program);
+    }
 
     glBindVertexArray(m_vao);
     glCheckError();
