@@ -1,12 +1,29 @@
 #include "Render/Mesh.hpp"
-
-#include <fstream>
-#include <sstream>
+#include "Log.hpp"
 
 Mesh::Mesh()
     : m_faces{},
-    m_vertices{}
+    m_vertices{},
+    m_indices{},
+    m_vbo{ 0 },
+    m_vao{ 0 },
+    m_ebo{ 0 },
+    m_materialName{ "" }
 {
+    glGenVertexArrays(1, &m_vao);
+    glCheckError();
+    glGenBuffers(1, &m_vbo);
+    glCheckError();
+    glGenBuffers(1, &m_ebo);
+    glCheckError();
+}
+
+Mesh::~Mesh()
+{
+    glDeleteBuffers(1, &m_vbo);
+    glCheckError();
+    glDeleteVertexArrays(1, &m_vao);
+    glCheckError();
 }
 
 size_t Mesh::addVertex(const Vertex& vertex)
@@ -24,60 +41,83 @@ void Mesh::addFace(const std::vector<size_t>& indices)
     m_faces.push_back(indices);
 }
 
-void Mesh::load(const std::string& filename)
+void Mesh::build()
 {
-    std::vector<glm::vec3> vertices;
-    std::vector<glm::vec2> uvs;
-    std::vector<glm::vec3> normals;
+    m_indices.clear();
 
-    std::ifstream file(filename);
-    if (file.is_open()) {
-        for (std::string line; std::getline(file, line);) {
-            if (line.substr(0, 2) == "v ") {
-                // vertex
-                std::stringstream ss(line.substr(2));
-                float x, y, z;
-                ss >> x >> y >> z;
-                vertices.push_back(glm::vec3(x, y, z));
-            }
-            else if (line.substr(0, 3) == "vt ") {
-                // uv
-                std::stringstream ss(line.substr(3));
-                float u, v;
-                ss >> u >> v;
-                uvs.push_back(glm::vec2(u, v));
-            }
-            else if (line.substr(0, 3) == "vn ") {
-                // normal
-                std::stringstream ss(line.substr(3));
-                float x, y, z;
-                ss >> x >> y >> z;
-                normals.push_back(glm::vec3(x, y, z));
-            }
-            else if (line.substr(0, 2) == "f ") {
-                // face
-                std::stringstream ss(line.substr(2));
-                std::vector<size_t> vertIds;
-
-                for (std::string result; std::getline(ss, result, ' ');) {
-                    std::stringstream ss2(result);
-                    std::string r; 
-                    Vertex vert;
-
-                    std::getline(ss2, r, '/');
-                    vert.position = vertices[std::atoi(r.c_str()) - 1];
-                    std::getline(ss2, r, '/');
-                    vert.uv = uvs[std::atoi(r.c_str()) - 1];
-                    std::getline(ss2, r, '/');
-                    vert.normal = normals[std::atoi(r.c_str()) - 1];
-                    
-                    vertIds.push_back(addVertex(vert));
-                }
-
-                addFace(vertIds);
-            }
+    for (auto face : m_faces) {
+        for (auto f : face) {
+            m_indices.push_back(static_cast<GLuint>(f));
         }
-
-        file.close();
     }
+
+    glBindVertexArray(m_vao);
+    glCheckError();
+
+    glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
+    glCheckError();
+
+    glBufferData(GL_ARRAY_BUFFER,
+        m_vertices.size() * sizeof(Vertex),
+        m_vertices.data(), GL_STATIC_DRAW);
+    glCheckError();
+
+    // position
+    glEnableVertexAttribArray(0);
+    glCheckError();
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), nullptr);
+    glCheckError();
+
+    // normal
+    glEnableVertexAttribArray(1);
+    glCheckError();
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE,
+        sizeof(Vertex), (void*)offsetof(Vertex, normal));
+    glCheckError();
+
+    // uv
+    glEnableVertexAttribArray(2);
+    glCheckError();
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE,
+        sizeof(Vertex), (void*)offsetof(Vertex, uv));
+    glCheckError();
+
+    // color
+    glEnableVertexAttribArray(3);
+    glCheckError();
+    glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE,
+        sizeof(Vertex), (void*)offsetof(Vertex, color));
+    glCheckError();
+
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glCheckError();
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo);
+    glCheckError();
+
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER,
+        m_indices.size() * sizeof(GLuint),
+        m_indices.data(), GL_STATIC_DRAW);
+    glCheckError();
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    glCheckError();
+
+    glBindVertexArray(0);
+    glCheckError();
+}
+
+void Mesh::draw() const
+{
+    glBindVertexArray(m_vao);
+    glCheckError();
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo);
+    glCheckError();
+    glDrawElements(GL_TRIANGLES,
+        (GLsizei)m_indices.size(), GL_UNSIGNED_INT, 0);
+    glCheckError();
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    glCheckError();
+    glBindVertexArray(0);
+    glCheckError();
 }

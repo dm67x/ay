@@ -1,11 +1,6 @@
 #include "render/Light.hpp"
 
-void PointLight::draw() const
+void Light::draw(const ShaderProgram& program) const
 {
-
-}
-
-void DirectionalLight::draw() const
-{
-
+    program.uniform("lightPosition", position);
 }

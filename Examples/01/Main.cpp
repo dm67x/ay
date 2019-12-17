@@ -1,11 +1,9 @@
 #include "Device.hpp"
 #include "Scene/Manager.hpp"
 #include "Render/Camera.hpp"
-#include "Render/MeshRenderer.hpp"
-#include "Render/Material.hpp"
+#include "Render/Model.hpp"
 #include "Render/Shader.hpp"
-#include "Render/Mesh.hpp"
-#include "Render/MaterialManager.hpp"
+#include "Render/Light.hpp"
 
 #include <stdexcept>
 #include <iostream>
@@ -20,17 +18,6 @@ int main(int argc, char** argv)
         Device device{ 800, 800 };
         auto mainScene = SceneManager::instance().getRoot()->create();
 
-        // Add materials
-        Material toreMat{ "tore" };
-        if (toreMat.load("../Models/tore.mtl")) {
-            MaterialManager::instance().add(toreMat);
-        }
-
-        Material suzanneMat{ "suzanne" };
-        if (suzanneMat.load("../Models/suzanne.mtl")) {
-            MaterialManager::instance().add(suzanneMat);
-        }
-
         // Shader
         Shader<GL_VERTEX_SHADER> vertex;
         Shader<GL_FRAGMENT_SHADER> fragment;
@@ -42,31 +29,26 @@ int main(int argc, char** argv)
 
         // Node
         auto cameraNode = mainScene->create();
-        auto toreNode = mainScene->create();
-        auto suzanneNode = mainScene->create();
+        auto lightNode = mainScene->create();
+        auto dodgeNode = mainScene->create();
 
         // Camera
         auto mainCamera = new Camera;
-        mainCamera->translate(glm::vec3(0, 0, -5));
+        mainCamera->translate(glm::vec3(0, 0, -10));
         mainCamera->target(glm::vec3(0));
         mainCamera->rotate(glm::radians(20.f), glm::vec3(1, 0, 0));
         cameraNode->attach(mainCamera);
 
-        // Tore
-        Mesh* toreMesh = new Mesh;
-        toreMesh->load("../Models/tore.obj");
-        MeshRenderer* toreRenderer = new MeshRenderer{ *toreMesh, "tore" };
-        toreRenderer->build();
-        toreNode->attach(toreRenderer);
+        // Dodge challenger
+        Model dodge;
+        if (dodge.load("../Models/dodge")) {
+            dodgeNode->attach(&dodge);
+        }
 
-        // Suzanne
-        Mesh* suzanneMesh = new Mesh;
-        suzanneMesh->load("../Models/suzanne.obj");
-        MeshRenderer* suzanneRenderer = new MeshRenderer{ *suzanneMesh, "suzanne" };
-        suzanneRenderer->build();
-        suzanneNode->attach(suzanneRenderer);
-        suzanneRenderer->translate(glm::vec3(0, 0.5f, 0));
-        suzanneRenderer->rotate(glm::radians(-45.f), glm::vec3(1, 0, 0));
+        // Light
+        Light* light = new Light;
+        light->position = glm::vec3(0, 10, 0);
+        lightNode->attach(light);
 
         float rotationAmount = 0;
 
@@ -88,17 +70,11 @@ int main(int argc, char** argv)
                     height / width,
                     1.f, 50.f);
             }
-
             
-            suzanneRenderer->rotate(glm::radians(rotationAmount++), glm::vec3(0, 1, 0));
-            toreRenderer->rotate(glm::radians(rotationAmount++), glm::vec3(0, 1, 0));
-
+            dodge.rotate(glm::radians(rotationAmount++), glm::vec3(0, 1, 0));
             program.use();
-
             program.uniform("projectionMatrix", projection);
-
             SceneManager::instance().render(program);
-
             program.reset();
         }
     }
