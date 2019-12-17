@@ -1,17 +1,15 @@
 #include "Render/MeshRenderer.hpp"
-#include "render/Mesh.hpp"
+#include "Render/Mesh.hpp"
+#include "Render/MaterialManager.hpp"
 #include "Log.hpp"
 
-MeshRenderer::MeshRenderer(
-    const Mesh& mesh, 
-    const std::vector<Material>& materials
-)
+MeshRenderer::MeshRenderer(const Mesh& mesh, const std::string& material)
     : m_mesh{ mesh },
     m_indices{},
     m_vbo{ 0 },
     m_vao{ 0 },
     m_ebo{ 0 },
-    m_materials{ materials }
+    m_material{ MaterialManager::instance().get(material) }
 {
     glGenVertexArrays(1, &m_vao);
     glCheckError();
@@ -100,9 +98,8 @@ void MeshRenderer::draw(const ShaderProgram& program) const
 {
     program.uniform("modelMatrix", transform());
 
-    for (auto material : m_materials) {
-        material.use(program);
-    }
+    if (m_material)
+        m_material->use(program);
 
     glBindVertexArray(m_vao);
     glCheckError();

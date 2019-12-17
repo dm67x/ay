@@ -5,6 +5,7 @@
 #include "Render/Material.hpp"
 #include "Render/Shader.hpp"
 #include "Render/Mesh.hpp"
+#include "Render/MaterialManager.hpp"
 
 #include <stdexcept>
 #include <iostream>
@@ -18,6 +19,17 @@ int main(int argc, char** argv)
     try {
         Device device{ 800, 800 };
         auto mainScene = SceneManager::instance().getRoot()->create();
+
+        // Add materials
+        Material toreMat{ "tore" };
+        if (toreMat.load("../Models/tore.mtl")) {
+            MaterialManager::instance().add(toreMat);
+        }
+
+        Material suzanneMat{ "suzanne" };
+        if (suzanneMat.load("../Models/suzanne.mtl")) {
+            MaterialManager::instance().add(suzanneMat);
+        }
 
         // Shader
         Shader<GL_VERTEX_SHADER> vertex;
@@ -40,21 +52,17 @@ int main(int argc, char** argv)
         mainCamera->rotate(glm::radians(20.f), glm::vec3(1, 0, 0));
         cameraNode->attach(mainCamera);
 
-        // Materials
-        auto toreMats = Material::load("../Models/tore.mtl");
-        auto suzanneMats = Material::load("../Models/suzanne.mtl");
-
         // Tore
         Mesh* toreMesh = new Mesh;
         toreMesh->load("../Models/tore.obj");
-        MeshRenderer* toreRenderer = new MeshRenderer{ *toreMesh, toreMats };
+        MeshRenderer* toreRenderer = new MeshRenderer{ *toreMesh, "tore" };
         toreRenderer->build();
         toreNode->attach(toreRenderer);
 
         // Suzanne
         Mesh* suzanneMesh = new Mesh;
         suzanneMesh->load("../Models/suzanne.obj");
-        MeshRenderer* suzanneRenderer = new MeshRenderer{ *suzanneMesh, suzanneMats };
+        MeshRenderer* suzanneRenderer = new MeshRenderer{ *suzanneMesh, "suzanne" };
         suzanneRenderer->build();
         suzanneNode->attach(suzanneRenderer);
         suzanneRenderer->translate(glm::vec3(0, 0.5f, 0));
@@ -82,15 +90,10 @@ int main(int argc, char** argv)
             }
 
             
-            //mainCamera->rotate(glm::radians(rotationAmount++), glm::vec3(0, 1, 0));
             suzanneRenderer->rotate(glm::radians(rotationAmount++), glm::vec3(0, 1, 0));
             toreRenderer->rotate(glm::radians(rotationAmount++), glm::vec3(0, 1, 0));
 
             program.use();
-
-            /*for (auto material : materials) {
-                material.use(program);
-            }*/
 
             program.uniform("projectionMatrix", projection);
 
