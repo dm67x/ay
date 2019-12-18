@@ -120,7 +120,7 @@ bool Texture2D::load(const std::string& filename) const
 
 void Texture2D::bind(GLuint unit) const
 {
-    glActiveTexture(unit);
+    glActiveTexture(GL_TEXTURE0+unit);
     glCheckError();
     glBindTexture(GL_TEXTURE_2D, m_id);
     glCheckError();

@@ -1,6 +1,7 @@
 #include "Model.hpp"
 #include "Mesh.hpp"
 #include "Log.hpp"
+#include "Texture2D.hpp"
 
 #include <fstream>
 #include <sstream>
@@ -9,17 +10,6 @@ Model::Model()
     : m_meshes{},
     m_materials{}
 {
-}
-
-Model::~Model()
-{
-    for (auto mesh : m_meshes) {
-        delete mesh;
-    }
-
-    for (auto material : m_materials) {
-        delete material;
-    }
 }
 
 bool Model::loadMeshes(const std::string& filename)
@@ -32,11 +22,11 @@ bool Model::loadMeshes(const std::string& filename)
     if (file.is_open()) {
         for (std::string line; std::getline(file, line);) {
             if (line.substr(0, 2) == "o ") {
-                m_meshes.push_back(new Mesh);
+                m_meshes.push_back(std::make_shared<Mesh>());
             }
             else if (line.substr(0, 7) == "usemtl ") {
                 if (m_meshes.size() == 0) {
-                    m_meshes.push_back(new Mesh);
+                    m_meshes.push_back(std::make_shared<Mesh>());
                 }
 
                 std::stringstream ss(line.substr(7));
@@ -103,7 +93,7 @@ bool Model::loadMaterials(const std::string& filename)
         for (std::string line; std::getline(file, line);) {
             if (line.substr(0, 7) == "newmtl ") {
                 std::stringstream ss(line.substr(7));
-                m_materials.push_back(new Material(ss.str()));
+                m_materials.push_back(std::make_shared<Material>(ss.str()));
             }
             else if (line.substr(0, 3) == "Ka ") {
                 std::stringstream ss(line.substr(3));
@@ -150,6 +140,17 @@ bool Model::loadMaterials(const std::string& filename)
             else if (line.substr(0, 6) == "illum ") {
                 //std::stringstream ss(line.substr(6));
             }
+            else if (line.substr(0, 7) == "map_Kd ") {
+                std::stringstream ss(line.substr(7));
+                Texture2DParameter params;
+                params.min = GL_NEAREST;
+                params.mag = GL_NEAREST;
+                params.wrap_s = GL_REPEAT;
+                params.wrap_t = GL_REPEAT;
+                m_materials.back()->m_mapKd = std::make_unique<Texture2D>(params);
+                m_materials.back()->m_isMapKd = 1;
+                m_materials.back()->m_mapKd->load(ss.str());
+            }
         }
 
         file.close();
@@ -157,15 +158,6 @@ bool Model::loadMaterials(const std::string& filename)
     }
 
     return false;
-}
-
-void Model::create(
-    const std::vector<Mesh*>& meshes,
-    const std::vector<Material*>& materials)
-{
-    m_meshes = meshes;
-    m_materials = materials;
-    build();
 }
 
 bool Model::load(const std::string& filename)
@@ -181,7 +173,7 @@ bool Model::load(const std::string& filename)
 
 void Model::build() const
 {
-    for (auto mesh : m_meshes) {
+    for (auto& mesh : m_meshes) {
         mesh->build();
     }
 }
@@ -190,8 +182,8 @@ void Model::draw(const ShaderProgram& program) const
 {
     program.uniform("modelMatrix", transform());
 
-    for (auto mesh : m_meshes) {
-        for (auto material : m_materials) {
+    for (auto& mesh : m_meshes) {
+        for (auto& material : m_materials) {
             if (material->name() == mesh->m_materialName) {
                 material->use(program);
                 break;

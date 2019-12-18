@@ -7,7 +7,15 @@
 #include <sstream>
 
 Material::Material(const std::string& name)
-    : m_name{ name }
+    : m_name{ name },
+    m_Ka{ glm::vec3(1) },
+    m_Kd{ glm::vec3(1) },
+    m_Ks{ glm::vec3(0) },
+    m_Ke{ glm::vec3(0) },
+    m_Ns{ 0 },
+    m_Ni{ 0 },
+    m_isMapKd{ 0 },
+    m_mapKd{ nullptr }
 {
 }
 
@@ -19,4 +27,10 @@ void Material::use(const ShaderProgram& program) const
     program.uniform("Ke", m_Ke);
     program.uniform("Ns", m_Ns);
     program.uniform("Ni", m_Ni);
+    program.uniform("mapKdValid", m_isMapKd);
+
+    if (m_isMapKd && m_mapKd) {
+        m_mapKd->bind(0);
+        program.uniform("mapKd", 0);
+    }
 }

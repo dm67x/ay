@@ -11,10 +11,10 @@
 
 int main(int argc, char** argv)
 {
-    if (argc != 2) {
+    /*if (argc != 2) {
         std::cerr << "usage: " << argv[0] << " <model>" << std::endl;
         return 1;
-    }
+    }*/
 
     try {
         Device device{ 800, 800 };
@@ -43,13 +43,14 @@ int main(int argc, char** argv)
 
         // object
         Model object;
-        if (object.load(argv[1])) {
+        if (object.load("models/container")) {
             objectNode->attach(&object);
         }
 
         // Light
         Light* light = new Light;
-        light->position = glm::vec3(3, 3, 0);
+        light->position = glm::vec3(1, 1, 1);
+        light->power = 5.f;
         lightNode->attach(light);
 
         float rotationAmount = 0;

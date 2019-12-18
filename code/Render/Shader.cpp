@@ -137,6 +137,7 @@ void ShaderProgram::uniform(const std::string& name, glm::mat4 value) const
     GLint loc = glGetUniformLocation(m_id, name.c_str());
     glCheckError();
     glUniformMatrix4fv(loc, 1, GL_FALSE, &value[0][0]);
+    glCheckError();
 }
 
 void ShaderProgram::uniform(const std::string& name, glm::mat3 value) const
@@ -144,6 +145,7 @@ void ShaderProgram::uniform(const std::string& name, glm::mat3 value) const
     GLint loc = glGetUniformLocation(m_id, name.c_str());
     glCheckError();
     glUniformMatrix3fv(loc, 1, GL_FALSE, &value[0][0]);
+    glCheckError();
 }
 
 void ShaderProgram::uniform(const std::string& name, glm::vec4 value) const
@@ -151,6 +153,7 @@ void ShaderProgram::uniform(const std::string& name, glm::vec4 value) const
     GLint loc = glGetUniformLocation(m_id, name.c_str());
     glCheckError();
     glUniform4fv(loc, 1, &value[0]);
+    glCheckError();
 }
 
 void ShaderProgram::uniform(const std::string& name, glm::vec3 value) const
@@ -158,6 +161,7 @@ void ShaderProgram::uniform(const std::string& name, glm::vec3 value) const
     GLint loc = glGetUniformLocation(m_id, name.c_str());
     glCheckError();
     glUniform3fv(loc, 1, &value[0]);
+    glCheckError();
 }
 
 void ShaderProgram::uniform(const std::string& name, glm::vec2 value) const
@@ -165,6 +169,7 @@ void ShaderProgram::uniform(const std::string& name, glm::vec2 value) const
     GLint loc = glGetUniformLocation(m_id, name.c_str());
     glCheckError();
     glUniform2fv(loc, 1, &value[0]);
+    glCheckError();
 }
 
 void ShaderProgram::uniform(const std::string& name, GLfloat value) const
@@ -172,6 +177,7 @@ void ShaderProgram::uniform(const std::string& name, GLfloat value) const
     GLint loc = glGetUniformLocation(m_id, name.c_str());
     glCheckError();
     glUniform1f(loc, value);
+    glCheckError();
 }
 
 void ShaderProgram::uniform(const std::string& name, GLint value) const
@@ -179,4 +185,5 @@ void ShaderProgram::uniform(const std::string& name, GLint value) const
     GLint loc = glGetUniformLocation(m_id, name.c_str());
     glCheckError();
     glUniform1i(loc, value);
+    glCheckError();
 }

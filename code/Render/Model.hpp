@@ -5,13 +5,14 @@
 
 #include <vector>
 #include <glad/glad.h>
+#include <memory>
 
 class Mesh;
 
 class Model : public SceneEntity
 {
-    std::vector<Mesh*> m_meshes;
-    std::vector<Material*> m_materials;
+    std::vector<std::shared_ptr<Mesh>> m_meshes;
+    std::vector<std::shared_ptr<Material>> m_materials;
 
 private:
     bool loadMeshes(const std::string&);
@@ -19,10 +20,8 @@ private:
 
 public:
     Model();
-    ~Model();
 
 public:
-    void create(const std::vector<Mesh*>&, const std::vector<Material*>&);
     bool load(const std::string&);
     void build() const;
     void draw(const ShaderProgram&) const override;

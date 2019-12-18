@@ -2,6 +2,7 @@
 
 #include <glm/glm.hpp>
 #include <string>
+#include <memory>
 
 class Texture2D;
 class ShaderProgram;
@@ -15,6 +16,8 @@ class Material
     glm::vec3 m_Ke;
     float m_Ns;
     float m_Ni;
+    int m_isMapKd;
+    std::shared_ptr<Texture2D> m_mapKd;
 
 private:
     friend class Model;
