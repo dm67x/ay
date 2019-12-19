@@ -8,7 +8,8 @@ Library.__index = Library
 local jsons = {
     "sdl2.json",
     "glad.json",
-    "glm.json"
+    "glm.json",
+    "stb.json"
 }
 
 local contents = {}

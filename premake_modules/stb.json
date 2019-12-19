@@ -1,0 +1,15 @@
+{
+    "include": "third_party/include/stb",
+    "x64": {
+        "vs": {
+            "debug": {
+                "bin": "",
+                "libs": [ ]
+            },
+            "release": {
+                "bin": "",
+                "libs": [ ]
+            }
+        }
+    }
+}
