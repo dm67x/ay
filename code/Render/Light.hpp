@@ -11,5 +11,5 @@ struct Light : public SceneEntity
     float power = 10.f;
 
 public:
-    virtual void draw(const ShaderProgram&) const override;
+    virtual void draw(const Shader&) const override;
 };

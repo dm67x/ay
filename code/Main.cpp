@@ -3,6 +3,7 @@
 #include "Render/Camera.hpp"
 #include "Render/Model.hpp"
 #include "Render/Shader.hpp"
+#include "Render/ShaderManager.hpp"
 #include "Render/Light.hpp"
 
 #include <stdexcept>
@@ -18,16 +19,14 @@ int main(int argc, char** argv)
 
     try {
         Device device{ 800, 800 };
+        ShaderManager shmgr;
         auto mainScene = SceneManager::instance().getRoot()->create();
 
         // Shader
-        Shader<GL_VERTEX_SHADER> vertex;
-        Shader<GL_FRAGMENT_SHADER> fragment;
-        ShaderProgram program{ vertex, fragment };
-
-        vertex.fromFile("shaders/phong_vert.glsl");
-        fragment.fromFile("shaders/phong_frag.glsl");
-        program.build();
+        shmgr.create("Standard");
+        shmgr["Standard"]->vertex().fromFile("shaders/phong_vert.glsl");
+        shmgr["Standard"]->fragment().fromFile("shaders/phong_frag.glsl");
+        shmgr["Standard"]->build();
 
         // Node
         auto cameraNode = mainScene->create();
@@ -43,7 +42,7 @@ int main(int argc, char** argv)
 
         // object
         Model object;
-        if (object.load("models/container")) {
+        if (object.load("models/dodge")) {
             objectNode->attach(&object);
         }
 
@@ -75,10 +74,10 @@ int main(int argc, char** argv)
             }
             
             object.rotate(glm::radians(rotationAmount++), glm::vec3(0, 1, 0));
-            program.use();
-            program.uniform("projectionMatrix", projection);
-            SceneManager::instance().render(program);
-            program.reset();
+            shmgr["Standard"]->use();
+            shmgr["Standard"]->uniform("projectionMatrix", projection);
+            SceneManager::instance().render(*shmgr["Standard"]);
+            shmgr["Standard"]->reset();
         }
     }
     catch (const std::exception & e) {

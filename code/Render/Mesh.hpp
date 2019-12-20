@@ -6,6 +6,7 @@
 #include <vector>
 #include <string>
 #include <glad/glad.h>
+#include <cstdint>
 
 class Mesh
 {

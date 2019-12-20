@@ -5,7 +5,7 @@
 #include <memory>
 
 class Texture2D;
-class ShaderProgram;
+class Shader;
 
 class Material
 {
@@ -27,7 +27,7 @@ public:
     virtual ~Material() = default;
 
 public:
-    void use(const ShaderProgram&) const;
+    void use(const Shader&) const;
 
 public:
     inline const std::string& name() const { return m_name; }

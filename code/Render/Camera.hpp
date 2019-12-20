@@ -15,7 +15,7 @@ public:
 
 public:
     void target(const glm::vec3&);
-    void draw(const ShaderProgram&) const override;
+    void draw(const Shader&) const override;
     glm::mat4 view() const;
 
 public:

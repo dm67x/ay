@@ -19,7 +19,7 @@ Material::Material(const std::string& name)
 {
 }
 
-void Material::use(const ShaderProgram& program) const
+void Material::use(const Shader& program) const
 {
     program.uniform("Ka", m_Ka);
     program.uniform("Ks", m_Ks);

@@ -6,23 +6,31 @@
 #include <fstream>
 #include <streambuf>
 
-template<GLenum T>
-Shader<T>::Shader()
-    : m_id{ 0 }
+void Shader::ShaderInst::fromMemory(const std::string& source) const
 {
-    m_id = glCreateShader(T);
+    const GLchar* src = static_cast<const GLchar*>(source.data());
+    const GLint size = static_cast<const GLint>(source.size());
+    glShaderSource(id, 1, &src, &size);
     glCheckError();
+    glCompileShader(id);
+    glCheckError();
+    GLint status = 0;
+    glGetShaderiv(id, GL_COMPILE_STATUS, &status);
+    glCheckError();
+    if (status == GL_FALSE) {
+        std::vector<GLchar> log;
+        GLint logSize;
+        glGetShaderiv(id, GL_INFO_LOG_LENGTH, &logSize);
+        glCheckError();
+        log.resize(logSize);
+        glGetShaderInfoLog(id, logSize, nullptr, &log[0]);
+        glCheckError();
+        std::string logStr(log.begin(), log.end());
+        std::cerr << logStr << std::endl;
+    }
 }
 
-template<GLenum T>
-Shader<T>::~Shader()
-{
-    glDeleteShader(m_id);
-    glCheckError();
-}
-
-template<GLenum T>
-void Shader<T>::fromFile(const std::string& source) const
+void Shader::ShaderInst::fromFile(const std::string& source) const
 {
     std::ifstream file(source);
     if (file.is_open()) {
@@ -33,65 +41,31 @@ void Shader<T>::fromFile(const std::string& source) const
     }
 }
 
-template<GLenum T>
-void Shader<T>::fromMemory(const std::string& source) const
-{
-    const GLchar* src = static_cast<const GLchar*>(source.data());
-    const GLint size = static_cast<const GLint>(source.size());
-    glShaderSource(m_id, 1, &src, &size);
-    glCheckError();
-    glCompileShader(m_id);
-    glCheckError();
-    GLint status = 0;
-    glGetShaderiv(m_id, GL_COMPILE_STATUS, &status);
-    glCheckError();
-    if (status == GL_FALSE) {
-        std::vector<GLchar> log;
-        GLint logSize;
-        glGetShaderiv(m_id, GL_INFO_LOG_LENGTH, &logSize);
-        glCheckError();
-        log.resize(logSize);
-        glGetShaderInfoLog(m_id, logSize, nullptr, &log[0]);
-        glCheckError();
-        std::string logStr(log.begin(), log.end());
-        std::cerr << logStr << std::endl;
-    }
-}
-
-// Instantiations for export
-template Shader<GL_VERTEX_SHADER>::Shader();
-template Shader<GL_FRAGMENT_SHADER>::Shader();
-template Shader<GL_VERTEX_SHADER>::~Shader();
-template Shader<GL_FRAGMENT_SHADER>::~Shader();
-template void Shader<GL_VERTEX_SHADER>::fromFile(const std::string&) const;
-template void Shader<GL_FRAGMENT_SHADER>::fromFile(const std::string&) const;
-template void Shader<GL_VERTEX_SHADER>::fromMemory(const std::string&) const;
-template void Shader<GL_FRAGMENT_SHADER>::fromMemory(const std::string&) const;
-
 // Shader program
-ShaderProgram::ShaderProgram(
-    const Shader<GL_VERTEX_SHADER>& vert, 
-    const Shader<GL_FRAGMENT_SHADER>& frag
-)
+Shader::Shader()
     : m_id{ 0 },
-    m_vertex{ vert },
-    m_fragment{ frag }
+    m_vertex{ ShaderInst{ 0, GL_VERTEX_SHADER } },
+    m_fragment{ ShaderInst{ 0, GL_FRAGMENT_SHADER } }
 {
     m_id = glCreateProgram();
     glCheckError();
+    m_vertex.id = glCreateShader(m_vertex.type);
+    glCheckError();
+    m_fragment.id = glCreateShader(m_fragment.type);
+    glCheckError();
 }
 
-ShaderProgram::~ShaderProgram()
+Shader::~Shader()
 {
     glDeleteProgram(m_id);
     glCheckError();
 }
 
-bool ShaderProgram::build() const
+bool Shader::build() const
 {
-    glAttachShader(m_id, m_vertex.m_id);
+    glAttachShader(m_id, m_vertex.id);
     glCheckError();
-    glAttachShader(m_id, m_fragment.m_id);
+    glAttachShader(m_id, m_fragment.id);
     glCheckError();
 
     glLinkProgram(m_id);
@@ -112,27 +86,27 @@ bool ShaderProgram::build() const
         return false;
     }
 
-    glDetachShader(m_id, m_vertex.m_id);
+    glDetachShader(m_id, m_vertex.id);
     glCheckError();
-    glDetachShader(m_id, m_fragment.m_id);
+    glDetachShader(m_id, m_fragment.id);
     glCheckError();
 
     return true;
 }
 
-void ShaderProgram::use() const
+void Shader::use() const
 {
     glUseProgram(m_id);
     glCheckError();
 }
 
-void ShaderProgram::reset() const
+void Shader::reset() const
 {
     glUseProgram(0);
     glCheckError();
 }
 
-void ShaderProgram::uniform(const std::string& name, glm::mat4 value) const
+void Shader::uniform(const std::string& name, glm::mat4 value) const
 {
     GLint loc = glGetUniformLocation(m_id, name.c_str());
     glCheckError();
@@ -140,7 +114,7 @@ void ShaderProgram::uniform(const std::string& name, glm::mat4 value) const
     glCheckError();
 }
 
-void ShaderProgram::uniform(const std::string& name, glm::mat3 value) const
+void Shader::uniform(const std::string& name, glm::mat3 value) const
 {
     GLint loc = glGetUniformLocation(m_id, name.c_str());
     glCheckError();
@@ -148,7 +122,7 @@ void ShaderProgram::uniform(const std::string& name, glm::mat3 value) const
     glCheckError();
 }
 
-void ShaderProgram::uniform(const std::string& name, glm::vec4 value) const
+void Shader::uniform(const std::string& name, glm::vec4 value) const
 {
     GLint loc = glGetUniformLocation(m_id, name.c_str());
     glCheckError();
@@ -156,7 +130,7 @@ void ShaderProgram::uniform(const std::string& name, glm::vec4 value) const
     glCheckError();
 }
 
-void ShaderProgram::uniform(const std::string& name, glm::vec3 value) const
+void Shader::uniform(const std::string& name, glm::vec3 value) const
 {
     GLint loc = glGetUniformLocation(m_id, name.c_str());
     glCheckError();
@@ -164,7 +138,7 @@ void ShaderProgram::uniform(const std::string& name, glm::vec3 value) const
     glCheckError();
 }
 
-void ShaderProgram::uniform(const std::string& name, glm::vec2 value) const
+void Shader::uniform(const std::string& name, glm::vec2 value) const
 {
     GLint loc = glGetUniformLocation(m_id, name.c_str());
     glCheckError();
@@ -172,7 +146,7 @@ void ShaderProgram::uniform(const std::string& name, glm::vec2 value) const
     glCheckError();
 }
 
-void ShaderProgram::uniform(const std::string& name, GLfloat value) const
+void Shader::uniform(const std::string& name, GLfloat value) const
 {
     GLint loc = glGetUniformLocation(m_id, name.c_str());
     glCheckError();
@@ -180,7 +154,7 @@ void ShaderProgram::uniform(const std::string& name, GLfloat value) const
     glCheckError();
 }
 
-void ShaderProgram::uniform(const std::string& name, GLint value) const
+void Shader::uniform(const std::string& name, GLint value) const
 {
     GLint loc = glGetUniformLocation(m_id, name.c_str());
     glCheckError();

@@ -24,7 +24,7 @@ public:
     SceneNode* create();
     void attach(SceneEntity*);
     void position(glm::vec3);
-    virtual void draw(const ShaderProgram&) const;
+    virtual void draw(const Shader&) const;
 
 public:
     inline glm::vec3 position() const { return m_position; }

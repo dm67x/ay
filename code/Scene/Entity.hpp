@@ -6,5 +6,5 @@
 class SceneEntity : public Transform
 {
 public:
-    virtual void draw(const ShaderProgram&) const = 0;
+    virtual void draw(const Shader&) const = 0;
 };

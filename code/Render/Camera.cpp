@@ -20,7 +20,7 @@ glm::mat4 Camera::view() const
         glm::vec3(0, 1, 0));
 }
 
-void Camera::draw(const ShaderProgram& program) const
+void Camera::draw(const Shader& program) const
 {
     auto position = transform() * glm::vec4(1.f);
 

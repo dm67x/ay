@@ -5,36 +5,28 @@
 #include <functional>
 #include <glm/glm.hpp>
 
-template<GLenum T>
 class Shader final
 {
     GLuint m_id;
 
-private:
-    friend class ShaderProgram;
+    struct ShaderInst
+    {
+        GLuint id;
+        GLenum type;
 
-public:
-    Shader();
-    ~Shader();
+        void fromMemory(const std::string&) const;
+        void fromFile(const std::string&) const;
+    };
 
-public:
-    void fromFile(const std::string&) const;
-    void fromMemory(const std::string&) const;
-};
-
-class ShaderProgram final
-{
-    GLuint m_id;
-    const Shader<GL_VERTEX_SHADER>& m_vertex;
-    const Shader<GL_FRAGMENT_SHADER>& m_fragment;
+    ShaderInst m_vertex;
+    ShaderInst m_fragment;
 
 private:
     friend class Material;
 
 public:
-    ShaderProgram(const Shader<GL_VERTEX_SHADER>&,
-        const Shader<GL_FRAGMENT_SHADER>&);
-    ~ShaderProgram();
+    Shader();
+    ~Shader();
 
 public:
     bool build() const;
@@ -47,4 +39,8 @@ public:
     void uniform(const std::string&, glm::vec2) const;
     void uniform(const std::string&, GLfloat) const;
     void uniform(const std::string&, GLint) const;
+
+public:
+    inline ShaderInst& vertex() { return m_vertex; }
+    inline ShaderInst& fragment() { return m_fragment; }
 };

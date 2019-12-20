@@ -178,7 +178,7 @@ void Model::build() const
     }
 }
 
-void Model::draw(const ShaderProgram& program) const
+void Model::draw(const Shader& program) const
 {
     program.uniform("modelMatrix", transform());
 

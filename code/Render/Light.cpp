@@ -1,6 +1,6 @@
 #include "Light.hpp"
 
-void Light::draw(const ShaderProgram& program) const
+void Light::draw(const Shader& program) const
 {
     program.uniform("lightPosition", position);
     program.uniform("lightPower", power);

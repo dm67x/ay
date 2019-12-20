@@ -24,5 +24,5 @@ public:
 public:
     bool load(const std::string&);
     void build() const;
-    void draw(const ShaderProgram&) const override;
+    void draw(const Shader&) const override;
 };
