@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Scene/Entity.hpp"
-#include "Render/Material.hpp"
+#include "scene/entity.h"
+#include "material.h"
 
 #include <vector>
 #include <glad/glad.h>

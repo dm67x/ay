@@ -11,7 +11,7 @@ project "Ay"
     targetdir "bin/%{cfg.buildcfg}"
 
     sysincludedirs { "code" }
-    files { "code/**.hpp", "code/**.cpp" }
+    files { "code/**.h", "code/**.cc" }
 
     filter "configurations:Debug"
         defines { "DEBUG" }

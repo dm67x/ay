@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Scene/Entity.hpp"
+#include "scene/entity.h"
 
 #include <glm/glm.hpp>
 

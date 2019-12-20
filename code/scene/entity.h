@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Render/Transform.hpp"
-#include "Render/Shader.hpp"
+#include "render/transform.h"
+#include "render/shader.h"
 
 class SceneEntity : public Transform
 {

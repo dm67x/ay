@@ -1,6 +1,6 @@
-#include "Material.hpp"
-#include "Texture2D.hpp"
-#include "Shader.hpp"
+#include "material.h"
+#include "texture_2d.h"
+#include "shader.h"
 
 #include <iostream>
 #include <fstream>

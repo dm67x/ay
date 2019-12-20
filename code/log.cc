@@ -1,4 +1,4 @@
-#include "Log.hpp"
+#include "log.h"
 
 GLenum glCheckError_(const char* file, int line)
 {

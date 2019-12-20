@@ -1,5 +1,5 @@
-#include "ShaderManager.hpp"
-#include "Shader.hpp"
+#include "shader_manager.h"
+#include "shader.h"
 
 ShaderManager::ShaderManager()
     : m_shaders{}

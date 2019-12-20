@@ -1,10 +1,10 @@
-#include "Device.hpp"
-#include "Scene/Manager.hpp"
-#include "Render/Camera.hpp"
-#include "Render/Model.hpp"
-#include "Render/Shader.hpp"
-#include "Render/ShaderManager.hpp"
-#include "Render/Light.hpp"
+#include "device.h"
+#include "scene/manager.h"
+#include "render/camera.h"
+#include "render/model.h"
+#include "render/shader.h"
+#include "render/shader_manager.h"
+#include "render/light.h"
 
 #include <stdexcept>
 #include <iostream>
@@ -20,7 +20,9 @@ int main(int argc, char** argv)
     try {
         Device device{ 800, 800 };
         ShaderManager shmgr;
-        auto mainScene = SceneManager::instance().getRoot()->create();
+        SceneManager smgr;
+
+        auto mainScene = smgr.getRoot().create();
 
         // Shader
         shmgr.create("Standard");
@@ -76,7 +78,7 @@ int main(int argc, char** argv)
             object.rotate(glm::radians(rotationAmount++), glm::vec3(0, 1, 0));
             shmgr["Standard"]->use();
             shmgr["Standard"]->uniform("projectionMatrix", projection);
-            SceneManager::instance().render(*shmgr["Standard"]);
+            smgr.render(*shmgr["Standard"]);
             shmgr["Standard"]->reset();
         }
     }

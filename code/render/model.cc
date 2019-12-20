@@ -1,7 +1,7 @@
-#include "Model.hpp"
-#include "Mesh.hpp"
-#include "Log.hpp"
-#include "Texture2D.hpp"
+#include "model.h"
+#include "mesh.h"
+#include "log.h"
+#include "texture_2d.h"
 
 #include <fstream>
 #include <sstream>

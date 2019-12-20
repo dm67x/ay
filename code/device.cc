@@ -1,4 +1,4 @@
-#include "Device.hpp"
+#include "device.h"
 
 #include <stdexcept>
 #include <sstream>

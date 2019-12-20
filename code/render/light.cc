@@ -1,4 +1,4 @@
-#include "Light.hpp"
+#include "light.h"
 
 void Light::draw(const Shader& program) const
 {

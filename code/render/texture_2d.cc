@@ -1,5 +1,5 @@
-#include "Texture2D.hpp"
-#include "Log.hpp"
+#include "texture_2D.h"
+#include "log.h"
 
 #include <iostream>
 

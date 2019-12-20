@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Timer.hpp"
+#include "timer.h"
 
 #include <glad/glad.h>
 #include <SDL.h>

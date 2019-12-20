@@ -1,4 +1,4 @@
-#include "Camera.hpp"
+#include "camera.h"
 
 Camera::Camera()
     : m_target{ glm::vec3(0, 0, 1) }

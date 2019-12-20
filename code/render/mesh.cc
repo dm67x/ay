@@ -1,5 +1,5 @@
-#include "Mesh.hpp"
-#include "Log.hpp"
+#include "mesh.h"
+#include "log.h"
 
 Mesh::Mesh()
     : m_faces{},

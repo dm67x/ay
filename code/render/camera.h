@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Scene/Entity.hpp"
-#include "Transform.hpp"
+#include "scene/entity.h"
+#include "transform.h"
 
 #include <glm/glm.hpp>
 

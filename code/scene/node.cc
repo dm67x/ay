@@ -1,5 +1,5 @@
-#include "Node.hpp"
-#include "Entity.hpp"
+#include "node.h"
+#include "entity.h"
 
 SceneNode::SceneNode()
     : m_nodes{},

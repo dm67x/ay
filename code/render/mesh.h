@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Vertex.hpp"
-#include "Transform.hpp"
+#include "vertex.h"
+#include "transform.h"
 
 #include <vector>
 #include <string>
