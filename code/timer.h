@@ -4,9 +4,8 @@
 
 class Timer
 {
-    uint64_t m_oldTime;
+    double m_oldTime;
     double m_elapsedTime;
-    static const uint64_t TICKS_PER_SECONDS;
 
 public:
     Timer();

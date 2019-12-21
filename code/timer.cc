@@ -1,8 +1,6 @@
 #include "timer.h"
 
-#include <SDL.h>
-
-const uint64_t Timer::TICKS_PER_SECONDS = SDL_GetPerformanceFrequency();
+#include <GLFW/glfw3.h>
 
 Timer::Timer()
     : m_oldTime{ 0 },
@@ -12,8 +10,8 @@ Timer::Timer()
 
 void Timer::update()
 {
-    const uint64_t currentTime = SDL_GetPerformanceCounter();
-    const uint64_t deltaTime =  currentTime - m_oldTime;
+    const double currentTime = glfwGetTime();
+    const double deltaTime =  currentTime - m_oldTime;
     m_oldTime = currentTime;
-    m_elapsedTime = deltaTime / static_cast<double>(TICKS_PER_SECONDS);
+    m_elapsedTime = deltaTime;
 }

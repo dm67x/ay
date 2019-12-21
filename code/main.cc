@@ -60,8 +60,9 @@ int main(int argc, char** argv)
         while (device.run()) {
             device.clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-            float width = static_cast<float>(device.width());
-            float height = static_cast<float>(device.height());
+            auto wsize = device.size();
+            float width = static_cast<float>(wsize.first);
+            float height = static_cast<float>(wsize.second);
             glm::mat4 projection = glm::mat4();
 
             if (width > height) {
