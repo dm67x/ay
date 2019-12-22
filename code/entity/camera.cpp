@@ -1,7 +1,9 @@
-#include "camera.h"
+#include "camera.hpp"
+#include "shader/shader.hpp"
 
 Camera::Camera()
-    : m_target{ glm::vec3(0, 0, 1) }
+    : m_target{ glm::vec3(0, 0, 1) },
+    m_projection{ glm::mat4() }
 {
 }
 
@@ -20,10 +22,16 @@ glm::mat4 Camera::view() const
         glm::vec3(0, 1, 0));
 }
 
+void Camera::projection(const glm::mat4& p)
+{
+    m_projection = p;
+}
+
 void Camera::draw(const Shader& program) const
 {
     auto position = transform() * glm::vec4(1.f);
 
+    program.uniform("projectionMatrix", m_projection);
     program.uniform("viewMatrix", view());
     program.uniform("cameraPosition", 
         glm::vec3(position.x, position.y, position.z));

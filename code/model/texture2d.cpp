@@ -1,5 +1,5 @@
-#include "texture_2D.h"
-#include "log.h"
+#include "texture2d.hpp"
+#include "log.hpp"
 
 #include <iostream>
 #include <stb_image.h>

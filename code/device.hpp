@@ -1,6 +1,6 @@
 #pragma once
 
-#include "timer.h"
+#include "timer.hpp"
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>

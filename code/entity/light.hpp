@@ -1,10 +1,10 @@
 #pragma once
 
-#include "scene/entity.h"
+#include "entity.hpp"
 
 #include <glm/glm.hpp>
 
-struct Light : public SceneEntity
+struct Light : public Entity
 {
     glm::vec3 position = glm::vec3(0);
     glm::vec3 color = glm::vec3(1);

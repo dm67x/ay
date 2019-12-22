@@ -21,6 +21,7 @@ class Material
 
 private:
     friend class Model;
+    friend class Scene;
 
 public:
     Material(const std::string&);
