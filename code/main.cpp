@@ -19,24 +19,21 @@ int main(int argc, char** argv)
         Device device{ 800, 800 };
         Scene mainScene{ "main" };
         ShaderManager shmgr;
-        Camera mainCamera;
+        Camera mainCamera{ 1.f };
 
         // Shader
         auto shader = shmgr.create("Standard");
-        shader->vertex().fromFile("shaders/phong_vert.glsl");
-        shader->fragment().fromFile("shaders/phong_frag.glsl");
+        shader->vertex().fromFile("../shaders/phong_vert.glsl");
+        shader->fragment().fromFile("../shaders/phong_frag.glsl");
         shader->build();
 
         // Scene
-        if (!mainScene.load("models/cube.glb")) {
+        if (!mainScene.load("../models/suzanne.glb")) {
             std::cout << "cannot load scene" << std::endl;
         }
 
         // Camera
-        mainCamera.translate(glm::vec3(0, 0, -10));
-        mainCamera.target(glm::vec3(0));
-        mainCamera.rotate(glm::radians(20.f), glm::vec3(1, 0, 0));
-
+        mainCamera.translate(glm::vec3(0, 0, -5));
         float rotationAmount = 0;
 
         // run
@@ -46,20 +43,14 @@ int main(int argc, char** argv)
             auto wsize = device.size();
             float width = static_cast<float>(wsize.first);
             float height = static_cast<float>(wsize.second);
-            glm::mat4 projection = glm::mat4();
+            float ratio = width / height;
 
-            if (width > height) {
-                projection = glm::perspective(70.f,
-                    width / height,
-                    1.f, 50.f);
-            }
-            else {
-                projection = glm::perspective(70.f,
-                    height / width,
-                    1.f, 50.f);
+            if (width < height) {
+                ratio = height / width;
             }
 
-            mainCamera.projection(projection);
+            mainCamera.aspectRatio(ratio);
+            mainCamera.rotate(glm::radians(rotationAmount++), glm::vec3(0, 1, 0));
 
             shmgr["Standard"]->use();
             mainCamera.draw(*shmgr["Standard"]);

@@ -1,13 +1,16 @@
 #include "mesh.hpp"
 #include "log.hpp"
 #include "shader/shader.hpp"
+#include "model/material.hpp"
 
 Mesh::Mesh()
     : m_vertices{},
     m_indices{},
     m_vbo{ 0 },
     m_vao{ 0 },
-    m_ebo{ 0 }
+    m_ebo{ 0 },
+    m_mode{ GL_TRIANGLES },
+    m_material{ nullptr }
 {
     glGenVertexArrays(1, &m_vao);
     glCheckError();
@@ -25,31 +28,8 @@ Mesh::~Mesh()
     glCheckError();
 }
 
-//size_t Mesh::addVertex(const Vertex& vertex)
-//{
-//    auto it = std::find(m_vertices.begin(), m_vertices.end(), vertex);
-//    if (it != m_vertices.end())
-//        return it - m_vertices.begin();
-//
-//    m_vertices.push_back(vertex);
-//    return m_vertices.size() - 1;
-//}
-//
-//void Mesh::addFace(const std::vector<size_t>& indices)
-//{
-//    m_faces.push_back(indices);
-//}
-
 void Mesh::build()
 {
-    /*m_indices.clear();
-
-    for (auto face : m_faces) {
-        for (auto f : face) {
-            m_indices.push_back(static_cast<GLuint>(f));
-        }
-    }*/
-
     glBindVertexArray(m_vao);
     glCheckError();
 
@@ -109,13 +89,15 @@ void Mesh::build()
 void Mesh::draw(const Shader& shader) const
 {
     shader.uniform("modelMatrix", transform());
-    //m_material->use(shader);
+    
+    if (m_material)
+        m_material->use(shader);
 
     glBindVertexArray(m_vao);
     glCheckError();
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo);
     glCheckError();
-    glDrawElements(GL_TRIANGLES,
+    glDrawElements(m_mode,
         (GLsizei)m_indices.size(), GL_UNSIGNED_INT, 0);
     glCheckError();
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);

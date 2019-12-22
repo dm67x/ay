@@ -10,14 +10,13 @@ class Shader;
 class Material
 {
     std::string m_name;
-    glm::vec3 m_Ka;
-    glm::vec3 m_Kd;
-    glm::vec3 m_Ks;
-    glm::vec3 m_Ke;
-    float m_Ns;
-    float m_Ni;
-    int m_isMapKd;
-    std::shared_ptr<Texture2D> m_mapKd;
+    glm::vec4 m_baseColorFactor;
+    float m_metallicFactor;
+    float m_roughnessFactor;
+    glm::vec3 m_emissiveFactor;
+    std::shared_ptr<Texture2D> m_baseColorTexture;
+    std::shared_ptr<Texture2D> m_metallicRoughnessTexture;
+    std::shared_ptr<Texture2D> m_normalTexture;
 
 private:
     friend class Model;

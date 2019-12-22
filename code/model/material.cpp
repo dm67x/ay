@@ -8,29 +8,41 @@
 
 Material::Material(const std::string& name)
     : m_name{ name },
-    m_Ka{ glm::vec3(1) },
-    m_Kd{ glm::vec3(1) },
-    m_Ks{ glm::vec3(0) },
-    m_Ke{ glm::vec3(0) },
-    m_Ns{ 0 },
-    m_Ni{ 0 },
-    m_isMapKd{ 0 },
-    m_mapKd{ nullptr }
+    m_baseColorFactor{ glm::vec4(1) },
+    m_metallicFactor{ 0 },
+    m_roughnessFactor{ 0 },
+    m_emissiveFactor{ glm::vec3(0) },
+    m_baseColorTexture{ nullptr },
+    m_metallicRoughnessTexture{ nullptr },
+    m_normalTexture{ nullptr }
 {
 }
 
 void Material::use(const Shader& program) const
 {
-    program.uniform("Ka", m_Ka);
-    program.uniform("Ks", m_Ks);
-    program.uniform("Kd", m_Kd);
-    program.uniform("Ke", m_Ke);
-    program.uniform("Ns", m_Ns);
-    program.uniform("Ni", m_Ni);
-    program.uniform("mapKdValid", m_isMapKd);
+    program.uniform("baseColorFactor", m_baseColorFactor);
+    program.uniform("metallicFactor", m_metallicFactor);
+    program.uniform("roughnessFactor", m_roughnessFactor);
+    program.uniform("emissiveFactor", m_emissiveFactor);
+    program.uniform("isBaseColorTexture", 0);
+    program.uniform("isMetallicRoughnessTexture", 0);
+    program.uniform("isNormalTexture", 0);
 
-    if (m_isMapKd && m_mapKd) {
-        m_mapKd->bind(0);
-        program.uniform("mapKd", 0);
+    if (m_baseColorTexture) {
+        program.uniform("isBaseColorTexture", 1);
+        m_baseColorTexture->bind(0);
+        program.uniform("baseColorTexture", 0);
+    }
+
+    if (m_metallicRoughnessTexture) {
+        program.uniform("isMetallicRoughnessTexture", 1);
+        m_metallicRoughnessTexture->bind(1);
+        program.uniform("metallicRoughnessTexture", 1);
+    }
+
+    if (m_metallicRoughnessTexture) {
+        program.uniform("isNormalTexture", 1);
+        m_normalTexture->bind(2);
+        program.uniform("normalTexture", 2);
     }
 }

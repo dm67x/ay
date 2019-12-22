@@ -1,9 +1,12 @@
 #include "camera.hpp"
 #include "shader/shader.hpp"
 
-Camera::Camera()
-    : m_target{ glm::vec3(0, 0, 1) },
-    m_projection{ glm::mat4() }
+Camera::Camera(float aspectRatio)
+    : m_target{ glm::vec3(0) },
+    m_fov{ glm::radians(90.f) },
+    m_zNear{ 0.1f },
+    m_zFar{ 100.f },
+    m_aspectRatio{ aspectRatio }
 {
 }
 
@@ -12,7 +15,12 @@ void Camera::target(const glm::vec3& target)
     m_target = target;
 }
 
-glm::mat4 Camera::view() const
+void Camera::aspectRatio(float aspectRatio)
+{
+    m_aspectRatio = aspectRatio;
+}
+
+glm::mat4 Camera::viewMatrix() const
 {
     auto position = transform() * glm::vec4(1.f);
 
@@ -22,17 +30,22 @@ glm::mat4 Camera::view() const
         glm::vec3(0, 1, 0));
 }
 
-void Camera::projection(const glm::mat4& p)
+glm::mat4 Camera::projectionMatrix() const
 {
-    m_projection = p;
+    return glm::perspective(
+        m_fov,
+        m_aspectRatio,
+        m_zNear,
+        m_zFar
+    );
 }
 
 void Camera::draw(const Shader& program) const
 {
     auto position = transform() * glm::vec4(1.f);
 
-    program.uniform("projectionMatrix", m_projection);
-    program.uniform("viewMatrix", view());
+    program.uniform("projectionMatrix", projectionMatrix());
+    program.uniform("viewMatrix", viewMatrix());
     program.uniform("cameraPosition", 
         glm::vec3(position.x, position.y, position.z));
 }

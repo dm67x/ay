@@ -8,15 +8,17 @@
 #include <glad/glad.h>
 #include <cstdint>
 
+class Material;
+
 class Mesh : public Entity
 {
-    //std::vector<std::vector<size_t>> m_faces;
     std::vector<Vertex> m_vertices;
     std::vector<GLuint> m_indices;
     GLuint m_vbo;
     GLuint m_vao;
     GLuint m_ebo;
-    // Material
+    GLenum m_mode;
+    std::shared_ptr<Material> m_material;
 
 private:
     friend class Scene;
@@ -26,19 +28,6 @@ public:
     ~Mesh();
 
 public:
-    /*size_t addVertex(const Vertex&);
-    void addFace(const std::vector<size_t>&);*/
     void build();
     void draw(const Shader&) const override;
-
-public:
-    /*inline const std::vector<std::vector<size_t>>& faces() const
-    { 
-        return m_faces; 
-    }
-
-    inline const std::vector<Vertex>& vertices() const
-    {
-        return m_vertices;
-    }*/
 };

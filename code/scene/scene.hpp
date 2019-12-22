@@ -17,8 +17,9 @@ class Scene
     std::vector<std::shared_ptr<Material>> m_materials;
 
 private:
+    int accessorSize(const tinygltf::Accessor&) const;
     void processNode(const tinygltf::Node&, int = -1);
-    std::shared_ptr<Entity> processMesh(const tinygltf::Mesh&);
+    size_t processMesh(const tinygltf::Mesh&);
     std::shared_ptr<Entity> processCamera(const tinygltf::Camera&);
 
 public:
