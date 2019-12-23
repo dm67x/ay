@@ -26,7 +26,7 @@ int main(void)
         float rotationAmount = 0;
 
         // Loader
-        if (!loader.load("../models/DamagedHelmet.glb")) {
+        if (!loader.load("../models/little_tokyo.glb")) {
             throw std::exception("cannot load glTF file");
         }
 

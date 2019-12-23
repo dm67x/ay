@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include <glm/gtx/matrix_decompose.hpp>
+#include <regex>
 
 glTFLoader::glTFLoader()
     : m_loader{},
@@ -299,7 +300,21 @@ GLenum glTFLoader::textureFilter(int texture) const
 bool glTFLoader::load(const std::string& filename)
 {
     std::string err, warn;
-    bool ret = m_loader.LoadBinaryFromFile(&m_model, &err, &warn, filename);
+    bool ret = false;
+
+    std::regex extensionRegex{ ".*\\.(.+)$" };
+    std::smatch sm;
+    if (std::regex_match(filename, sm, extensionRegex)) {
+        if (sm[1] == "glb") {
+            ret = m_loader.LoadBinaryFromFile(&m_model, &err, &warn, filename);
+        }
+        else if (sm[1] == "gltf") {
+            ret = m_loader.LoadASCIIFromFile(&m_model, &err, &warn, filename);
+        }
+        else {
+            throw std::exception("file extension not supported");
+        }
+    }
 
     if (!warn.empty()) {
         std::cout << "warn: " << warn << std::endl;
