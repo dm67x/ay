@@ -16,7 +16,7 @@ private:
     friend class Scene;
 
 public:
-    Camera(float);
+    Camera(const std::string&, float);
     ~Camera() = default;
 
 public:

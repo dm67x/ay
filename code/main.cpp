@@ -19,7 +19,7 @@ int main(int argc, char** argv)
         Device device{ 800, 800 };
         Scene mainScene{ "main" };
         ShaderManager shmgr;
-        Camera mainCamera{ 1.f };
+        Camera mainCamera{ "mainCamera", 1.f };
 
         // Shader
         auto shader = shmgr.create("Standard");
@@ -28,12 +28,12 @@ int main(int argc, char** argv)
         shader->build();
 
         // Scene
-        if (!mainScene.load("../models/suzanne.glb")) {
+        if (!mainScene.load("../models/DamagedHelmet.glb")) {
             std::cout << "cannot load scene" << std::endl;
         }
 
         // Camera
-        mainCamera.translate(glm::vec3(0, 0, -5));
+        mainCamera.translate(glm::vec3(0, 0, -2));
         float rotationAmount = 0;
 
         // run
@@ -50,7 +50,10 @@ int main(int argc, char** argv)
             }
 
             mainCamera.aspectRatio(ratio);
-            mainCamera.rotate(glm::radians(rotationAmount++), glm::vec3(0, 1, 0));
+            //mainCamera.rotate(glm::radians(rotationAmount++), glm::vec3(0, 1, 0));
+
+            mainScene.get("mesh_helmet_LP_13930damagedHelmet")
+                ->rotate(glm::radians(rotationAmount++), glm::vec3(0, 1, 0));
 
             shmgr["Standard"]->use();
             mainCamera.draw(*shmgr["Standard"]);

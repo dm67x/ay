@@ -1,8 +1,9 @@
 #include "camera.hpp"
 #include "shader/shader.hpp"
 
-Camera::Camera(float aspectRatio)
-    : m_target{ glm::vec3(0) },
+Camera::Camera(const std::string& name, float aspectRatio)
+    : Entity(name),
+    m_target{ glm::vec3(0) },
     m_fov{ glm::radians(90.f) },
     m_zNear{ 0.1f },
     m_zFar{ 100.f },

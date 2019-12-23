@@ -19,7 +19,7 @@ class Scene
 private:
     int accessorSize(const tinygltf::Accessor&) const;
     void processNode(const tinygltf::Node&, int = -1);
-    size_t processMesh(const tinygltf::Mesh&);
+    std::shared_ptr<Entity> processMesh(const tinygltf::Mesh&);
     std::shared_ptr<Entity> processCamera(const tinygltf::Camera&);
 
 public:
@@ -29,4 +29,5 @@ public:
 public:
     bool load(const std::string&);
     void draw(const Shader&) const;
+    std::shared_ptr<Entity> get(const std::string&) const;
 };

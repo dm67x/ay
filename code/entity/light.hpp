@@ -11,5 +11,6 @@ struct Light : public Entity
     float power = 10.f;
 
 public:
+    Light(const std::string&);
     virtual void draw(const Shader&) const override;
 };

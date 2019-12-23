@@ -3,7 +3,7 @@
 #include "shader/shader.hpp"
 #include "model/material.hpp"
 
-Mesh::Mesh()
+Mesh::MeshPrimitive::MeshPrimitive()
     : m_vertices{},
     m_indices{},
     m_vbo{ 0 },
@@ -20,7 +20,7 @@ Mesh::Mesh()
     glCheckError();
 }
 
-Mesh::~Mesh()
+Mesh::MeshPrimitive::~MeshPrimitive()
 {
     glDeleteBuffers(1, &m_vbo);
     glCheckError();
@@ -28,7 +28,32 @@ Mesh::~Mesh()
     glCheckError();
 }
 
-void Mesh::build()
+Vertex& Mesh::MeshPrimitive::operator[](int index)
+{
+    return m_vertices.at(index);
+}
+
+void Mesh::MeshPrimitive::add(const Vertex& vert)
+{
+    m_vertices.push_back(vert);
+}
+
+void Mesh::MeshPrimitive::add(GLuint indice)
+{
+    m_indices.push_back(indice);
+}
+
+void Mesh::MeshPrimitive::set(GLenum mode)
+{
+    m_mode = mode;
+}
+
+void Mesh::MeshPrimitive::set(const Material& mat)
+{
+    m_material = std::make_shared<Material>(mat);
+}
+
+void Mesh::MeshPrimitive::build() const
 {
     glBindVertexArray(m_vao);
     glCheckError();
@@ -86,10 +111,8 @@ void Mesh::build()
     glCheckError();
 }
 
-void Mesh::draw(const Shader& shader) const
+void Mesh::MeshPrimitive::draw(const Shader& shader) const
 {
-    shader.uniform("modelMatrix", transform());
-    
     if (m_material)
         m_material->use(shader);
 
@@ -104,4 +127,31 @@ void Mesh::draw(const Shader& shader) const
     glCheckError();
     glBindVertexArray(0);
     glCheckError();
+}
+
+Mesh::Mesh(const std::string& name)
+    : Entity(name),
+    m_primitives{}
+{
+}
+
+std::shared_ptr<Mesh::MeshPrimitive>& Mesh::create()
+{
+    m_primitives.push_back(std::make_shared<Mesh::MeshPrimitive>());
+    return m_primitives.at(m_primitives.size() - 1);
+}
+
+void Mesh::build()
+{
+    for (auto primitive : m_primitives) {
+        primitive->build();
+    }
+}
+
+void Mesh::draw(const Shader& shader) const
+{
+    for (auto primitive : m_primitives) {
+        shader.uniform("modelMatrix", transform() * primitive->transform());
+        primitive->draw(shader);
+    }
 }

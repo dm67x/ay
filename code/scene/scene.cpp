@@ -41,10 +41,10 @@ int Scene::accessorSize(const tinygltf::Accessor& accessor) const
 
 void Scene::processNode(const tinygltf::Node& node, int parent)
 {
-    size_t nb = 0;
+    std::shared_ptr<Entity> entity = nullptr;
 
     if (node.mesh > -1) {
-        nb = processMesh(m_scene.meshes[node.mesh]);
+        entity = processMesh(m_scene.meshes[node.mesh]);
     }
     /*else if (node.camera > -1) {
         entity = processCamera(m_scene.cameras[node.camera]);
@@ -53,99 +53,93 @@ void Scene::processNode(const tinygltf::Node& node, int parent)
         //processLight();
     }
 
-    if (nb > 0) {
-        size_t nbEntities = m_entities.size();
-        size_t i = nbEntities - (nb + 1);
-
-        for (; i < nbEntities; i++) {
-            auto entity = m_entities.at(i);
-            auto pMatrix = glm::mat4(1);
+    if (entity) {
+        auto pMatrix = glm::mat4(1);
             
-            if (parent > -1) {
-                auto parentNode = m_scene.nodes[parent];
-                if (parentNode.matrix.size() == 16) {
-                    pMatrix = glm::mat4(
-                        node.matrix[0], node.matrix[1], node.matrix[2], node.matrix[3],
-                        node.matrix[4], node.matrix[5], node.matrix[6], node.matrix[7],
-                        node.matrix[8], node.matrix[9], node.matrix[10], node.matrix[11],
-                        node.matrix[12], node.matrix[13], node.matrix[14], node.matrix[15]
-                    );
-                }
-                else {
-                    glm::mat4 scale = glm::mat4(1);
-                    glm::mat4 rotate = glm::mat4(1);
-                    glm::mat4 translate = glm::mat4(1);
-
-                    if(parentNode.scale.size() == 3) {
-                        scale = glm::scale(glm::mat4(1), glm::vec3(
-                            (float)parentNode.scale[0],
-                            (float)parentNode.scale[1],
-                            (float)parentNode.scale[2]));
-                    }
-
-                    if (parentNode.translation.size() == 3) {
-                        translate = glm::translate(glm::mat4(1), glm::vec3(
-                            (float)parentNode.translation[0],
-                            (float)parentNode.translation[1],
-                            (float)parentNode.translation[2]));
-                    }
-
-                    /*if (parentNode.rotation.size() == 4) {
-                        rotate = glm::rotate(glm::mat4(1),
-                            (float)parentNode.rotation[0],
-                            glm::vec3(
-                                parentNode.rotation[1],
-                                parentNode.rotation[2],
-                                parentNode.rotation[3]));
-                    }*/
-
-                    pMatrix = scale * rotate * translate;
-                }
-            }
-
-            if (node.matrix.size() == 16) {
-                auto matrix = glm::mat4(
+        if (parent > -1) {
+            auto parentNode = m_scene.nodes[parent];
+            if (parentNode.matrix.size() == 16) {
+                pMatrix = glm::mat4(
                     node.matrix[0], node.matrix[1], node.matrix[2], node.matrix[3],
-                    node.matrix[4], node.matrix[5], node.matrix[6], node.matrix[7], 
-                    node.matrix[8], node.matrix[9], node.matrix[10], node.matrix[11], 
+                    node.matrix[4], node.matrix[5], node.matrix[6], node.matrix[7],
+                    node.matrix[8], node.matrix[9], node.matrix[10], node.matrix[11],
                     node.matrix[12], node.matrix[13], node.matrix[14], node.matrix[15]
                 );
-
-                glm::vec3 translation;
-                glm::vec3 scale;
-                glm::quat rotation;
-                glm::vec3 skew;
-                glm::vec4 perspective;
-                glm::decompose(matrix, scale, rotation, translation, skew, perspective);
-
-                entity->translate(glm::vec3(pMatrix * glm::vec4(translation, 1.f)));
-                entity->scale(glm::vec3(pMatrix * glm::vec4(scale, 1.f)));
             }
             else {
-                if (node.scale.size() == 3) {
-                    glm::vec3 scale = glm::vec3(
-                        node.scale[0],
-                        node.scale[1],
-                        node.scale[2]);
+                glm::mat4 scale = glm::mat4(1);
+                glm::mat4 rotate = glm::mat4(1);
+                glm::mat4 translate = glm::mat4(1);
+
+                if(parentNode.scale.size() == 3) {
+                    scale = glm::scale(glm::mat4(1), glm::vec3(
+                        (float)parentNode.scale[0],
+                        (float)parentNode.scale[1],
+                        (float)parentNode.scale[2]));
+                }
+
+                if (parentNode.translation.size() == 3) {
+                    translate = glm::translate(glm::mat4(1), glm::vec3(
+                        (float)parentNode.translation[0],
+                        (float)parentNode.translation[1],
+                        (float)parentNode.translation[2]));
+                }
+
+                /*if (parentNode.rotation.size() == 4) {
+                    rotate = glm::rotate(glm::mat4(1),
+                        (float)parentNode.rotation[0],
+                        glm::vec3(
+                            parentNode.rotation[1],
+                            parentNode.rotation[2],
+                            parentNode.rotation[3]));
+                }*/
+
+                pMatrix = scale * rotate * translate;
+            }
+        }
+
+        if (node.matrix.size() == 16) {
+            auto matrix = glm::mat4(
+                node.matrix[0], node.matrix[1], node.matrix[2], node.matrix[3],
+                node.matrix[4], node.matrix[5], node.matrix[6], node.matrix[7], 
+                node.matrix[8], node.matrix[9], node.matrix[10], node.matrix[11], 
+                node.matrix[12], node.matrix[13], node.matrix[14], node.matrix[15]
+            );
+
+            glm::vec3 translation;
+            glm::vec3 scale;
+            glm::quat rotation;
+            glm::vec3 skew;
+            glm::vec4 perspective;
+            glm::decompose(matrix, scale, rotation, translation, skew, perspective);
+
+            entity->translate(glm::vec3(pMatrix * glm::vec4(translation, 1.f)));
+            entity->scale(glm::vec3(pMatrix * glm::vec4(scale, 1.f)));
+        }
+        else {
+            if (node.scale.size() == 3) {
+                glm::vec3 scale = glm::vec3(
+                    node.scale[0],
+                    node.scale[1],
+                    node.scale[2]);
                     
-                    entity->scale(glm::vec3(pMatrix * glm::vec4(scale, 1.f)));
-                }
+                entity->scale(glm::vec3(pMatrix * glm::vec4(scale, 1.f)));
+            }
 
-                if (node.translation.size() == 3) {
-                    glm::vec3 translate = glm::vec3(
-                        node.translation[0],
-                        node.translation[1],
-                        node.translation[2]);
+            if (node.translation.size() == 3) {
+                glm::vec3 translate = glm::vec3(
+                    node.translation[0],
+                    node.translation[1],
+                    node.translation[2]);
 
-                    entity->translate(glm::vec3(pMatrix * glm::vec4(translate, 1.f)));
-                }
+                entity->translate(glm::vec3(pMatrix * glm::vec4(translate, 1.f)));
+            }
 
-                if (node.rotation.size() == 4) {
-                    glm::vec3 rotate = glm::vec3(
-                        node.rotation[1],
-                        node.rotation[2],
-                        node.rotation[3]);
-                }
+            if (node.rotation.size() == 4) {
+                glm::vec3 rotate = glm::vec3(
+                    node.rotation[1],
+                    node.rotation[2],
+                    node.rotation[3]);
             }
         }
     }
@@ -156,19 +150,19 @@ void Scene::processNode(const tinygltf::Node& node, int parent)
     }
 }
 
-size_t Scene::processMesh(const tinygltf::Mesh& mesh)
+std::shared_ptr<Entity> Scene::processMesh(const tinygltf::Mesh& mesh)
 {
-    size_t res = 0;
+    auto res = std::make_shared<Mesh>(mesh.name);
 
     for (auto primitive : mesh.primitives) {
         if (primitive.indices < 0) 
             continue;
 
-        auto entity = std::make_shared<Mesh>();
+        auto mprimitive = res->create();
 
-        entity->m_mode = primitive.mode;
+        mprimitive->set(primitive.mode);
         if (primitive.material > -1) {
-            entity->m_material = m_materials.at(primitive.material);
+            mprimitive->set(*m_materials.at(primitive.material));
         }
 
         // Accessors
@@ -215,7 +209,7 @@ size_t Scene::processMesh(const tinygltf::Mesh& mesh)
 
             Vertex vert;
             vert.position = glm::vec3(x, y, z);
-            entity->m_vertices.push_back(vert);
+            mprimitive->add(vert);
         }
 
         // Normals
@@ -224,7 +218,7 @@ size_t Scene::processMesh(const tinygltf::Mesh& mesh)
             float y = normals[i * nSize + 1];
             float z = normals[i * nSize + 2];
 
-            entity->m_vertices.at(i).normal = glm::vec3(x, y, z);
+            (*mprimitive)[i].normal = glm::vec3(x, y, z);
         }
 
         // UVs
@@ -232,19 +226,18 @@ size_t Scene::processMesh(const tinygltf::Mesh& mesh)
             float x = uvs[i * uvSize];
             float y = uvs[i * uvSize + 1];
 
-            entity->m_vertices.at(i).uv = glm::vec2(x, y);
+            (*mprimitive)[i].uv = glm::vec2(x, y);
         }
 
         // Indices
         for (size_t i = 0; i < iAccessor.count; i++) {
-            entity->m_indices.push_back(indices[i * iSize]);
+            mprimitive->add(indices[i * iSize]);
         }
 
-        entity->build();
-        m_entities.push_back(entity);
-        res++;
+        res->build();
     }
 
+    m_entities.push_back(res);
     return res;
 }
 
@@ -255,7 +248,7 @@ std::shared_ptr<Entity> Scene::processCamera(const tinygltf::Camera& camera)
         return nullptr;
     }
 
-    auto entity = std::make_shared<Camera>(1.f);
+    auto entity = std::make_shared<Camera>(camera.name, 1.f);
 
     if (camera.type == "perspective") {
         auto projection = camera.perspective;
@@ -383,4 +376,15 @@ void Scene::draw(const Shader& shader) const
     for (auto entity : m_entities) {
         entity->draw(shader);
     }
+}
+
+std::shared_ptr<Entity> Scene::get(const std::string& name) const
+{
+    for (auto entity : m_entities) {
+        if (entity->name() == name) {
+            return entity;
+        }
+    }
+
+    return nullptr;
 }
