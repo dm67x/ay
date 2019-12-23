@@ -20,7 +20,10 @@ Texture2D::~Texture2D()
     glCheckError();
 }
 
-void Texture2D::create(const GLuint width, const GLuint height) const
+void Texture2D::create(
+    const GLuint width, 
+    const GLuint height,
+    unsigned char* data) const
 {
     bind();
 
@@ -54,7 +57,7 @@ void Texture2D::create(const GLuint width, const GLuint height) const
         0,
         GL_RGBA,
         GL_UNSIGNED_BYTE,
-        nullptr);
+        data);
     glCheckError();
 
     unbind();

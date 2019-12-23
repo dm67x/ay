@@ -1,5 +1,5 @@
 #include "light.hpp"
-#include "shader/shader.hpp"
+#include "rendering/shader.hpp"
 
 Light::Light(const std::string& name)
     : Entity(name)

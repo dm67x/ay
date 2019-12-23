@@ -1,27 +1,27 @@
-#include "scene.hpp"
+#include "gltf_loader.hpp"
 #include "entity/camera.hpp"
-#include "shader/shader.hpp"
-#include "model/material.hpp"
+#include "rendering/shader.hpp"
+#include "rendering/material.hpp"
 #include "entity/mesh.hpp"
-#include "model/texture2d.hpp"
+#include "rendering/texture2d.hpp"
 
 #include <iostream>
 #include <glm/gtx/matrix_decompose.hpp>
 
-Scene::Scene(const std::string& name)
-    : m_name{ name },
-    m_loader{},
-    m_scene{},
+glTFLoader::glTFLoader()
+    : m_loader{},
+    m_model{},
     m_entities{},
     m_materials{}
 {
 }
 
-Scene::~Scene()
+std::shared_ptr<Entity> glTFLoader::operator[](int index)
 {
+    return m_entities.at(index);
 }
 
-int Scene::accessorSize(const tinygltf::Accessor& accessor) const
+int glTFLoader::accessorSize(const tinygltf::Accessor& accessor) const
 {
     switch (accessor.type)
     {
@@ -39,12 +39,12 @@ int Scene::accessorSize(const tinygltf::Accessor& accessor) const
     }
 }
 
-void Scene::processNode(const tinygltf::Node& node, int parent)
+void glTFLoader::processNode(const tinygltf::Node& node, int parent)
 {
     std::shared_ptr<Entity> entity = nullptr;
 
     if (node.mesh > -1) {
-        entity = processMesh(m_scene.meshes[node.mesh]);
+        entity = processMesh(m_model.meshes[node.mesh]);
     }
     /*else if (node.camera > -1) {
         entity = processCamera(m_scene.cameras[node.camera]);
@@ -55,15 +55,15 @@ void Scene::processNode(const tinygltf::Node& node, int parent)
 
     if (entity) {
         auto pMatrix = glm::mat4(1);
-            
+
         if (parent > -1) {
-            auto parentNode = m_scene.nodes[parent];
+            auto parentNode = m_model.nodes[parent];
             if (parentNode.matrix.size() == 16) {
                 pMatrix = glm::mat4(
-                    node.matrix[0], node.matrix[1], node.matrix[2], node.matrix[3],
-                    node.matrix[4], node.matrix[5], node.matrix[6], node.matrix[7],
-                    node.matrix[8], node.matrix[9], node.matrix[10], node.matrix[11],
-                    node.matrix[12], node.matrix[13], node.matrix[14], node.matrix[15]
+                    parentNode.matrix[0], parentNode.matrix[1], parentNode.matrix[2], parentNode.matrix[3],
+                    parentNode.matrix[4], parentNode.matrix[5], parentNode.matrix[6], parentNode.matrix[7],
+                    parentNode.matrix[8], parentNode.matrix[9], parentNode.matrix[10], parentNode.matrix[11],
+                    parentNode.matrix[12], parentNode.matrix[13], parentNode.matrix[14], parentNode.matrix[15]
                 );
             }
             else {
@@ -71,7 +71,7 @@ void Scene::processNode(const tinygltf::Node& node, int parent)
                 glm::mat4 rotate = glm::mat4(1);
                 glm::mat4 translate = glm::mat4(1);
 
-                if(parentNode.scale.size() == 3) {
+                if (parentNode.scale.size() == 3) {
                     scale = glm::scale(glm::mat4(1), glm::vec3(
                         (float)parentNode.scale[0],
                         (float)parentNode.scale[1],
@@ -101,8 +101,8 @@ void Scene::processNode(const tinygltf::Node& node, int parent)
         if (node.matrix.size() == 16) {
             auto matrix = glm::mat4(
                 node.matrix[0], node.matrix[1], node.matrix[2], node.matrix[3],
-                node.matrix[4], node.matrix[5], node.matrix[6], node.matrix[7], 
-                node.matrix[8], node.matrix[9], node.matrix[10], node.matrix[11], 
+                node.matrix[4], node.matrix[5], node.matrix[6], node.matrix[7],
+                node.matrix[8], node.matrix[9], node.matrix[10], node.matrix[11],
                 node.matrix[12], node.matrix[13], node.matrix[14], node.matrix[15]
             );
 
@@ -122,7 +122,7 @@ void Scene::processNode(const tinygltf::Node& node, int parent)
                     node.scale[0],
                     node.scale[1],
                     node.scale[2]);
-                    
+
                 entity->scale(glm::vec3(pMatrix * glm::vec4(scale, 1.f)));
             }
 
@@ -144,18 +144,18 @@ void Scene::processNode(const tinygltf::Node& node, int parent)
         }
     }
 
-    auto it = std::find(m_scene.nodes.begin(), m_scene.nodes.end(), node);
+    auto it = std::find(m_model.nodes.begin(), m_model.nodes.end(), node);
     for (auto cn : node.children) {
-        processNode(m_scene.nodes[cn], (int)(it - m_scene.nodes.begin()));
+        processNode(m_model.nodes[cn], (int)(it - m_model.nodes.begin()));
     }
 }
 
-std::shared_ptr<Entity> Scene::processMesh(const tinygltf::Mesh& mesh)
+std::shared_ptr<Entity> glTFLoader::processMesh(const tinygltf::Mesh& mesh)
 {
     auto res = std::make_shared<Mesh>(mesh.name);
 
     for (auto primitive : mesh.primitives) {
-        if (primitive.indices < 0) 
+        if (primitive.indices < 0)
             continue;
 
         auto mprimitive = res->create();
@@ -166,22 +166,22 @@ std::shared_ptr<Entity> Scene::processMesh(const tinygltf::Mesh& mesh)
         }
 
         // Accessors
-        auto pAccessor = m_scene.accessors[primitive.attributes["POSITION"]];
-        auto nAccessor = m_scene.accessors[primitive.attributes["NORMAL"]];
-        auto uvAccessor = m_scene.accessors[primitive.attributes["TEXCOORD_0"]];
-        auto iAccessor = m_scene.accessors[primitive.indices];
+        auto pAccessor = m_model.accessors[primitive.attributes["POSITION"]];
+        auto nAccessor = m_model.accessors[primitive.attributes["NORMAL"]];
+        auto uvAccessor = m_model.accessors[primitive.attributes["TEXCOORD_0"]];
+        auto iAccessor = m_model.accessors[primitive.indices];
 
         // Bufferviews
-        auto pBufferView = m_scene.bufferViews[pAccessor.bufferView];
-        auto nBufferView = m_scene.bufferViews[nAccessor.bufferView];
-        auto uvBufferView = m_scene.bufferViews[uvAccessor.bufferView];
-        auto iBufferView = m_scene.bufferViews[iAccessor.bufferView];
+        auto pBufferView = m_model.bufferViews[pAccessor.bufferView];
+        auto nBufferView = m_model.bufferViews[nAccessor.bufferView];
+        auto uvBufferView = m_model.bufferViews[uvAccessor.bufferView];
+        auto iBufferView = m_model.bufferViews[iAccessor.bufferView];
 
         // Buffers
-        auto pBuffer = m_scene.buffers[pBufferView.buffer];
-        auto nBuffer = m_scene.buffers[nBufferView.buffer];
-        auto uvBuffer = m_scene.buffers[uvBufferView.buffer];
-        auto iBuffer = m_scene.buffers[iBufferView.buffer];
+        auto pBuffer = m_model.buffers[pBufferView.buffer];
+        auto nBuffer = m_model.buffers[nBufferView.buffer];
+        auto uvBuffer = m_model.buffers[uvBufferView.buffer];
+        auto iBuffer = m_model.buffers[iBufferView.buffer];
 
         // Position inside buffers
         auto pPos = pBufferView.byteOffset + pAccessor.byteOffset;
@@ -241,7 +241,7 @@ std::shared_ptr<Entity> Scene::processMesh(const tinygltf::Mesh& mesh)
     return res;
 }
 
-std::shared_ptr<Entity> Scene::processCamera(const tinygltf::Camera& camera)
+std::shared_ptr<Entity> glTFLoader::processCamera(const tinygltf::Camera& camera)
 {
     if (camera.type != "perspective") {
         std::cout << "camera type not supported" << std::endl;
@@ -262,10 +262,44 @@ std::shared_ptr<Entity> Scene::processCamera(const tinygltf::Camera& camera)
     return entity;
 }
 
-bool Scene::load(const std::string& filename)
+GLenum glTFLoader::textureFilter(int texture) const
+{
+    switch (texture) {
+    case TINYGLTF_TEXTURE_WRAP_REPEAT:
+        return GL_REPEAT;
+
+    case TINYGLTF_TEXTURE_WRAP_CLAMP_TO_EDGE:
+        return GL_CLAMP_TO_EDGE;
+
+    case TINYGLTF_TEXTURE_WRAP_MIRRORED_REPEAT:
+        GL_MIRRORED_REPEAT;
+
+    case TINYGLTF_TEXTURE_FILTER_LINEAR:
+        return GL_LINEAR;
+
+    case TINYGLTF_TEXTURE_FILTER_NEAREST:
+        return GL_NEAREST;
+
+    case TINYGLTF_TEXTURE_FILTER_LINEAR_MIPMAP_LINEAR:
+        return GL_LINEAR_MIPMAP_LINEAR;
+
+    case TINYGLTF_TEXTURE_FILTER_LINEAR_MIPMAP_NEAREST:
+        return GL_LINEAR_MIPMAP_NEAREST;
+
+    case TINYGLTF_TEXTURE_FILTER_NEAREST_MIPMAP_LINEAR:
+        return GL_NEAREST_MIPMAP_LINEAR;
+
+    case TINYGLTF_TEXTURE_FILTER_NEAREST_MIPMAP_NEAREST:
+        return GL_NEAREST_MIPMAP_NEAREST;
+    }
+
+    return GL_NONE;
+}
+
+bool glTFLoader::load(const std::string& filename)
 {
     std::string err, warn;
-    bool ret = m_loader.LoadBinaryFromFile(&m_scene, &err, &warn, filename);
+    bool ret = m_loader.LoadBinaryFromFile(&m_model, &err, &warn, filename);
 
     if (!warn.empty()) {
         std::cout << "warn: " << warn << std::endl;
@@ -280,7 +314,7 @@ bool Scene::load(const std::string& filename)
         return false;
     }
 
-    for (auto material : m_scene.materials) {
+    for (auto material : m_model.materials) {
         auto mat = std::make_shared<Material>(material.name);
         auto pbr = material.pbrMetallicRoughness;
 
@@ -296,50 +330,74 @@ bool Scene::load(const std::string& filename)
         mat->m_roughnessFactor = (float)pbr.roughnessFactor;
 
         if (pbr.baseColorTexture.index > -1) {
-            auto texture = m_scene.textures[pbr.baseColorTexture.index];
-            auto image = m_scene.images[texture.source];
-            auto sampler = m_scene.samplers[texture.sampler];
+            auto texture = m_model.textures[pbr.baseColorTexture.index];
+            auto image = m_model.images[texture.source];
+            auto sampler = m_model.samplers[texture.sampler];
 
             Texture2DParameter param;
-            param.mag = sampler.magFilter;
-            param.min = sampler.minFilter;
-            param.wrap_s = sampler.wrapS;
-            param.wrap_t = sampler.wrapT;
+            param.mag = sampler.magFilter > -1 ? textureFilter(sampler.magFilter) : GL_LINEAR;
+            param.min = sampler.minFilter > -1 ? textureFilter(sampler.minFilter) : GL_LINEAR;
+            param.wrap_s = sampler.wrapS > -1 ? textureFilter(sampler.wrapS) : GL_REPEAT;
+            param.wrap_t = sampler.wrapT > -1 ? textureFilter(sampler.wrapT) : GL_REPEAT;
 
             auto tex = std::make_shared<Texture2D>(param);
-            tex->load(image.uri);
+            if (image.uri.empty()) {
+                auto bufferview = m_model.bufferViews[image.bufferView];
+                auto buffer = m_model.buffers[bufferview.buffer];
+                auto ibuffer = reinterpret_cast<unsigned char*>(&buffer.data[bufferview.byteOffset]);
+                tex->create(image.width, image.height);
+            }
+            else {
+                tex->load(image.uri);
+            }
             mat->m_baseColorTexture = tex;
         }
 
         if (pbr.metallicRoughnessTexture.index > -1) {
-            auto texture = m_scene.textures[pbr.metallicRoughnessTexture.index];
-            auto image = m_scene.images[texture.source];
-            auto sampler = m_scene.samplers[texture.sampler];
+            auto texture = m_model.textures[pbr.metallicRoughnessTexture.index];
+            auto image = m_model.images[texture.source];
+            auto sampler = m_model.samplers[texture.sampler];
 
             Texture2DParameter param;
-            param.mag = sampler.magFilter;
-            param.min = sampler.minFilter;
-            param.wrap_s = sampler.wrapS;
-            param.wrap_t = sampler.wrapT;
+            param.mag = sampler.magFilter > -1 ? textureFilter(sampler.magFilter) : GL_LINEAR;
+            param.min = sampler.minFilter > -1 ? textureFilter(sampler.minFilter) : GL_LINEAR;
+            param.wrap_s = sampler.wrapS > -1 ? textureFilter(sampler.wrapS) : GL_REPEAT;
+            param.wrap_t = sampler.wrapT > -1 ? textureFilter(sampler.wrapT) : GL_REPEAT;
 
             auto tex = std::make_shared<Texture2D>(param);
-            tex->load(image.uri);
+            if (image.uri.empty()) {
+                auto bufferview = m_model.bufferViews[image.bufferView];
+                auto buffer = m_model.buffers[bufferview.buffer];
+                auto ibuffer = reinterpret_cast<unsigned char*>(&buffer.data[bufferview.byteOffset]);
+                tex->create(image.width, image.height);
+            }
+            else {
+                tex->load(image.uri);
+            }
             mat->m_metallicRoughnessTexture = tex;
         }
 
         if (material.normalTexture.index > -1) {
-            auto texture = m_scene.textures[material.normalTexture.index];
-            auto image = m_scene.images[texture.source];
-            auto sampler = m_scene.samplers[texture.sampler];
+            auto texture = m_model.textures[material.normalTexture.index];
+            auto image = m_model.images[texture.source];
+            auto sampler = m_model.samplers[texture.sampler];
 
             Texture2DParameter param;
-            param.mag = sampler.magFilter;
-            param.min = sampler.minFilter;
-            param.wrap_s = sampler.wrapS;
-            param.wrap_t = sampler.wrapT;
+            param.mag = sampler.magFilter > -1 ? textureFilter(sampler.magFilter) : GL_LINEAR;
+            param.min = sampler.minFilter > -1 ? textureFilter(sampler.minFilter) : GL_LINEAR;
+            param.wrap_s = sampler.wrapS > -1 ? textureFilter(sampler.wrapS) : GL_REPEAT;
+            param.wrap_t = sampler.wrapT > -1 ? textureFilter(sampler.wrapT) : GL_REPEAT;
 
             auto tex = std::make_shared<Texture2D>(param);
-            tex->load(image.uri);
+            if (image.uri.empty()) {
+                auto bufferview = m_model.bufferViews[image.bufferView];
+                auto buffer = m_model.buffers[bufferview.buffer];
+                auto ibuffer = reinterpret_cast<unsigned char*>(&buffer.data[bufferview.byteOffset]);
+                tex->create(image.width, image.height);
+            }
+            else {
+                tex->load(image.uri);
+            }
             mat->m_normalTexture = tex;
         }
 
@@ -353,15 +411,15 @@ bool Scene::load(const std::string& filename)
         m_materials.push_back(mat);
     }
 
-    auto currentScene = m_scene.scenes[0];
+    auto currentScene = m_model.scenes[m_model.defaultScene];
     for (auto node : currentScene.nodes) {
-        processNode(m_scene.nodes[node]);
+        processNode(m_model.nodes[node]);
     }
 
     // Informations
-    size_t length = 60 - m_name.size();
+    size_t length = 60 - filename.size();
     for (size_t i = 0; i < length / 2; i++) std::cout << "=";
-    std::cout << " " << m_name << " ";
+    std::cout << " " << filename << " ";
     for (size_t i = 0; i < length / 2; i++) std::cout << "=";
     std::cout << std::endl;
 
@@ -371,14 +429,14 @@ bool Scene::load(const std::string& filename)
     return true;
 }
 
-void Scene::draw(const Shader& shader) const
+void glTFLoader::draw(const Shader& shader) const
 {
     for (auto entity : m_entities) {
         entity->draw(shader);
     }
 }
 
-std::shared_ptr<Entity> Scene::get(const std::string& name) const
+std::shared_ptr<Entity> glTFLoader::get(const std::string& name) const
 {
     for (auto entity : m_entities) {
         if (entity->name() == name) {

@@ -6,7 +6,6 @@ in vec3 positionOut;
 in vec4 colorOut;
 in vec3 normalOut;
 in vec2 uvOut;
-in mat4 normalMatrix;
 
 out vec4 fragOut;
 
@@ -49,5 +48,5 @@ void main() {
         Kd * texKd.rgb * lambertian * lightColor * lightPower / distance +
         Ks * specular * lightColor * lightPower / distance;
 
-    fragOut = vec4(colorLinear, 1.0);
+    fragOut = vec4(normalOut, 1.0);
 }

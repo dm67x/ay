@@ -1,5 +1,5 @@
 #include "camera.hpp"
-#include "shader/shader.hpp"
+#include "rendering/shader.hpp"
 
 Camera::Camera(const std::string& name, float aspectRatio)
     : Entity(name),

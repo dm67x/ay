@@ -19,8 +19,7 @@ class Material
     std::shared_ptr<Texture2D> m_normalTexture;
 
 private:
-    friend class Model;
-    friend class Scene;
+    friend class glTFLoader;
 
 public:
     Material(const std::string&);

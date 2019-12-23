@@ -13,7 +13,7 @@ class Camera : public Entity
     float m_aspectRatio;
 
 private:
-    friend class Scene;
+    friend class glTFLoader;
 
 public:
     Camera(const std::string&, float);

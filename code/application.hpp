@@ -7,14 +7,14 @@
 #include <functional>
 #include <tuple>
 
-class Device final
+class Application final
 {
     GLFWwindow* m_window;
     Timer m_sysClock;
 
 public:
-    Device(GLuint, GLuint);
-    ~Device();
+    Application();
+    ~Application();
 
 public:
     bool run();

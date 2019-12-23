@@ -1,7 +1,7 @@
 #pragma once
 
 #include "entity.hpp"
-#include "model/vertex.hpp"
+#include "rendering/vertex.hpp"
 
 #include <vector>
 #include <string>
@@ -41,9 +41,6 @@ class Mesh : public Entity
 
     
     std::vector<std::shared_ptr<MeshPrimitive>> m_primitives;
-
-private:
-    friend class Scene;
 
 public:
     Mesh(const std::string&);

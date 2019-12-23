@@ -1,7 +1,7 @@
 #include "mesh.hpp"
 #include "log.hpp"
-#include "shader/shader.hpp"
-#include "model/material.hpp"
+#include "rendering/shader.hpp"
+#include "rendering/material.hpp"
 
 Mesh::MeshPrimitive::MeshPrimitive()
     : m_vertices{},

@@ -1,11 +1,11 @@
-#include "device.hpp"
+#include "application.hpp"
 
 #include <stdexcept>
 #include <sstream>
 #include <iomanip>
 #include <iostream>
 
-Device::Device(GLuint width, GLuint height)
+Application::Application()
     : m_window{ nullptr },
     m_sysClock{}
 {
@@ -35,13 +35,13 @@ Device::Device(GLuint width, GLuint height)
     glDepthFunc(GL_LESS);
 }
 
-Device::~Device()
+Application::~Application()
 {
     glfwDestroyWindow(m_window);
     glfwTerminate();
 }
 
-bool Device::run()
+bool Application::run()
 {
     m_sysClock.update();
 
@@ -65,19 +65,19 @@ bool Device::run()
     return true;
 }
 
-void Device::resize(int w, int h)
+void Application::resize(int w, int h)
 {
     glfwSetWindowSize(m_window, w, h);
 }
 
-std::pair<int, int> Device::size() const
+std::pair<int, int> Application::size() const
 {
     int width, height;
     glfwGetWindowSize(m_window, &width, &height);
     return std::make_pair(width, height);
 }
 
-void Device::clear(GLbitfield mask) const
+void Application::clear(GLbitfield mask) const
 {
     glClear(mask);
 }

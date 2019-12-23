@@ -23,7 +23,7 @@ public:
     ~Texture2D();
 
 public:
-    void create(const GLuint, const GLuint) const;
+    void create(const GLuint, const GLuint, unsigned char* = nullptr) const;
     bool load(const std::string&) const;
     void bind(GLuint = 0) const;
     void unbind() const;

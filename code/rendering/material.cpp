@@ -1,5 +1,5 @@
 #include "material.hpp"
-#include "shader/shader.hpp"
+#include "shader.hpp"
 #include "texture2d.hpp"
 
 #include <iostream>

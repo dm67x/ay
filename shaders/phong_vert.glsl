@@ -17,7 +17,6 @@ uniform mat4 modelMatrix;
 void main() {
     gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(position, 1.0);
     colorOut = color;
-    normalOut = normal;
     uvOut = uv;
     vec4 pos = modelMatrix * vec4(position, 1.0);
     positionOut = vec3(pos) / pos.w;
