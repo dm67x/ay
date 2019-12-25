@@ -11,7 +11,6 @@ int main(void)
 {
     Application app;
     glTFLoader helmetLoader;
-    glTFLoader suzanneLoader;
     Camera mainCamera{ "mainCamera", 1.f };
     ShaderManager shmgr;
 
@@ -23,19 +22,14 @@ int main(void)
         }
 
         // Camera
-        mainCamera.position(0, 0, -8);
+        mainCamera.backgroundColor(glm::vec4(1));
+        mainCamera.position(0, 0, -2);
         float rotationAmount = 0;
 
         // Loader
         if (!helmetLoader.load("assets/models/DamagedHelmet.glb")) {
             throw std::exception("cannot load glTF file");
         }
-
-        if (!suzanneLoader.load("assets/models/suzanne.glb")) {
-            throw std::exception("cannot load glTF file");
-        }
-
-        suzanneLoader.position(0, 0, 5);
 
         while (app.run()) {
             auto wsize = app.size();
@@ -50,16 +44,10 @@ int main(void)
             mainCamera.aspectRatio(ratio);
 
             helmetLoader.rotateY(rotationAmount++);
-            suzanneLoader.rotateX(rotationAmount++);
-            suzanneLoader.rotateAroundY(rotationAmount++);
-
-            glClearColor(0.f, 0.f, 0.f, 0.f);
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
             shmgr["Standard"]->use();
             mainCamera.draw(*shmgr["Standard"]);
             helmetLoader.draw(*shmgr["Standard"]);
-            suzanneLoader.draw(*shmgr["Standard"]);
             shmgr["Standard"]->reset();
         }
     }

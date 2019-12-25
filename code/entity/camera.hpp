@@ -6,6 +6,7 @@
 
 class Camera : public Entity
 {
+    glm::vec4 m_clearColor;
     glm::vec3 m_target;
     float m_fov;
     float m_zNear;
@@ -20,6 +21,7 @@ public:
     ~Camera() = default;
 
 public:
+    void backgroundColor(const glm::vec4&);
     void target(const glm::vec3&);
     void aspectRatio(float);
     glm::mat4 viewMatrix() const;
