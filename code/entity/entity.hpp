@@ -15,7 +15,7 @@ protected:
 
 public:
     void name(const std::string& name) { m_name = name; }
-    virtual void draw(const Shader&) const = 0;
+    virtual void draw(const Shader&, const Transform& = Transform()) const = 0;
 
 public:
     inline const std::string& name() const { return m_name; }

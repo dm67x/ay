@@ -111,8 +111,10 @@ void Mesh::MeshPrimitive::build() const
     glCheckError();
 }
 
-void Mesh::MeshPrimitive::draw(const Shader& shader) const
+void Mesh::MeshPrimitive::draw(const Shader& shader, const Transform& tr) const
 {
+    shader.uniform("modelMatrix", tr.transform() * transform());
+
     if (m_material)
         m_material->use(shader);
 
@@ -148,10 +150,9 @@ void Mesh::build()
     }
 }
 
-void Mesh::draw(const Shader& shader) const
+void Mesh::draw(const Shader& shader, const Transform& tr) const
 {
     for (auto primitive : m_primitives) {
-        shader.uniform("modelMatrix", transform() * primitive->transform());
-        primitive->draw(shader);
+        primitive->draw(shader, tr);
     }
 }

@@ -2,6 +2,7 @@
 
 #include "entity.hpp"
 #include "rendering/vertex.hpp"
+#include "rendering/transform.hpp"
 
 #include <vector>
 #include <string>
@@ -36,7 +37,7 @@ class Mesh : public Entity
         void set(GLenum);
         void set(const Material&);
         void build() const;
-        void draw(const Shader&) const;
+        void draw(const Shader&, const Transform&) const;
     };
 
     
@@ -49,5 +50,5 @@ public:
 public:
     std::shared_ptr<MeshPrimitive>& create();
     void build();
-    void draw(const Shader&) const override;
+    void draw(const Shader&, const Transform& = Transform()) const override;
 };

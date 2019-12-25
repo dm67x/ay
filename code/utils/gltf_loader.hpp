@@ -1,6 +1,7 @@
 #pragma once
 
 #include "entity/entity.hpp"
+#include "rendering/transform.hpp"
 
 #include <tiny_gltf.h>
 #include <memory>
@@ -9,7 +10,7 @@
 
 class Material;
 
-class glTFLoader final
+class glTFLoader final : public Transform
 {
     std::string m_name;
     tinygltf::TinyGLTF m_loader;

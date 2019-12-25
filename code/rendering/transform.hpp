@@ -5,10 +5,7 @@
 
 class Transform
 {
-    glm::vec3 m_position;
-    glm::vec3 m_rAxis;
-    float m_rAmount;
-    glm::vec3 m_size;
+    glm::mat4 m_transform;
 
 public:
     Transform();

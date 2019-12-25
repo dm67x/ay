@@ -447,7 +447,7 @@ bool glTFLoader::load(const std::string& filename)
 void glTFLoader::draw(const Shader& shader) const
 {
     for (auto entity : m_entities) {
-        entity->draw(shader);
+        entity->draw(shader, *this);
     }
 }
 
