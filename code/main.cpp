@@ -22,14 +22,16 @@ int main(void)
         }
 
         // Camera
+        mainCamera.target(glm::vec3(0, 0, -2));
         mainCamera.backgroundColor(glm::vec4(1));
-        mainCamera.position(0, 0, -2);
         float rotationAmount = 0;
 
         // Loader
         if (!helmetLoader.load("assets/models/DamagedHelmet.glb")) {
             throw std::exception("cannot load glTF file");
         }
+
+        helmetLoader.position(0, 0, -2);
 
         while (app.run()) {
             auto wsize = app.size();

@@ -5,12 +5,12 @@ It use SDL2 for window/input management, GLAD, STB and GLM for OpenGL stuffs.
 
 ## TODO
 
-- [ ] Multiple lights scene
-- [ ] PBR
-- [ ] Image Based Lighting
-- [ ] Better camera
-- [ ] More and more work
+- [ ] Scene with multiple light sources
+- [ ] PBR (Physical Based Rendering)
+- [ ] IBL (Image Based Lighting)
+- [ ] Better camera support (movement, etc...)
+- [ ] ...
 
 ## Example
 
-![Example Dodge Challenger](example_01.gif)
+![Example Damaged Helmet (normal edition)](example_01.gif)
