@@ -41,7 +41,7 @@ glm::mat4 Camera::projectionMatrix() const
     );
 }
 
-void Camera::draw(const Shader& program, const Transform& tr) const
+void Camera::draw(const Shader& program, const glm::mat4& tr) const
 {
     auto position = transform() * glm::vec4(1.f);
 

@@ -1,117 +1,101 @@
 #include "transform.hpp"
 
 #include <glm/gtx/matrix_decompose.hpp>
-#include <glm/gtc/quaternion.hpp>
 
 Transform::Transform()
-    : m_transform{ glm::mat4(1) }
+    : m_position{ glm::vec3(0) },
+    m_rotation{ glm::identity<glm::quat>() },
+    m_rotateAround{ glm::identity<glm::quat>() },
+    m_scale{ glm::vec3(1) }
 {
 }
 
-void Transform::translate(const glm::vec3& position)
+void Transform::position(const glm::vec3& position)
 {
-    glm::vec3 scale;
-    glm::quat rotation;
-    glm::vec3 translation;
-    glm::vec3 skew;
-    glm::vec4 perspective;
-
-    glm::decompose(
-        m_transform, 
-        scale, 
-        rotation, 
-        translation, 
-        skew, 
-        perspective);
-
-    // Find rotation
-    glm::mat4 rotate = glm::mat4(1);
-    auto eulerAngles = glm::eulerAngles(rotation);
-    auto eulerAnglesLength = glm::length(eulerAngles);
-
-    rotate = glm::translate(rotate, position);
-    if (eulerAnglesLength != 0) {
-        eulerAngles /= eulerAnglesLength;
-        rotate = glm::rotate(rotate, eulerAnglesLength, eulerAngles);
-    }
-    rotate = glm::translate(rotate, -position);
-
-    // Basic transformation
-    glm::mat4 translate, scaling;
-    translate = glm::translate(glm::mat4(1), position);
-    scaling = glm::scale(glm::mat4(1), scale);
-
-    m_transform = scaling * rotate * translate;
+    m_position = position;
 }
 
-void Transform::rotate(float angle, const glm::vec3& axis)
+void Transform::position(float x, float y, float z)
 {
-    glm::vec3 scale;
-    glm::quat rotation;
-    glm::vec3 translation;
-    glm::vec3 skew;
-    glm::vec4 perspective;
+    position(glm::vec3(x, y, z));
+}
 
-    glm::decompose(
-        m_transform,
-        scale,
-        rotation,
-        translation,
-        skew,
-        perspective);
+void Transform::rotate(const glm::quat& quaternion)
+{
+    m_rotation = quaternion;
+}
 
-    // Find rotation
-    glm::mat4 rotate = glm::mat4(1);
+void Transform::rotateX(float angle)
+{
+    m_rotation = glm::rotate(
+        glm::identity<glm::quat>(),
+        glm::radians(angle), 
+        glm::vec3(1, 0, 0));
+}
 
-    rotate = glm::translate(rotate, translation);
-    rotate = glm::rotate(rotate, glm::radians(angle), axis);
-    rotate = glm::translate(rotate, -translation);
+void Transform::rotateY(float angle)
+{
+    m_rotation = glm::rotate(
+        glm::identity<glm::quat>(),
+        glm::radians(angle),
+        glm::vec3(0, 1, 0));
+}
 
-    // Basic transformation
-    glm::mat4 translate, scaling;
-    translate = glm::translate(glm::mat4(1), translation);
-    scaling = glm::scale(glm::mat4(1), scale);
+void Transform::rotateZ(float angle)
+{
+    m_rotation = glm::rotate(
+        glm::identity<glm::quat>(),
+        glm::radians(angle),
+        glm::vec3(0, 0, 1));
+}
 
-    m_transform = scaling * rotate * translate;
+void Transform::rotateAround(const glm::quat& quaternion)
+{
+    m_rotateAround = quaternion;
+}
+
+void Transform::rotateAroundX(float angle)
+{
+    m_rotateAround = glm::rotate(
+        glm::identity<glm::quat>(),
+        glm::radians(angle),
+        glm::vec3(1, 0, 0));
+}
+
+void Transform::rotateAroundY(float angle)
+{
+    m_rotateAround = glm::rotate(
+        glm::identity<glm::quat>(),
+        glm::radians(angle),
+        glm::vec3(0, 1, 0));
+}
+
+void Transform::rotateAroundZ(float angle)
+{
+    m_rotateAround = glm::rotate(
+        glm::identity<glm::quat>(),
+        glm::radians(angle),
+        glm::vec3(0, 0, 1));
 }
 
 void Transform::scale(const glm::vec3& scale)
 {
-    glm::vec3 _scale;
-    glm::quat rotation;
-    glm::vec3 translation;
-    glm::vec3 skew;
-    glm::vec4 perspective;
+    m_scale = scale;
+}
 
-    glm::decompose(
-        m_transform,
-        _scale,
-        rotation,
-        translation,
-        skew,
-        perspective);
-
-    // Find rotation
-    glm::mat4 rotate = glm::mat4(1);
-    auto eulerAngles = glm::eulerAngles(rotation);
-    auto eulerAnglesLength = glm::length(eulerAngles);
-
-    rotate = glm::translate(rotate, translation);
-    if (eulerAnglesLength != 0) {
-        eulerAngles /= eulerAnglesLength;
-        rotate = glm::rotate(rotate, eulerAnglesLength, eulerAngles);
-    }
-    rotate = glm::translate(rotate, -translation);
-
-    // Basic transformation
-    glm::mat4 translate, scaling;
-    translate = glm::translate(glm::mat4(1), translation);
-    scaling = glm::scale(glm::mat4(1), scale);
-
-    m_transform = scaling * rotate * translate;
+void Transform::scale(float x, float y, float z)
+{
+    scale(glm::vec3(x, y, z));
 }
 
 glm::mat4 Transform::transform() const
 {
-    return m_transform;
+    auto translation = glm::translate(glm::mat4(1), m_position);
+    auto ntranslation = glm::translate(glm::mat4(1), -m_position);
+    auto rotate = glm::toMat4(m_rotation);
+    auto rotateAround = glm::toMat4(m_rotateAround);
+    auto scale = glm::scale(glm::mat4(1), m_scale);
+    
+    return scale * rotateAround * 
+        translation * rotate * ntranslation * translation;
 }

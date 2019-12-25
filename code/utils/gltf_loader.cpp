@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include <glm/gtx/matrix_decompose.hpp>
+#include <glm/gtx/quaternion.hpp>
 #include <regex>
 
 glTFLoader::glTFLoader()
@@ -40,7 +41,9 @@ int glTFLoader::accessorSize(const tinygltf::Accessor& accessor) const
     }
 }
 
-void glTFLoader::processNode(const tinygltf::Node& node, int parent)
+void glTFLoader::processNode(
+    const tinygltf::Node& node, 
+    const std::shared_ptr<Entity>& parent)
 {
     std::shared_ptr<Entity> entity = nullptr;
 
@@ -55,48 +58,8 @@ void glTFLoader::processNode(const tinygltf::Node& node, int parent)
     }
 
     if (entity) {
-        auto pMatrix = glm::mat4(1);
-
-        if (parent > -1) {
-            auto parentNode = m_model.nodes[parent];
-            if (parentNode.matrix.size() == 16) {
-                pMatrix = glm::mat4(
-                    parentNode.matrix[0], parentNode.matrix[1], parentNode.matrix[2], parentNode.matrix[3],
-                    parentNode.matrix[4], parentNode.matrix[5], parentNode.matrix[6], parentNode.matrix[7],
-                    parentNode.matrix[8], parentNode.matrix[9], parentNode.matrix[10], parentNode.matrix[11],
-                    parentNode.matrix[12], parentNode.matrix[13], parentNode.matrix[14], parentNode.matrix[15]
-                );
-            }
-            else {
-                glm::mat4 scale = glm::mat4(1);
-                glm::mat4 rotate = glm::mat4(1);
-                glm::mat4 translate = glm::mat4(1);
-
-                if (parentNode.scale.size() == 3) {
-                    scale = glm::scale(glm::mat4(1), glm::vec3(
-                        (float)parentNode.scale[0],
-                        (float)parentNode.scale[1],
-                        (float)parentNode.scale[2]));
-                }
-
-                if (parentNode.translation.size() == 3) {
-                    translate = glm::translate(glm::mat4(1), glm::vec3(
-                        (float)parentNode.translation[0],
-                        (float)parentNode.translation[1],
-                        (float)parentNode.translation[2]));
-                }
-
-                /*if (parentNode.rotation.size() == 4) {
-                    rotate = glm::rotate(glm::mat4(1),
-                        (float)parentNode.rotation[0],
-                        glm::vec3(
-                            parentNode.rotation[1],
-                            parentNode.rotation[2],
-                            parentNode.rotation[3]));
-                }*/
-
-                pMatrix = scale * rotate * translate;
-            }
+        if (parent) {
+            entity->parent(parent);
         }
 
         if (node.matrix.size() == 16) {
@@ -114,40 +77,37 @@ void glTFLoader::processNode(const tinygltf::Node& node, int parent)
             glm::vec4 perspective;
             glm::decompose(matrix, scale, rotation, translation, skew, perspective);
 
-            entity->translate(glm::vec3(pMatrix * glm::vec4(translation, 1.f)));
-            entity->scale(glm::vec3(pMatrix * glm::vec4(scale, 1.f)));
+            entity->position(translation);
+            entity->scale(scale);
+            entity->rotate(rotation);
         }
         else {
             if (node.scale.size() == 3) {
-                glm::vec3 scale = glm::vec3(
+                entity->scale(
                     node.scale[0],
                     node.scale[1],
                     node.scale[2]);
-
-                entity->scale(glm::vec3(pMatrix * glm::vec4(scale, 1.f)));
             }
 
             if (node.translation.size() == 3) {
-                glm::vec3 translate = glm::vec3(
+                entity->position(
                     node.translation[0],
                     node.translation[1],
                     node.translation[2]);
-
-                entity->translate(glm::vec3(pMatrix * glm::vec4(translate, 1.f)));
             }
 
             if (node.rotation.size() == 4) {
-                glm::vec3 rotate = glm::vec3(
-                    node.rotation[1],
-                    node.rotation[2],
-                    node.rotation[3]);
+                entity->rotate(glm::quat(
+                    node.rotation[0], 
+                    node.rotation[1], 
+                    node.rotation[2], 
+                    node.rotation[3]));
             }
         }
     }
 
-    auto it = std::find(m_model.nodes.begin(), m_model.nodes.end(), node);
     for (auto cn : node.children) {
-        processNode(m_model.nodes[cn], (int)(it - m_model.nodes.begin()));
+        processNode(m_model.nodes[cn], entity);
     }
 }
 
@@ -447,7 +407,7 @@ bool glTFLoader::load(const std::string& filename)
 void glTFLoader::draw(const Shader& shader) const
 {
     for (auto entity : m_entities) {
-        entity->draw(shader, *this);
+        entity->draw(shader, transform());
     }
 }
 

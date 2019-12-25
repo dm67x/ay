@@ -23,7 +23,7 @@ int main(void)
         }
 
         // Camera
-        mainCamera.translate(glm::vec3(0, 0, -2));
+        mainCamera.position(0, 0, -8);
         float rotationAmount = 0;
 
         // Loader
@@ -35,7 +35,7 @@ int main(void)
             throw std::exception("cannot load glTF file");
         }
 
-        suzanneLoader.translate(glm::vec3(0, 0, 5));
+        suzanneLoader.position(0, 0, 5);
 
         while (app.run()) {
             auto wsize = app.size();
@@ -48,10 +48,10 @@ int main(void)
             }
 
             mainCamera.aspectRatio(ratio);
-            //mainCamera.rotate(glm::radians(rotationAmount++), glm::vec3(0, 1, 0));
 
-            helmetLoader.rotate(rotationAmount++, glm::vec3(0, 1, 0));
-            suzanneLoader.rotate(rotationAmount++, glm::vec3(1, 0, 0));
+            helmetLoader.rotateY(rotationAmount++);
+            suzanneLoader.rotateX(rotationAmount++);
+            suzanneLoader.rotateAroundY(rotationAmount++);
 
             glClearColor(0.f, 0.f, 0.f, 0.f);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

@@ -20,7 +20,7 @@ class glTFLoader final : public Transform
 
 private:
     int accessorSize(const tinygltf::Accessor&) const;
-    void processNode(const tinygltf::Node&, int = -1);
+    void processNode(const tinygltf::Node&, const std::shared_ptr<Entity>& = nullptr);
     std::shared_ptr<Entity> processMesh(const tinygltf::Mesh&);
     std::shared_ptr<Entity> processCamera(const tinygltf::Camera&);
     GLenum textureFilter(int) const;

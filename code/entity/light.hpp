@@ -15,5 +15,5 @@ private:
 
 public:
     Light(const std::string&);
-    virtual void draw(const Shader&, const Transform& = Transform()) const override;
+    virtual void draw(const Shader&, const glm::mat4& = glm::mat4(1)) const override;
 };

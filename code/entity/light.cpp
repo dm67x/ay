@@ -6,10 +6,10 @@ Light::Light(const std::string& name)
 {
 }
 
-void Light::draw(const Shader& program, const Transform& tr) const
+void Light::draw(const Shader& program, const glm::mat4& tr) const
 {
     program.uniform("lightPosition", 
-        glm::vec3(tr.transform() * glm::vec4(position, 1)));
+        glm::vec3(tr * glm::vec4(position, 1)));
     program.uniform("lightPower", power);
     program.uniform("lightColor", color);
 }
