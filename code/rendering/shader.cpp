@@ -61,6 +61,54 @@ Shader::~Shader()
     glCheckError();
 }
 
+bool Shader::load(const std::string& filename) const
+{
+    std::ifstream file(filename);
+    if (!file.is_open())
+        return false;
+
+    enum Mode { NONE, VERTEX, FRAGMENT };
+    Mode currentMode = Mode::NONE;
+
+    std::string vertex = "";
+    std::string fragment = "";
+
+    for (std::string line; std::getline(file, line); ) {
+        // #vertex
+        if (line == "#vertex") {
+            if (currentMode != Mode::NONE) return false;
+            currentMode = Mode::VERTEX;
+            continue;
+        }
+        else if (line == "#fragment") {
+            if (currentMode != Mode::NONE) return false;
+            currentMode = Mode::FRAGMENT;
+            continue;
+        }
+        else if (line == "#end") {
+            currentMode = Mode::NONE;
+            continue;
+        }
+
+        if (currentMode == Mode::VERTEX) {
+            vertex += line + "\n";
+        }
+        else if (currentMode == Mode::FRAGMENT) {
+            fragment += line + "\n";
+        }
+    }
+
+    if (vertex.empty() || fragment.empty()) {
+        return false;
+    }
+
+    m_vertex.fromMemory(vertex);
+    m_fragment.fromMemory(fragment);
+
+    file.close();
+    return build();
+}
+
 bool Shader::build() const
 {
     glAttachShader(m_id, m_vertex.id);

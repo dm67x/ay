@@ -40,7 +40,7 @@ void Material::use(const Shader& program) const
         program.uniform("metallicRoughnessTexture", 1);
     }
 
-    if (m_metallicRoughnessTexture) {
+    if (m_normalTexture) {
         program.uniform("isNormalTexture", 1);
         m_normalTexture->bind(2);
         program.uniform("normalTexture", 2);

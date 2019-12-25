@@ -17,16 +17,16 @@ int main(void)
     try {
         // Shader
         auto shader = shmgr.create("Standard");
-        shader->vertex().fromFile("../shaders/phong_vert.glsl");
-        shader->fragment().fromFile("../shaders/phong_frag.glsl");
-        shader->build();
+        if (!shader->load("assets/shaders/phong.glsl")) {
+            std::cerr << "cannot load shader" << std::endl;
+        }
 
         // Camera
         mainCamera.translate(glm::vec3(0, 0, -2));
         float rotationAmount = 0;
 
         // Loader
-        if (!loader.load("../models/little_tokyo.glb")) {
+        if (!loader.load("assets/models/DamagedHelmet.glb")) {
             throw std::exception("cannot load glTF file");
         }
 

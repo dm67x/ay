@@ -29,6 +29,7 @@ public:
     ~Shader();
 
 public:
+    bool load(const std::string&) const;
     bool build() const;
     void use() const;
     void reset() const;
