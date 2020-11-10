@@ -186,7 +186,7 @@ private:
     /// @param value Value
     ///
     inline static PlatformId uniform1f(PlatformId id, const std::string& name, float value) {
-        GLuint loc = glGetUniformLocation(id, name.c_str());
+        GLint loc = glGetUniformLocation(id, name.c_str());
         glUniform1f(loc, value);
         return id;
     }
@@ -198,7 +198,7 @@ private:
     /// @param value Value
     ///
     inline static PlatformId uniform1i(PlatformId id, const std::string& name, int value) {
-        GLuint loc = glGetUniformLocation(id, name.c_str());
+        GLint loc = glGetUniformLocation(id, name.c_str());
         glUniform1i(loc, value);
         return id;
     }
@@ -210,7 +210,7 @@ private:
     /// @param value Value
     ///
     inline static PlatformId uniform3fv(PlatformId id, const std::string& name, float value[3]) {
-        GLuint loc = glGetUniformLocation(id, name.c_str());
+        GLint loc = glGetUniformLocation(id, name.c_str());
         glUniform3fv(loc, 1, value);
         return id;
     }
@@ -222,7 +222,7 @@ private:
     /// @param value Value
     ///
     inline static PlatformId uniform4fv(PlatformId id, const std::string& name, float value[4]) {
-        GLuint loc = glGetUniformLocation(id, name.c_str());
+        GLint loc = glGetUniformLocation(id, name.c_str());
         glUniform4fv(loc, 1, value);
         return id;
     }
@@ -235,7 +235,7 @@ private:
     /// @param transpose Transpose matrix
     ///
     inline static PlatformId uniformMatrix4fv(PlatformId id, const std::string& name, float value[16], bool transpose = false) {
-        GLuint loc = glGetUniformLocation(id, name.c_str());
+        GLint loc = glGetUniformLocation(id, name.c_str());
         glUniformMatrix4fv(loc, 1, transpose, value);
         return id;
     }
@@ -470,7 +470,7 @@ private:
         const void* ptr) 
     {
         glEnableVertexAttribArray(index);
-        glVertexAttribPointer(index, size, (GLenum)type, GL_FALSE, stride, ptr);
+        glVertexAttribPointer(index, size, (GLenum)type, GL_FALSE, (GLsizei)stride, ptr);
     }
 
     ///
@@ -479,7 +479,7 @@ private:
     /// @param first Specifies the starting index in the enabled arrays
     /// @param count Specifies the number of indices to be rendered
     inline static void drawArrays(DrawMode mode, int first, size_t count) {
-        glDrawArrays((GLenum)mode, first, count);
+        glDrawArrays((GLenum)mode, first, (GLsizei)count);
     }
 
     ///
@@ -490,6 +490,6 @@ private:
     /// @param indices Specifies a pointer to the location where the indices are stored
     ///
     inline static void drawElements(DrawMode mode, size_t count, AttribType type, const void* indices) {
-        glDrawElements((GLenum)mode, count, (GLenum)type, indices);
+        glDrawElements((GLenum)mode, (GLsizei)count, (GLenum)type, indices);
     }
 };

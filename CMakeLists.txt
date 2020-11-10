@@ -21,6 +21,6 @@ include_directories(extern/stb)
 add_executable(ay "src/main.cpp" "src/window.cpp" "src/mesh.cpp" "src/context.cpp")
 target_link_libraries(ay PRIVATE glad glfw OpenGL::GL)
 target_compile_options(ay PRIVATE
-    $<$<CXX_COMPILER_ID:MSVC>:/W4 /WX /Wall>
+    $<$<CXX_COMPILER_ID:MSVC>:/W4 /WX>
     $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wall -Wextra -pedantic -Werror>
 )
