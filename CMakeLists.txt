@@ -1,23 +1,26 @@
-cmake_minimum_required(VERSION 3.8)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_HOME_DIRECTORY}/bin)
+cmake_minimum_required(VERSION 3.12)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
-project(Ay)
+project(ay 
+    LANGUAGES CXX C
+    HOMEPAGE_URL "https://github.com/dm67x/ay"
+    DESCRIPTION "3D Render Engine"
+    VERSION "0.2")
 
-option(COPY_ASSETS "Copy assets" ON)
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(OpenGL REQUIRED)
-add_subdirectory(third_party/glm)
-add_subdirectory(third_party/glfw)
-add_subdirectory(third_party/glad)
-add_subdirectory(third_party/tinygltf)
+add_subdirectory(extern/glfw)
+add_subdirectory(extern/glad)
+add_subdirectory(extern/stb)
 
-if (COPY_ASSETS)
-    add_subdirectory(assets)
-endif ()
+include_directories(extern/glad)
+include_directories(extern/stb)
 
-file(GLOB_RECURSE SRCFILES ${CMAKE_CURRENT_SOURCE_DIR}/code/**.cpp ${CMAKE_CURRENT_SOURCE_DIR}/code/**.hpp)
-source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${SRCFILES})
-
-add_executable(ay ${SRCFILES})
-target_include_directories(ay PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/code)
-target_link_libraries(ay PRIVATE glm glad glfw tinygltf OpenGL::GL)
+add_executable(ay "src/main.cpp" "src/window.cpp" "src/mesh.cpp")
+target_link_libraries(ay PRIVATE glad glfw OpenGL::GL)
+target_compile_options(ay PRIVATE
+    $<$<CXX_COMPILER_ID:MSVC>:/W4 /WX /Wall>
+    $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wall -Wextra -pedantic -Werror>
+)
