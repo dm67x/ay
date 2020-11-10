@@ -74,10 +74,57 @@ public:
     void vaoBind(PlatformId id) const;
 
     ///
+    /// @brief Create a new buffer
+    /// @return buffer id
+    ///
+    PlatformId bufferNew() const;
+
+    ///
+    /// @brief Destroy the buffer specified by id
+    /// @param id buffer to destroy
+    ///
+    void bufferDestroy(PlatformId id) const;
+
+    ///
+    /// @brief Bind buffer
+    /// @param id buffer id
+    /// @param mode buffer target mode
+    ///
+    void bufferBind(PlatformId id, OpenGL::BufferMode mode) const;
+
+    ///
+    /// @brief Set buffer data
+    /// @param mode buffer target mode
+    /// @param size buffer size
+    /// @param data data
+    /// @param target buffer data target mode
+    ///
+    void bufferData(OpenGL::BufferMode mode, size_t size, const void* data, OpenGL::BufferTarget target) const;
+
+    ///
+    /// @brief VertexAttribArray
+    /// @param id Specifies the index of the generic vertex attribute to be modified
+    /// @param size Specifies the number of components per generic vertex attribute
+    /// @param type Specifies the data type of each component in the array
+    /// @param stride Specifies the byte offset between consecutive generic vertex attributes
+    /// @param ptr Specifies a offset of the first component of the first generic vertex attribute
+    ///
+    void bufferAttribArray(PlatformId id, int size, OpenGL::AttribType type, size_t stride, const void* ptr);    
+
+    ///
     /// @brief Draw arrays
     /// @param mode Draw mode
     /// @param first Specifies the starting index in the enabled arrays
     /// @param count Specifies the number of indices to be rendered
     ///
     void drawArrays(OpenGL::DrawMode mode, int first, size_t count) const;
+
+    ///
+    /// @brief Draw elements call
+    /// @param mode Specifies what kind of primitives to render
+    /// @param count Specifies the number of elements to be rendered
+    /// @param type Specifies the type of the values in indices
+    /// @param indices Specifies a pointer to the location where the indices are stored
+    ///
+    void drawElements(OpenGL::DrawMode mode, size_t count, OpenGL::AttribType type, const void* indices);
 };

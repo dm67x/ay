@@ -8,7 +8,10 @@
 
 using PlatformId = GLuint;
 
-struct OpenGL {
+class OpenGL {
+    friend class Context;
+
+public:
     enum class Error {
         NO_ERROR,
         INVALID_ENUM,
@@ -47,6 +50,28 @@ struct OpenGL {
         PATCHES = GL_PATCHES
     };
 
+    enum class BufferMode {
+        ARRAY = GL_ARRAY_BUFFER,
+        ELEMENT_ARRAY = GL_ELEMENT_ARRAY_BUFFER
+    };
+
+    enum class BufferTarget {
+        STATIC_DRAW = GL_STATIC_DRAW,
+        STATIC_COPY = GL_STATIC_COPY,
+        STATIC_READ = GL_STATIC_READ,
+        DYNAMIC_DRAW = GL_DYNAMIC_DRAW,
+        DYNAMIC_COPY = GL_DYNAMIC_COPY,
+        DYNAMIC_READ = GL_DYNAMIC_READ,
+    };
+
+    enum class AttribType {
+        FLOAT = GL_FLOAT,
+        UNSIGNED_INT = GL_UNSIGNED_INT,
+        BYTE = GL_BYTE,
+        UNSIGNED_BYTE = GL_UNSIGNED_BYTE,
+        INT = GL_INT
+    };
+
     ///
     /// @brief Get OpenGL Version
     /// @return Version
@@ -75,6 +100,7 @@ struct OpenGL {
         return gladLoadGLES2Loader((GLADloadproc)glfwGetProcAddress);
     }
 
+private:
     ///
     /// @brief Get OpenGL error
     /// @return Error code
@@ -389,11 +415,81 @@ struct OpenGL {
     }
 
     ///
+    /// @brief Create buffer
+    /// @return buffer id
+    ///
+    inline static PlatformId createBuffer() {
+        PlatformId id;
+        glGenBuffers(1, &id);
+        return id;
+    }
+
+    ///
+    /// @brief Destroy buffer
+    /// @param id buffer id
+    ///
+    inline static void destroyBuffer(PlatformId id) {
+        glDeleteBuffers(1, &id);
+    }
+
+    ///
+    /// @brief Bind buffer
+    /// @param id buffer id
+    /// @param mode buffer target mode
+    /// @return buffer id
+    ///
+    inline static PlatformId bindBuffer(PlatformId id, BufferMode mode) {
+        glBindBuffer((GLenum)mode, id);
+        return id;
+    }
+
+    ///
+    /// @brief Set buffer data
+    /// @param mode buffer target mode
+    /// @param size buffer size
+    /// @param data data
+    /// @param target buffer data target mode
+    ///
+    inline static void bufferData(BufferMode mode, size_t size, const void* data, BufferTarget target) {
+        glBufferData((GLenum)mode, (GLsizeiptr)size, data, (GLenum)target);
+    }
+
+    ///
+    /// @brief VertexAttribArray
+    /// @param index Specifies the index of the generic vertex attribute to be modified
+    /// @param size Specifies the number of components per generic vertex attribute
+    /// @param type Specifies the data type of each component in the array
+    /// @param stride Specifies the byte offset between consecutive generic vertex attributes
+    /// @param ptr Specifies a offset of the first component of the first generic vertex attribute
+    ///
+    inline static void vertexAttribArray(
+        PlatformId index, 
+        int size,
+        AttribType type,
+        size_t stride,
+        const void* ptr) 
+    {
+        glEnableVertexAttribArray(index);
+        glVertexAttribPointer(index, size, (GLenum)type, GL_FALSE, stride, ptr);
+    }
+
+    ///
     /// @brief Draw arrays call
     /// @param mode Draw mode
     /// @param first Specifies the starting index in the enabled arrays
     /// @param count Specifies the number of indices to be rendered
     inline static void drawArrays(DrawMode mode, int first, size_t count) {
         glDrawArrays((GLenum)mode, first, count);
+    }
+
+    ///
+    /// @brief Draw elements call
+    /// @param mode Specifies what kind of primitives to render
+    /// @param count Specifies the number of elements to be rendered
+    /// @param type Specifies the type of the values in indices
+    /// @param indices Specifies a pointer to the location where the indices are stored
+    ///
+    inline static void drawElements(DrawMode mode, size_t count, AttribType type, const void* indices) {
+        glDrawElements((GLenum)mode, count, (GLenum)type, indices);
     }
 };

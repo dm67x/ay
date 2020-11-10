@@ -105,6 +105,30 @@ void Context::vaoBind(PlatformId id) const {
     OpenGL::bindVertexArray(id);
 }
 
+PlatformId Context::bufferNew() const {
+    return OpenGL::createBuffer();
+}
+
+void Context::bufferDestroy(PlatformId id) const {
+    OpenGL::destroyBuffer(id);
+}
+
+void Context::bufferBind(PlatformId id, OpenGL::BufferMode mode) const {
+    OpenGL::bindBuffer(id, mode);
+}
+
+void Context::bufferData(OpenGL::BufferMode mode, size_t size, const void* data, OpenGL::BufferTarget target) const {
+    OpenGL::bufferData(mode, size, data, target);
+}
+
+void Context::bufferAttribArray(PlatformId id, int size, OpenGL::AttribType type, size_t stride, const void* ptr) {
+    OpenGL::vertexAttribArray(id, size, type, stride, ptr);
+}
+
 void Context::drawArrays(OpenGL::DrawMode mode, int first, size_t count) const {
     OpenGL::drawArrays(mode, first, count);
+}
+
+void Context::drawElements(OpenGL::DrawMode mode, size_t count, OpenGL::AttribType type, const void* indices) {
+    OpenGL::drawElements(mode, count, type, indices);
 }
