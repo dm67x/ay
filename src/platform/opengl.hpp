@@ -4,6 +4,7 @@
 #include <glad.h>
 #include <string>
 #include <sstream>
+#include <vector>
 
 using PlatformId = GLuint;
 
@@ -90,12 +91,11 @@ struct OpenGL {
     /// @return log
     /// 
     inline static const std::string getProgramLog(PlatformId id) {
-        GLsizei length;
-        std::string log;
-        glGetProgramInfoLog(id, 1, &length, nullptr);
-        log.reserve(length);
-        glGetProgramInfoLog(id, 1, nullptr, (GLchar*)&log);
-        return log;
+        GLint length;
+        glGetProgramiv(id, GL_INFO_LOG_LENGTH, &length);
+        std::vector<GLchar> log(length);
+        glGetProgramInfoLog(id, length, nullptr, log.data());
+        return std::string(log.begin(), log.end());
     }
 
     ///
@@ -251,12 +251,11 @@ struct OpenGL {
     /// @return log
     ///
     inline static const std::string getShaderLog(PlatformId id) {
-        GLsizei length;
-        std::string log;
-        glGetShaderInfoLog(id, 1, &length, nullptr);
-        log.reserve(length);
-        glGetShaderInfoLog(id, 1, nullptr, (GLchar*)&log);
-        return log;
+        GLint length;
+        glGetShaderiv(id, GL_INFO_LOG_LENGTH, &length);
+        std::vector<GLchar> log(length);
+        glGetShaderInfoLog(id, length, nullptr, log.data());
+        return std::string(log.begin(), log.end());
     }
 
     ///
@@ -339,5 +338,12 @@ struct OpenGL {
     ///
     inline static void textureActiveUnit(unsigned char slot) {
         glActiveTexture(GL_TEXTURE0 + slot);
+    }
+
+    ///
+    /// @brief Generate mipmap
+    ///
+    inline static void textureGenMipmap() {
+        glGenerateMipmap(GL_TEXTURE_2D);
     }
 };
