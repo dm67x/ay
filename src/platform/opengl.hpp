@@ -19,6 +19,18 @@ struct OpenGL {
         INVALID_FRAMEBUFFER_OPERATION
     };
 
+    enum class TextureWrap {
+        REPEAT = GL_REPEAT,
+        MIRRORED_REPEAT = GL_MIRRORED_REPEAT,
+        CLAMP_TO_EDGE = GL_CLAMP_TO_EDGE,
+        CLAMP_TO_BORDER = GL_CLAMP_TO_BORDER
+    };
+
+    enum class TextureFiltering {
+        NEAREST = GL_NEAREST,
+        LINEAR = GL_LINEAR
+    };
+
     ///
     /// @brief Get OpenGL Version
     /// @return Version
@@ -127,6 +139,67 @@ struct OpenGL {
     }
 
     ///
+    /// @brief Uniform1f
+    /// @param id Program id
+    /// @param name Uniform name
+    /// @param value Value
+    ///
+    inline static PlatformId uniform1f(PlatformId id, const std::string& name, float value) {
+        GLuint loc = glGetUniformLocation(id, name.c_str());
+        glUniform1f(loc, value);
+        return id;
+    }
+
+    ///
+    /// @brief Uniform1i
+    /// @param id Program id
+    /// @param name Uniform name
+    /// @param value Value
+    ///
+    inline static PlatformId uniform1i(PlatformId id, const std::string& name, int value) {
+        GLuint loc = glGetUniformLocation(id, name.c_str());
+        glUniform1i(loc, value);
+        return id;
+    }
+
+    ///
+    /// @brief Uniform3fv
+    /// @param id Program id
+    /// @param name Uniform name
+    /// @param value Value
+    ///
+    inline static PlatformId uniform3fv(PlatformId id, const std::string& name, float value[3]) {
+        GLuint loc = glGetUniformLocation(id, name.c_str());
+        glUniform3fv(loc, 1, value);
+        return id;
+    }
+
+    ///
+    /// @brief Uniform4fv
+    /// @param id Program id
+    /// @param name Uniform name
+    /// @param value Value
+    ///
+    inline static PlatformId uniform4fv(PlatformId id, const std::string& name, float value[4]) {
+        GLuint loc = glGetUniformLocation(id, name.c_str());
+        glUniform4fv(loc, 1, value);
+        return id;
+    }
+
+    ///
+    /// @brief UniformMatrix4fv
+    /// @param id Program id
+    /// @param name Uniform name
+    /// @param value Value
+    /// @param transpose Transpose matrix
+    ///
+    inline static PlatformId uniformMatrix4fv(PlatformId id, const std::string& name, float value[16], bool transpose = false) {
+        GLuint loc = glGetUniformLocation(id, name.c_str());
+        glUniformMatrix4fv(loc, 1, transpose, value);
+        return id;
+    }
+
+    ///
     /// @brief Create a new vertex shader
     /// @return Shader id
     /// 
@@ -184,5 +257,87 @@ struct OpenGL {
         log.reserve(length);
         glGetShaderInfoLog(id, 1, nullptr, (GLchar*)&log);
         return log;
+    }
+
+    ///
+    /// @brief Bind program
+    /// @param id program id
+    /// @return program id
+    ///
+    inline static PlatformId useProgram(PlatformId id) {
+        glUseProgram(id);
+        return id;
+    }
+
+    ///
+    /// @brief Create a new texture
+    /// @return texture id
+    ///
+    inline static PlatformId createTexture() {
+        PlatformId id;
+        glGenTextures(1, &id);
+        return id;
+    }
+
+    ///
+    /// @brief Texture MIN filter
+    /// @param id texture id
+    /// @param filter filter parameter
+    /// @return texture id
+    ///
+    inline static PlatformId textureMinParameter(PlatformId id, TextureFiltering filter) {
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, (GLint)filter);
+        return id;
+    }
+
+    ///
+    /// @brief Texture MAG filter
+    /// @param id texture id
+    /// @param filter filter parameter
+    /// @return texture id
+    ///
+    inline static PlatformId textureMagParameter(PlatformId id, TextureFiltering filter) {
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, (GLint)filter);
+        return id;
+    }
+
+    ///
+    /// @brief Texture wrap S
+    /// @param id texture id
+    /// @param wrap wrap parameter
+    /// @return texture id
+    ///
+    inline static PlatformId textureWrapSParameter(PlatformId id, TextureWrap wrap) {
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, (GLint)wrap);
+        return id;
+    }
+
+    ///
+    /// @brief Texture wrap T
+    /// @param id texture id
+    /// @param wrap wrap parameter
+    /// @return texture id
+    ///
+    inline static PlatformId textureWrapTParameter(PlatformId id, TextureWrap wrap) {
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, (GLint)wrap);
+        return id;
+    }
+
+    ///
+    /// @brief Bind texture
+    /// @param id texture id
+    /// @return texture id
+    ///
+    inline static PlatformId textureBind(PlatformId id) {
+        glBindTexture(GL_TEXTURE_2D, id);
+        return id;
+    }
+
+    ///
+    /// @brief Active texture at slot (slot)
+    /// @param slot texture slot
+    ///
+    inline static void textureActiveUnit(unsigned char slot) {
+        glActiveTexture(GL_TEXTURE0 + slot);
     }
 };
