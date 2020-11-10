@@ -32,6 +32,21 @@ struct OpenGL {
         LINEAR = GL_LINEAR
     };
 
+    enum class DrawMode {
+        TRIANGLES = GL_TRIANGLES,
+        TRIANGLE_STRIP_ADJACENCY = GL_TRIANGLE_STRIP_ADJACENCY,
+        TRIANGLES_ADJACENCY = GL_TRIANGLES_ADJACENCY,
+        POINTS = GL_POINTS,
+        LINE_STRIP = GL_LINE_STRIP,
+        LINE_LOOP = GL_LINE_LOOP,
+        LINES = GL_LINES,
+        LINE_STRIP_ADJACENCY = GL_LINE_STRIP_ADJACENCY,
+        LINES_ADJACENCY = GL_LINES_ADJACENCY,
+        TRIANGLE_STRIP = GL_TRIANGLE_STRIP,
+        TRIANGLE_FAN = GL_TRIANGLE_FAN,
+        PATCHES = GL_PATCHES
+    };
+
     ///
     /// @brief Get OpenGL Version
     /// @return Version
@@ -345,5 +360,40 @@ struct OpenGL {
     ///
     inline static void textureGenMipmap() {
         glGenerateMipmap(GL_TEXTURE_2D);
+    }
+
+    ///
+    /// @brief Create vertex array
+    /// @return vertex array id
+    ///
+    inline static PlatformId createVertexArray() {
+        PlatformId id;
+        glGenVertexArrays(1, &id);
+        return id;
+    }
+
+    ///
+    /// @brief Destroy vertex array
+    /// @param id vertex array id
+    ///
+    inline static void destroyVertexArray(PlatformId id) {
+        glDeleteVertexArrays(1, &id);
+    }
+
+    ///
+    /// @brief Bind vertex array
+    /// @param id vertex array id
+    ///
+    inline static void bindVertexArray(PlatformId id) {
+        glBindVertexArray(id);
+    }
+
+    ///
+    /// @brief Draw arrays call
+    /// @param mode Draw mode
+    /// @param first Specifies the starting index in the enabled arrays
+    /// @param count Specifies the number of indices to be rendered
+    inline static void drawArrays(DrawMode mode, int first, size_t count) {
+        glDrawArrays((GLenum)mode, first, count);
     }
 };
