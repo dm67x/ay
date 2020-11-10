@@ -163,6 +163,16 @@ struct OpenGL {
     }
 
     ///
+    /// @brief Compile shader
+    /// @param id shader id
+    /// @return shader id
+    ///
+    inline static PlatformId compileShader(PlatformId id) {
+        glCompileShader(id);
+        return id;
+    }
+
+    ///
     /// @brief Get shader log
     /// @param id shader id
     /// @return log
