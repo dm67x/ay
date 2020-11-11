@@ -5,6 +5,18 @@
 #include <string>
 #include <sstream>
 #include <vector>
+#include <iostream>
+
+#ifdef NDEBUG
+#define glCheckError(expr) expr
+#else
+#define glCheckError(expr) {\
+    expr;\
+    Error err = OpenGL::getError();\
+    if (err != Error::NO_ERROR) {\
+        std::cerr << "GLError at line: " << __LINE__ << std::endl;\
+    } }
+#endif
 
 using PlatformId = GLuint;
 
@@ -126,8 +138,8 @@ private:
     /// @param a Alpha
     /// 
     inline static void clear(float r, float g, float b, float a) {
-        glClearColor(r, g, b, a);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glCheckError(glClearColor(r, g, b, a));
+        glCheckError(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
     }
 
     ///
@@ -135,7 +147,9 @@ private:
     /// @return Shader program id
     /// 
     inline static PlatformId createProgram() {
-        return glCreateProgram();
+        PlatformId id;
+        glCheckError(id = glCreateProgram());
+        return id;
     }
 
     ///
@@ -145,9 +159,9 @@ private:
     /// 
     inline static const std::string getProgramLog(PlatformId id) {
         GLint length;
-        glGetProgramiv(id, GL_INFO_LOG_LENGTH, &length);
+        glCheckError(glGetProgramiv(id, GL_INFO_LOG_LENGTH, &length));
         std::vector<GLchar> log(length);
-        glGetProgramInfoLog(id, length, nullptr, log.data());
+        glCheckError(glGetProgramInfoLog(id, length, nullptr, log.data()));
         return std::string(log.begin(), log.end());
     }
 
@@ -158,7 +172,7 @@ private:
     /// @return program id
     ///
     inline static PlatformId attachShader(PlatformId pid, PlatformId sid) {
-        glAttachShader(pid, sid);
+        glCheckError(glAttachShader(pid, sid));
         return pid;
     }
 
@@ -169,7 +183,7 @@ private:
     /// @return program id
     ///
     inline static PlatformId detachShader(PlatformId pid, PlatformId sid) {
-        glDetachShader(pid, sid);
+        glCheckError(glDetachShader(pid, sid));
         return pid;
     }
 
@@ -179,7 +193,7 @@ private:
     /// @return program id
     ///
     inline static PlatformId linkProgram(PlatformId id) {
-        glLinkProgram(id);
+        glCheckError(glLinkProgram(id));
         return id;
     }
 
@@ -188,7 +202,7 @@ private:
     /// @param id Program id
     ///
     inline static void destroyProgram(PlatformId id) {
-        glDeleteProgram(id);
+        glCheckError(glDeleteProgram(id));
     }
 
     ///
@@ -198,8 +212,9 @@ private:
     /// @param value Value
     ///
     inline static PlatformId uniform1f(PlatformId id, const std::string& name, float value) {
-        GLint loc = glGetUniformLocation(id, name.c_str());
-        glUniform1f(loc, value);
+        GLint loc;
+        glCheckError(loc = glGetUniformLocation(id, name.c_str()));
+        glCheckError(glUniform1f(loc, value));
         return id;
     }
 
@@ -210,8 +225,9 @@ private:
     /// @param value Value
     ///
     inline static PlatformId uniform1i(PlatformId id, const std::string& name, int value) {
-        GLint loc = glGetUniformLocation(id, name.c_str());
-        glUniform1i(loc, value);
+        GLint loc;
+        glCheckError(loc = glGetUniformLocation(id, name.c_str()));
+        glCheckError(glUniform1i(loc, value));
         return id;
     }
 
@@ -222,8 +238,9 @@ private:
     /// @param value Value
     ///
     inline static PlatformId uniform3fv(PlatformId id, const std::string& name, float value[3]) {
-        GLint loc = glGetUniformLocation(id, name.c_str());
-        glUniform3fv(loc, 1, value);
+        GLint loc;
+        glCheckError(loc = glGetUniformLocation(id, name.c_str()));
+        glCheckError(glUniform3fv(loc, 1, value));
         return id;
     }
 
@@ -234,8 +251,9 @@ private:
     /// @param value Value
     ///
     inline static PlatformId uniform4fv(PlatformId id, const std::string& name, float value[4]) {
-        GLint loc = glGetUniformLocation(id, name.c_str());
-        glUniform4fv(loc, 1, value);
+        GLint loc;
+        glCheckError(loc = glGetUniformLocation(id, name.c_str()));
+        glCheckError(glUniform4fv(loc, 1, value));
         return id;
     }
 
@@ -247,8 +265,9 @@ private:
     /// @param transpose Transpose matrix
     ///
     inline static PlatformId uniformMatrix4fv(PlatformId id, const std::string& name, float value[16], bool transpose = false) {
-        GLint loc = glGetUniformLocation(id, name.c_str());
-        glUniformMatrix4fv(loc, 1, transpose, value);
+        GLint loc;
+        glCheckError(loc = glGetUniformLocation(id, name.c_str()));
+        glCheckError(glUniformMatrix4fv(loc, 1, transpose, value));
         return id;
     }
 
@@ -257,7 +276,9 @@ private:
     /// @return Shader id
     /// 
     inline static PlatformId createVertexShader() {
-        return glCreateShader(GL_VERTEX_SHADER);
+        PlatformId id;
+        glCheckError(id = glCreateShader(GL_VERTEX_SHADER));
+        return id;
     }
 
     ///
@@ -265,7 +286,9 @@ private:
     /// @return Shader id
     /// 
     inline static PlatformId createFragmentShader() {
-        return glCreateShader(GL_FRAGMENT_SHADER);
+        PlatformId id;
+        glCheckError(id = glCreateShader(GL_FRAGMENT_SHADER));
+        return id;
     }
 
     ///
@@ -273,7 +296,7 @@ private:
     /// @param id Shader id
     ///
     inline static void destroyShader(PlatformId id) {
-        glDeleteShader(id);
+        glCheckError(glDeleteShader(id));
     }
 
     ///
@@ -284,7 +307,7 @@ private:
     ///
     inline static PlatformId shaderSource(PlatformId id, const std::string& src) {
         const GLchar* c_src = (const GLchar*)src.c_str();
-        glShaderSource(id, 1, &c_src, nullptr);
+        glCheckError(glShaderSource(id, 1, &c_src, nullptr));
         return id;
     }
 
@@ -294,7 +317,7 @@ private:
     /// @return shader id
     ///
     inline static PlatformId compileShader(PlatformId id) {
-        glCompileShader(id);
+        glCheckError(glCompileShader(id));
         return id;
     }
 
@@ -305,9 +328,9 @@ private:
     ///
     inline static const std::string getShaderLog(PlatformId id) {
         GLint length;
-        glGetShaderiv(id, GL_INFO_LOG_LENGTH, &length);
+        glCheckError(glGetShaderiv(id, GL_INFO_LOG_LENGTH, &length));
         std::vector<GLchar> log(length);
-        glGetShaderInfoLog(id, length, nullptr, log.data());
+        glCheckError(glGetShaderInfoLog(id, length, nullptr, log.data()));
         return std::string(log.begin(), log.end());
     }
 
@@ -317,7 +340,7 @@ private:
     /// @return program id
     ///
     inline static PlatformId useProgram(PlatformId id) {
-        glUseProgram(id);
+        glCheckError(glUseProgram(id));
         return id;
     }
 
@@ -327,7 +350,7 @@ private:
     ///
     inline static PlatformId createTexture() {
         PlatformId id;
-        glGenTextures(1, &id);
+        glCheckError(glGenTextures(1, &id));
         return id;
     }
 
@@ -338,7 +361,7 @@ private:
     /// @return texture id
     ///
     inline static PlatformId textureMinParameter(PlatformId id, TextureFiltering filter) {
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, (GLint)filter);
+        glCheckError(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, (GLint)filter));
         return id;
     }
 
@@ -349,7 +372,7 @@ private:
     /// @return texture id
     ///
     inline static PlatformId textureMagParameter(PlatformId id, TextureFiltering filter) {
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, (GLint)filter);
+        glCheckError(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, (GLint)filter));
         return id;
     }
 
@@ -360,7 +383,7 @@ private:
     /// @return texture id
     ///
     inline static PlatformId textureWrapSParameter(PlatformId id, TextureWrap wrap) {
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, (GLint)wrap);
+        glCheckError(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, (GLint)wrap));
         return id;
     }
 
@@ -371,7 +394,7 @@ private:
     /// @return texture id
     ///
     inline static PlatformId textureWrapTParameter(PlatformId id, TextureWrap wrap) {
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, (GLint)wrap);
+        glCheckError(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, (GLint)wrap));
         return id;
     }
 
@@ -381,7 +404,7 @@ private:
     /// @return texture id
     ///
     inline static PlatformId textureBind(PlatformId id) {
-        glBindTexture(GL_TEXTURE_2D, id);
+        glCheckError(glBindTexture(GL_TEXTURE_2D, id));
         return id;
     }
 
@@ -390,14 +413,14 @@ private:
     /// @param slot texture slot
     ///
     inline static void textureActiveUnit(unsigned char slot) {
-        glActiveTexture(GL_TEXTURE0 + slot);
+        glCheckError(glActiveTexture(GL_TEXTURE0 + slot));
     }
 
     ///
     /// @brief Generate mipmap
     ///
     inline static void textureGenMipmap() {
-        glGenerateMipmap(GL_TEXTURE_2D);
+        glCheckError(glGenerateMipmap(GL_TEXTURE_2D));
     }
 
     ///
@@ -406,7 +429,7 @@ private:
     ///
     inline static PlatformId createVertexArray() {
         PlatformId id;
-        glGenVertexArrays(1, &id);
+        glCheckError(glGenVertexArrays(1, &id));
         return id;
     }
 
@@ -415,7 +438,7 @@ private:
     /// @param id vertex array id
     ///
     inline static void destroyVertexArray(PlatformId id) {
-        glDeleteVertexArrays(1, &id);
+        glCheckError(glDeleteVertexArrays(1, &id));
     }
 
     ///
@@ -423,7 +446,7 @@ private:
     /// @param id vertex array id
     ///
     inline static void bindVertexArray(PlatformId id) {
-        glBindVertexArray(id);
+        glCheckError(glBindVertexArray(id));
     }
 
     ///
@@ -432,7 +455,7 @@ private:
     ///
     inline static PlatformId createBuffer() {
         PlatformId id;
-        glGenBuffers(1, &id);
+        glCheckError(glGenBuffers(1, &id));
         return id;
     }
 
@@ -441,7 +464,7 @@ private:
     /// @param id buffer id
     ///
     inline static void destroyBuffer(PlatformId id) {
-        glDeleteBuffers(1, &id);
+        glCheckError(glDeleteBuffers(1, &id));
     }
 
     ///
@@ -451,7 +474,7 @@ private:
     /// @return buffer id
     ///
     inline static PlatformId bindBuffer(PlatformId id, BufferMode mode) {
-        glBindBuffer((GLenum)mode, id);
+        glCheckError(glBindBuffer((GLenum)mode, id));
         return id;
     }
 
@@ -463,7 +486,7 @@ private:
     /// @param target buffer data target mode
     ///
     inline static void bufferData(BufferMode mode, size_t size, const void* data, BufferTarget target) {
-        glBufferData((GLenum)mode, (GLsizeiptr)size, data, (GLenum)target);
+        glCheckError(glBufferData((GLenum)mode, (GLsizeiptr)size, data, (GLenum)target));
     }
 
     ///
@@ -481,8 +504,8 @@ private:
         size_t stride,
         const void* ptr) 
     {
-        glEnableVertexAttribArray(index);
-        glVertexAttribPointer(index, size, (GLenum)type, GL_FALSE, (GLsizei)stride, ptr);
+        glCheckError(glEnableVertexAttribArray(index));
+        glCheckError(glVertexAttribPointer(index, size, (GLenum)type, GL_FALSE, (GLsizei)stride, ptr));
     }
 
     ///
@@ -491,7 +514,7 @@ private:
     /// @param first Specifies the starting index in the enabled arrays
     /// @param count Specifies the number of indices to be rendered
     inline static void drawArrays(DrawMode mode, int first, size_t count) {
-        glDrawArrays((GLenum)mode, first, (GLsizei)count);
+        glCheckError(glDrawArrays((GLenum)mode, first, (GLsizei)count));
     }
 
     ///
@@ -502,6 +525,6 @@ private:
     /// @param indices Specifies a pointer to the location where the indices are stored
     ///
     inline static void drawElements(DrawMode mode, size_t count, AttribType type, const void* indices) {
-        glDrawElements((GLenum)mode, (GLsizei)count, (GLenum)type, indices);
+        glCheckError(glDrawElements((GLenum)mode, (GLsizei)count, (GLenum)type, indices));
     }
 };
