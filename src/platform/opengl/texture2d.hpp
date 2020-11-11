@@ -2,30 +2,64 @@
 
 #include "helper.hpp"
 
-/// 
-/// @brief TextureParameters
-/// 
+enum class TextureWrap {
+    REPEAT = GL_REPEAT,
+    MIRRORED_REPEAT = GL_MIRRORED_REPEAT,
+    CLAMP_TO_EDGE = GL_CLAMP_TO_EDGE,
+    CLAMP_TO_BORDER = GL_CLAMP_TO_BORDER
+};
+
+enum class TextureFiltering {
+    NEAREST = GL_NEAREST,
+    LINEAR = GL_LINEAR
+};
+
+enum class TextureType {
+    UNSIGNED_BYTE = GL_UNSIGNED_BYTE,
+    BYTE = GL_BYTE,
+    UNSIGNED_SHORT = GL_UNSIGNED_SHORT,
+    SHORT = GL_SHORT,
+    UNSIGNED_INT = GL_UNSIGNED_INT,
+    INT = GL_INT,
+    HALF_FLOAT = GL_HALF_FLOAT,
+    FLOAT = GL_FLOAT
+};
+
+enum class TextureFormat {
+    RED = GL_RED,
+    RG = GL_RG,
+    RGB = GL_RGB,
+    RGBA = GL_RGBA,
+    RED_INTEGER = GL_RED_INTEGER,
+    RG_INTEGER = GL_RG_INTEGER,
+    RGB_INTEGER = GL_RGB_INTEGER,
+    RGBA_INTEGER = GL_RGBA_INTEGER,
+    STENCIL_INDEX = GL_STENCIL_INDEX,
+    DEPTH_COMPONENT = GL_DEPTH_COMPONENT,
+    DEPTH_STENCIL = GL_DEPTH_STENCIL
+};
+
 struct TextureParameters {
     using Helper = OpenGLHelper;
 
-    Helper::TextureFiltering mag;
-    Helper::TextureFiltering min;
-    Helper::TextureWrap wrapS;
-    Helper::TextureWrap wrapT;
-    Helper::TextureFormat internalFormat;
-    Helper::TextureFormat dataFormat;
-    Helper::TextureType dataType;
+    TextureFiltering mag;
+    TextureFiltering min;
+    TextureWrap wrapS;
+    TextureWrap wrapT;
+    TextureFormat internalFormat;
+    TextureFormat dataFormat;
+    TextureType dataType;
     int levelOfDetail;
     bool mipMap;
 
     TextureParameters()
-        : mag(Helper::TextureFiltering::LINEAR),
-        min(Helper::TextureFiltering::LINEAR),
-        wrapS(Helper::TextureWrap::REPEAT),
-        wrapT(Helper::TextureWrap::REPEAT),
-        internalFormat(Helper::TextureFormat::RGBA),
-        dataFormat(Helper::TextureFormat::RGBA),
-        dataType(Helper::TextureType::UNSIGNED_BYTE),
+        : mag(TextureFiltering::LINEAR),
+        min(TextureFiltering::LINEAR),
+        wrapS(TextureWrap::REPEAT),
+        wrapT(TextureWrap::REPEAT),
+        internalFormat(TextureFormat::RGBA),
+        dataFormat(TextureFormat::RGBA),
+        dataType(TextureType::UNSIGNED_BYTE),
         levelOfDetail(0),
         mipMap(false)
     {

@@ -29,7 +29,7 @@ int main(void)
         ctx->texture2DGet("logo")->use();
         ctx->shaderUniform("logoTexture", 0);
         vao->use();
-        vao->drawArrays(0, 6);
+        vao->drawArrays(DrawMode::TRIANGLES, 0, 6);
     }
 
     return 0;

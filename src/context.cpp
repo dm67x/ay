@@ -117,7 +117,7 @@ void Context::texture2DNew(const std::string& name, const std::string& filename)
     }
 
     TextureParameters params;
-    params.dataFormat = channels == 4 ? OpenGLHelper::TextureFormat::RGBA : OpenGLHelper::TextureFormat::RGB;
+    params.dataFormat = channels == 4 ? TextureFormat::RGBA : TextureFormat::RGB;
     params.mipMap = true;
     auto tex = platform->newTexture2D(width, height, data, params);
     stbi_image_free(data);

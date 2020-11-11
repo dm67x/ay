@@ -2,6 +2,28 @@
 
 #include "helper.hpp"
 
+enum class BufferMode {
+    ARRAY = GL_ARRAY_BUFFER,
+    ELEMENT_ARRAY = GL_ELEMENT_ARRAY_BUFFER
+};
+
+enum class BufferTarget {
+    STATIC_DRAW = GL_STATIC_DRAW,
+    STATIC_COPY = GL_STATIC_COPY,
+    STATIC_READ = GL_STATIC_READ,
+    DYNAMIC_DRAW = GL_DYNAMIC_DRAW,
+    DYNAMIC_COPY = GL_DYNAMIC_COPY,
+    DYNAMIC_READ = GL_DYNAMIC_READ,
+};
+
+enum class AttribType {
+    FLOAT = GL_FLOAT,
+    UNSIGNED_INT = GL_UNSIGNED_INT,
+    BYTE = GL_BYTE,
+    UNSIGNED_BYTE = GL_UNSIGNED_BYTE,
+    INT = GL_INT
+};
+
 class Buffer {
     using Helper = OpenGLHelper;
 
@@ -26,7 +48,7 @@ public:
     /// @brief Use buffer
     /// @param mode Buffer target mode
     ///
-    inline void use(Helper::BufferMode mode) const {
+    inline void use(BufferMode mode) const {
         glCheckError(glBindBuffer((GLenum)mode, id));
     }
 
@@ -37,7 +59,7 @@ public:
     /// @param data Data
     /// @param target Buffer data target mode
     ///
-    inline void set(Helper::BufferMode mode, size_t size, const void* data, Helper::BufferTarget target) {
+    inline void set(BufferMode mode, size_t size, const void* data, BufferTarget target) {
         glCheckError(glBufferData((GLenum)mode, (GLsizeiptr)size, data, (GLenum)target));
     }
 
@@ -49,7 +71,7 @@ public:
     /// @param stride Specifies the byte offset between consecutive generic vertex attributes
     /// @param ptr Specifies a offset of the first component of the first generic vertex attribute
     ///
-    inline void attribArray(GLuint index, int size, Helper::AttribType type, size_t stride, const void* ptr)
+    inline void attribArray(GLuint index, int size, AttribType type, size_t stride, const void* ptr)
     {
         glCheckError(glEnableVertexAttribArray(index));
         glCheckError(glVertexAttribPointer(index, size, (GLenum)type, GL_FALSE, (GLsizei)stride, ptr));
