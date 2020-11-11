@@ -6,6 +6,7 @@
 #include <sstream>
 #include <vector>
 #include <iostream>
+#include <cstring>
 
 #ifdef NDEBUG
 #define glCheckError(expr) expr
@@ -168,6 +169,17 @@ private:
     }
 
     ///
+    /// @brief Set viewport
+    /// @param x Left
+    /// @param y Top
+    /// @param w Width
+    /// @param h Height
+    /// 
+    inline static void viewport(int x, int y, int w, int h) {
+        glCheckError(glViewport((GLint)x, (GLint)y, (GLsizei)w, (GLsizei)h));
+    }
+
+    ///
     /// @brief Create a new shader program
     /// @param vertex vertex source
     /// @param fragment fragment source
@@ -325,6 +337,9 @@ private:
         return std::string(log.begin(), log.end());
     }
 
+    /// 
+    /// @brief TextureParameters
+    /// 
     struct TextureParameters {
         TextureFiltering mag;
         TextureFiltering min;
@@ -354,7 +369,7 @@ private:
     /// @brief Create a new texture
     /// @return texture id
     ///
-    inline static PlatformId textureNew(int width, int height, const void* data, TextureParameters params) {
+    static PlatformId textureNew(int width, int height, const void* data, TextureParameters params) {
         PlatformId id;
         glCheckError(glGenTextures(1, &id));
         glCheckError(glBindTexture(GL_TEXTURE_2D, id));
@@ -389,21 +404,96 @@ private:
         glCheckError(glBindTexture(GL_TEXTURE_2D, id));
     }
 
-    inline static PlatformId createFramebuffer() {
+    ///
+    /// @brief Create a new renderbuffer
+    /// @param width Renderbuffer width
+    /// @param height Renderbuffer height
+    /// @return Renderbuffer id
+    /// 
+    static PlatformId renderbufferNew(int width, int height) {
         PlatformId id;
-        glCheckError(glGenFramebuffers(1, &id));
+        glCheckError(glGenRenderbuffers(1, &id));
+        glCheckError(glBindRenderbuffer(GL_RENDERBUFFER, id));
+        glCheckError(glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height));
+        glCheckError(glBindRenderbuffer(GL_RENDERBUFFER, 0));
         return id;
     }
 
-    inline static void destroyFramebuffer(PlatformId id) {
+    ///
+    /// @brief Destroy the renderbuffer
+    /// @param id Renderbuffer id
+    /// 
+    inline static void renderbufferDestroy(PlatformId id) {
+        glCheckError(glDeleteRenderbuffers(1, &id));
+    }
+
+    /// 
+    /// @brief FramebufferParams
+    /// 
+    struct FramebufferParameters {
+        PlatformId colorAttachments[32];
+        PlatformId depthStencilAttachment;
+
+        FramebufferParameters() {
+            std::memset(colorAttachments, 0, sizeof(colorAttachments));
+            depthStencilAttachment = 0;
+        }
+    };
+
+    static PlatformId framebufferNew(const FramebufferParameters& params) {
+        PlatformId id;
+        glCheckError(glGenFramebuffers(1, &id));
+        glCheckError(glBindFramebuffer(GL_FRAMEBUFFER, id));
+        for (int i = 0; i < 32; i++) {
+            if (params.colorAttachments[i] > 0) {
+                glCheckError(glFramebufferTexture2D(
+                    GL_FRAMEBUFFER, 
+                    (GLenum)(GL_COLOR_ATTACHMENT0 + i), 
+                    GL_TEXTURE_2D, 
+                    params.colorAttachments[i], 0));
+            }
+        }
+        
+        if (params.depthStencilAttachment != 0) {
+            glCheckError(glFramebufferRenderbuffer(
+                GL_FRAMEBUFFER, 
+                GL_DEPTH_STENCIL_ATTACHMENT, 
+                GL_RENDERBUFFER, 
+                params.depthStencilAttachment));
+        }
+
+        GLenum status;
+        glCheckError(status = glCheckFramebufferStatus(GL_FRAMEBUFFER));
+        if (status != GL_FRAMEBUFFER_COMPLETE) {
+            std::cerr << "The framebuffer is not complete" << std::endl;
+            return 0;
+        }
+
+        glCheckError(glBindFramebuffer(GL_FRAMEBUFFER, 0));
+        return id;
+    }
+
+    /// 
+    /// @brief Destroy the framebuffer
+    /// @param id Framebuffer id
+    /// 
+    inline static void framebufferDestroy(PlatformId id) {
         glCheckError(glDeleteFramebuffers(1, &id));
+    }
+
+    /// 
+    /// @brief Bind the framebuffer
+    /// @param id Framebuffer id
+    ///
+    inline static void framebufferUse(PlatformId id) {
+        glCheckError(glBindFramebuffer(GL_FRAMEBUFFER, id));
     }
 
     ///
     /// @brief Create vertex array
     /// @return vertex array id
     ///
-    inline static PlatformId createVertexArray() {
+    inline static PlatformId vertexArrayNew() {
         PlatformId id;
         glCheckError(glGenVertexArrays(1, &id));
         return id;
@@ -413,7 +503,7 @@ private:
     /// @brief Destroy vertex array
     /// @param id vertex array id
     ///
-    inline static void destroyVertexArray(PlatformId id) {
+    inline static void vertexArrayDestroy(PlatformId id) {
         glCheckError(glDeleteVertexArrays(1, &id));
     }
 
@@ -421,7 +511,7 @@ private:
     /// @brief Bind vertex array
     /// @param id vertex array id
     ///
-    inline static void bindVertexArray(PlatformId id) {
+    inline static void vertexArrayUse(PlatformId id) {
         glCheckError(glBindVertexArray(id));
     }
 
@@ -429,7 +519,7 @@ private:
     /// @brief Create buffer
     /// @return buffer id
     ///
-    inline static PlatformId createBuffer() {
+    inline static PlatformId bufferNew() {
         PlatformId id;
         glCheckError(glGenBuffers(1, &id));
         return id;
@@ -439,7 +529,7 @@ private:
     /// @brief Destroy buffer
     /// @param id buffer id
     ///
-    inline static void destroyBuffer(PlatformId id) {
+    inline static void bufferDestroy(PlatformId id) {
         glCheckError(glDeleteBuffers(1, &id));
     }
 
@@ -449,7 +539,7 @@ private:
     /// @param mode buffer target mode
     /// @return buffer id
     ///
-    inline static PlatformId bindBuffer(PlatformId id, BufferMode mode) {
+    inline static PlatformId bufferUse(PlatformId id, BufferMode mode) {
         glCheckError(glBindBuffer((GLenum)mode, id));
         return id;
     }

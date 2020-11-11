@@ -8,13 +8,15 @@ struct Vec3;
 class Context {
     std::map<std::string, PlatformId> shaders;
     std::map<std::string, PlatformId> textures;
+    std::map<std::string, PlatformId> renderbuffers;
+    std::map<std::string, PlatformId> framebuffers;
     PlatformId currentShader;
 
 public:
     ///
     /// @brief Constructor of context
     ///
-    Context() : shaders(), textures(), currentShader(0) {}
+    Context() : shaders(), textures(), renderbuffers(), framebuffers(), currentShader(0) {}
 
     ///
     /// @brief Destructor of context
@@ -29,6 +31,15 @@ public:
     /// @param a Alpha
     /// 
     void clear(float r = 0.f, float g = 0.f, float b = 0.f, float a = 1.f) const;
+
+    ///
+    /// @brief Set viewport
+    /// @param x Left
+    /// @param y Top
+    /// @param w Width
+    /// @param h Height
+    /// 
+    void viewport(int x, int y, int w, int h) const;
 
     ///
     /// @brief Create shader from memory
@@ -94,7 +105,7 @@ public:
     /// @brief Bind vao
     /// @param id vao id
     ///
-    void vaoBind(PlatformId id) const;
+    void vaoUse(PlatformId id) const;
 
     ///
     /// @brief Create a new buffer
@@ -113,7 +124,7 @@ public:
     /// @param id buffer id
     /// @param mode buffer target mode
     ///
-    void bufferBind(PlatformId id, Platform::BufferMode mode) const;
+    void bufferUse(PlatformId id, Platform::BufferMode mode) const;
 
     ///
     /// @brief Set buffer data
@@ -156,17 +167,15 @@ public:
     /// @param name Texture name
     /// @param width Texture width
     /// @param height Texture height
-    /// @return Texture id
     /// 
-    PlatformId textureNew(const std::string& name, int width, int height);
+    void textureNew(const std::string& name, int width, int height);
 
     /// 
     /// @brief Create a new texture from file
     /// @param name Texture name
     /// @param filename Filename
-    /// @return Texture id
     /// 
-    PlatformId textureNew(const std::string& name, const std::string& filename);
+    void textureNew(const std::string& name, const std::string& filename);
 
     ///
     /// @brief Destroy the texture
@@ -180,4 +189,51 @@ public:
     /// @param slot To which slot bind the texture
     /// 
     void textureUse(const std::string& name, unsigned char slot = 0) const;
+
+    /// 
+    /// @brief Get the texture by name
+    /// @param name Texture name
+    /// @return Texture id
+    /// 
+    PlatformId textureGet(const std::string& name) const;
+
+    /// 
+    /// @brief Create a new renderbuffer
+    /// @param name Renderbuffer name
+    /// @param width Width
+    /// @param height Height
+    /// 
+    void renderbufferNew(const std::string& name, int width, int height);
+
+    /// 
+    /// @brief Destroy the renderbuffer
+    /// @param name Renderbuffer name
+    /// 
+    void renderbufferDestroy(const std::string& name);
+
+    /// 
+    /// @brief Get the renderbuffer by name
+    /// @param name Renderbuffer name
+    /// @return Renderbuffer id
+    /// 
+    PlatformId renderbufferGet(const std::string& name) const;
+
+    /// 
+    /// @brief Create a new framebuffer
+    /// @param name Framebuffer name
+    /// @param params Framebuffer parameters
+    /// 
+    void framebufferNew(const std::string& name, const std::vector<PlatformId>& colorAttachments, PlatformId depthStencilAttachment = 0);
+
+    /// 
+    /// @brief Destroy the framebuffer
+    /// @param name Framebuffer name
+    /// 
+    void framebufferDestroy(const std::string& name);
+
+    /// 
+    /// @brief Use the framebuffer
+    /// @param name Framebuffer name
+    ///
+    void framebufferUse(const std::string& name) const;
 };

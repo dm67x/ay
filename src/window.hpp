@@ -25,3 +25,15 @@ GLFWwindow* getWindow();
 /// @return True if window is open false otherwise
 ///
 bool windowIsOpen();
+
+///
+/// @brief Get window width
+/// @return window width
+///
+int windowGetWidth();
+
+///
+/// @brief Get window height
+/// @return window height
+///
+int windowGetHeight();

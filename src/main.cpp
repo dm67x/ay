@@ -17,21 +17,20 @@ int main(void)
         "in vec2 uv;\n"
         "out vec4 fragOut;\n"
         "uniform sampler2D logoTexture;\n"
-        "uniform vec3 bg;\n"
-        "void main() { fragOut = texture(logoTexture, uv) * vec4(bg, 1); }");
+        "void main() { fragOut = texture(logoTexture, uv) * vec4(1); }");
 
     PlatformId vao = ctx->vaoNew();
     ctx->textureNew("logo", "../../assets/logo.png");
 
     while (windowIsOpen()) {
         ctx->clear();
+        ctx->viewport(0, 0, windowGetWidth(), windowGetHeight());
         ctx->shaderUse("base");
-        ctx->shaderUniform("bg", Vec3(1.f, 1.f, 1.f));
         ctx->textureUse("logo");
         ctx->shaderUniform("logoTexture", 0);
-        ctx->vaoBind(vao);
+        ctx->vaoUse(vao);
         ctx->drawArrays(Platform::DrawMode::TRIANGLES, 0, 6);
-        ctx->vaoBind(0);
+        ctx->vaoUse(0);
     }
 
     delete ctx;

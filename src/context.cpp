@@ -12,10 +12,22 @@ Context::~Context() {
     for (auto it = textures.begin(); it != textures.end(); it++) {
         Platform::textureDestroy(it->second);
     }
+
+    for (auto it = renderbuffers.begin(); it != renderbuffers.end(); it++) {
+        Platform::renderbufferDestroy(it->second);
+    }
+
+    for (auto it = framebuffers.begin(); it != framebuffers.end(); it++) {
+        Platform::framebufferDestroy(it->second);
+    }
 }
 
 void Context::clear(float r, float g, float b, float a) const {
     Platform::clear(r, g, b, a);
+}
+
+void Context::viewport(int x, int y, int w, int h) const {
+    Platform::viewport(x, y, w, h);
 }
 
 PlatformId Context::shaderFromMemory(const std::string& name, const std::string& vertex, const std::string& fragment) {
@@ -85,27 +97,27 @@ void Context::shaderUniform(const std::string& name, const Vec3& value) const {
 }
 
 PlatformId Context::vaoNew() const {
-    return Platform::createVertexArray();
+    return Platform::vertexArrayNew();
 }
 
 void Context::vaoDestroy(PlatformId id) const {
-    Platform::destroyVertexArray(id);
+    Platform::vertexArrayDestroy(id);
 }
 
-void Context::vaoBind(PlatformId id) const {
-    Platform::bindVertexArray(id);
+void Context::vaoUse(PlatformId id) const {
+    Platform::vertexArrayUse(id);
 }
 
 PlatformId Context::bufferNew() const {
-    return Platform::createBuffer();
+    return Platform::bufferNew();
 }
 
 void Context::bufferDestroy(PlatformId id) const {
-    Platform::destroyBuffer(id);
+    Platform::bufferDestroy(id);
 }
 
-void Context::bufferBind(PlatformId id, Platform::BufferMode mode) const {
-    Platform::bindBuffer(id, mode);
+void Context::bufferUse(PlatformId id, Platform::BufferMode mode) const {
+    Platform::bufferUse(id, mode);
 }
 
 void Context::bufferData(Platform::BufferMode mode, size_t size, const void* data, Platform::BufferTarget target) const {
@@ -124,20 +136,19 @@ void Context::drawElements(Platform::DrawMode mode, size_t count, Platform::Attr
     Platform::drawElements(mode, count, type, indices);
 }
 
-PlatformId Context::textureNew(const std::string& name, int width, int height) {
+void Context::textureNew(const std::string& name, int width, int height) {
     PlatformId id = Platform::textureNew(width, height, nullptr, Platform::TextureParameters());
     textures.insert(std::make_pair(name, id));
-    return id;
 }
 
-PlatformId Context::textureNew(const std::string& name, const std::string& filename) {
+void Context::textureNew(const std::string& name, const std::string& filename) {
     stbi_set_flip_vertically_on_load(true);
 
     int width, height, channels;
     unsigned char* data = stbi_load(filename.c_str(), &width, &height, &channels, 0);
     if (!data) {
         std::cerr << "cannot load data from " << filename << std::endl;
-        return 0;
+        return;
     }
 
     Platform::TextureParameters params;
@@ -146,7 +157,6 @@ PlatformId Context::textureNew(const std::string& name, const std::string& filen
     PlatformId id = Platform::textureNew(width, height, data, params);
     stbi_image_free(data);
     textures.insert(std::make_pair(name, id));
-    return id;
 }
 
 void Context::textureDestroy(const std::string& name) {
@@ -159,9 +169,75 @@ void Context::textureDestroy(const std::string& name) {
 
 void Context::textureUse(const std::string& name, unsigned char slot) const {
     auto it = textures.find(name);
-    if (it == textures.end()) {
+    if (it != textures.end()) {
+        Platform::textureUse(it->second, slot);
+    }
+}
+
+PlatformId Context::textureGet(const std::string& name) const {
+    auto it = textures.find(name);
+    if (it != textures.end()) {
+        return it->second;
+    }
+    return 0;
+}
+
+void Context::renderbufferNew(const std::string& name, int width, int height) {
+    PlatformId id = Platform::renderbufferNew(width, height);
+    renderbuffers.insert(std::make_pair(name, id));
+}
+
+void Context::renderbufferDestroy(const std::string& name) {
+    auto it = renderbuffers.find(name);
+    if (it != renderbuffers.end()) {
+        Platform::renderbufferDestroy(it->second);
+        renderbuffers.erase(it);
+    }
+}
+
+PlatformId Context::renderbufferGet(const std::string& name) const {
+    auto it = renderbuffers.find(name);
+    if (it != renderbuffers.end()) {
+        return it->second;
+    }
+    return 0;
+}
+
+void Context::framebufferNew(const std::string& name, const std::vector<PlatformId>& colorAttachments, PlatformId depthStencilAttachment) {
+    Platform::FramebufferParameters params;
+    if (colorAttachments.size() > 32) {
+        std::cerr << "framebuffer cannot have more than 32 color attachments" << std::endl;
         return;
     }
-    
-    Platform::textureUse(it->second, slot);
+
+    for (size_t i = 0; i < colorAttachments.size(); i++) {
+        params.colorAttachments[i] = colorAttachments[i];
+    }
+
+    params.depthStencilAttachment = depthStencilAttachment;
+
+    PlatformId id = Platform::framebufferNew(params);
+    if (id != 0) {
+        framebuffers.insert(std::make_pair(name, id));
+    }
+}
+
+void Context::framebufferDestroy(const std::string& name) {
+    auto it = framebuffers.find(name);
+    if (it != framebuffers.end()) {
+        Platform::framebufferDestroy(it->second);
+        framebuffers.erase(it);
+    }
+}
+
+void Context::framebufferUse(const std::string& name) const {
+    if (name.size() == 0) {
+        Platform::framebufferUse(0);
+        return;
+    }
+
+    auto it = framebuffers.find(name);
+    if (it != framebuffers.end()) {
+        Platform::framebufferUse(it->second);
+    }
 }

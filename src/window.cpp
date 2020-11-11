@@ -49,3 +49,17 @@ bool windowIsOpen() {
     glfwSwapBuffers(window);
     return !glfwWindowShouldClose(window);
 }
+
+int windowGetWidth() {
+    GLFWwindow* window = getWindow();
+    int width;
+    glfwGetWindowSize(window, &width, nullptr);
+    return width;
+}
+
+int windowGetHeight() {
+    GLFWwindow* window = getWindow();
+    int height;
+    glfwGetWindowSize(window, nullptr, &height);
+    return height;
+}
