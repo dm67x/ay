@@ -2,6 +2,7 @@
 #include "math.hpp"
 #include <iostream>
 #include <fstream>
+#include <streambuf>
 #include <stb_image.h>
 
 Context::~Context() {
@@ -36,32 +37,19 @@ void Context::shaderFromMemory(const std::string& name, const std::string& verte
 }
 
 void Context::shaderFromFile(const std::string& name, const std::string& vertex, const std::string& fragment) {
-    std::string vsrc, fsrc;
-    
-    std::ifstream file(vertex, std::ifstream::binary);
-    if (!file.is_open()) {
+    std::ifstream vfile(vertex, std::ifstream::binary);
+    if (!vfile.is_open()) {
         std::cerr << "cannot open file: " << vertex << std::endl;
         return;
     }
+    std::string vsrc((std::istreambuf_iterator<char>(vfile)), std::istreambuf_iterator<char>());
 
-    file.seekg(0, file.end);
-    auto length = file.tellg();
-    file.seekg(0, file.beg);
-    file.read(&vsrc[0], length);
-    file.close();
-
-    file.open(fragment, std::ifstream::binary);
-    if (!file.is_open()) {
+    std::ifstream ffile(fragment, std::ifstream::binary);
+    if (!ffile.is_open()) {
         std::cerr << "cannot open file: " << fragment << std::endl;
         return;
     }
-
-    file.seekg(0, file.end);
-    length = file.tellg();
-    file.seekg(0, file.beg);
-    file.read(&fsrc[0], length);
-    file.close();
-
+    std::string fsrc((std::istreambuf_iterator<char>(ffile)), std::istreambuf_iterator<char>());
     shaderFromMemory(name, vsrc, fsrc);
 }
 
