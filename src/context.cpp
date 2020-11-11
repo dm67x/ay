@@ -2,10 +2,15 @@
 #include "math.hpp"
 #include <iostream>
 #include <fstream>
+#include <stb_image.h>
 
 Context::~Context() {
     for (auto it = shaders.begin(); it != shaders.end(); it++) {
         OpenGL::destroyProgram(it->second);
+    }
+
+    for (auto it = textures.begin(); it != textures.end(); it++) {
+        OpenGL::destroyTexture(it->second);
     }
 }
 
@@ -81,6 +86,14 @@ PlatformId Context::shaderFromFile(const std::string& name, const std::string& v
     return shaderFromMemory(name, vsrc, fsrc);
 }
 
+void Context::shaderDestroy(const std::string& name) {
+    auto it = shaders.find(name);
+    if (it != shaders.end()) {
+        OpenGL::destroyShader(it->second);
+        shaders.erase(it);
+    }
+}
+
 void Context::shaderUse(const std::string& name) {
     auto shader = shaders.find(name);
     if (shader != shaders.end()) {
@@ -91,6 +104,10 @@ void Context::shaderUse(const std::string& name) {
 
 void Context::shaderUniform(const std::string& name, float value) const {
     OpenGL::uniform1f(currentShader, name, value);
+}
+
+void Context::shaderUniform(const std::string& name, int value) const {
+    OpenGL::uniform1i(currentShader, name, value);
 }
 
 void Context::shaderUniform(const std::string& name, const Vec3& value) const {
@@ -135,4 +152,64 @@ void Context::drawArrays(OpenGL::DrawMode mode, int first, size_t count) const {
 
 void Context::drawElements(OpenGL::DrawMode mode, size_t count, OpenGL::AttribType type, const void* indices) {
     OpenGL::drawElements(mode, count, type, indices);
+}
+
+PlatformId Context::textureNew(const std::string& name, int width, int height) {
+    PlatformId id = OpenGL::createTexture();
+    OpenGL::textureBind(id);
+    OpenGL::textureMinParameter(id, OpenGL::TextureFiltering::LINEAR);
+    OpenGL::textureMagParameter(id, OpenGL::TextureFiltering::LINEAR);
+    OpenGL::textureWrapSParameter(id, OpenGL::TextureWrap::REPEAT);
+    OpenGL::textureWrapTParameter(id, OpenGL::TextureWrap::REPEAT);
+    OpenGL::textureData(0, OpenGL::TextureFormat::RGBA, OpenGL::TextureFormat::RGBA, width, height, OpenGL::TextureType::UNSIGNED_BYTE, nullptr);
+    OpenGL::textureBind(0);
+    textures.insert(std::make_pair(name, id));
+    return id;
+}
+
+PlatformId Context::textureNew(const std::string& name, const std::string& filename) {
+    stbi_set_flip_vertically_on_load(true);
+
+    int width, height, channels;
+    unsigned char* data = stbi_load(filename.c_str(), &width, &height, &channels, 0);
+    if (!data) {
+        std::cerr << "cannot load data from " << filename << std::endl;
+        return 0;
+    }
+
+    PlatformId id = OpenGL::createTexture();
+    OpenGL::textureBind(id);
+    OpenGL::textureMinParameter(id, OpenGL::TextureFiltering::LINEAR);
+    OpenGL::textureMagParameter(id, OpenGL::TextureFiltering::LINEAR);
+    OpenGL::textureWrapSParameter(id, OpenGL::TextureWrap::REPEAT);
+    OpenGL::textureWrapTParameter(id, OpenGL::TextureWrap::REPEAT);
+    OpenGL::textureData(0, 
+        OpenGL::TextureFormat::RGBA, 
+        channels == 4 ? OpenGL::TextureFormat::RGBA : OpenGL::TextureFormat::RGB, 
+        width, height, 
+        OpenGL::TextureType::UNSIGNED_BYTE, data);
+    OpenGL::textureGenMipmap();
+    OpenGL::textureBind(0);
+
+    stbi_image_free(data);
+    textures.insert(std::make_pair(name, id));
+    return id;
+}
+
+void Context::textureDestroy(const std::string& name) {
+    auto it = textures.find(name);
+    if (it != textures.end()) {
+        OpenGL::destroyTexture(it->second);
+        textures.erase(it);
+    }
+}
+
+void Context::textureUse(const std::string& name, unsigned char slot) const {
+    auto it = textures.find(name);
+    if (it == textures.end()) {
+        return;
+    }
+    
+    OpenGL::textureActiveUnit(slot);
+    OpenGL::textureBind(it->second);
 }

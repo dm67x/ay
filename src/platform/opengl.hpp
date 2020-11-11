@@ -84,6 +84,31 @@ public:
         INT = GL_INT
     };
 
+    enum class TextureType {
+        UNSIGNED_BYTE = GL_UNSIGNED_BYTE, 
+        BYTE = GL_BYTE, 
+        UNSIGNED_SHORT = GL_UNSIGNED_SHORT, 
+        SHORT = GL_SHORT, 
+        UNSIGNED_INT = GL_UNSIGNED_INT, 
+        INT = GL_INT, 
+        HALF_FLOAT = GL_HALF_FLOAT, 
+        FLOAT = GL_FLOAT
+    };
+
+    enum class TextureFormat {
+        RED = GL_RED, 
+        RG = GL_RG, 
+        RGB = GL_RGB,  
+        RGBA = GL_RGBA, 
+        RED_INTEGER = GL_RED_INTEGER, 
+        RG_INTEGER = GL_RG_INTEGER, 
+        RGB_INTEGER = GL_RGB_INTEGER, 
+        RGBA_INTEGER = GL_RGBA_INTEGER, 
+        STENCIL_INDEX = GL_STENCIL_INDEX, 
+        DEPTH_COMPONENT = GL_DEPTH_COMPONENT, 
+        DEPTH_STENCIL = GL_DEPTH_STENCIL
+    };
+
     ///
     /// @brief Get OpenGL Version
     /// @return Version
@@ -352,6 +377,28 @@ private:
         PlatformId id;
         glCheckError(glGenTextures(1, &id));
         return id;
+    }
+
+    ///
+    /// @brief Destroy the texture
+    /// @param id texture id
+    ///
+    inline static void destroyTexture(PlatformId id) {
+        glCheckError(glDeleteTextures(1, &id));
+    }
+
+    ///
+    /// @brief Set the texture data
+    /// @param lod Specifies the level-of-detail number. Level 0 is the base image level.
+    /// @param internalFormat Specifies the number of color components in the texture
+    /// @param format Specifies the format of the pixel data
+    /// @param width Texture width
+    /// @param height Texture height
+    /// @param type Specifies the data type of the pixel data
+    /// @param data Specifies a pointer to the image data in memory
+    ///
+    inline static void textureData(int lod, TextureFormat internalFormat, TextureFormat format, int width, int height, TextureType type, const void* data) {
+        glCheckError(glTexImage2D(GL_TEXTURE_2D, lod, (GLenum)internalFormat, width, height, 0, (GLenum)format, (GLenum)type, data));
     }
 
     ///

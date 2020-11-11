@@ -7,13 +7,14 @@ struct Vec3;
 
 class Context {
     std::map<std::string, PlatformId> shaders;
+    std::map<std::string, PlatformId> textures;
     PlatformId currentShader;
 
 public:
     ///
     /// @brief Constructor of context
     ///
-    Context() : shaders(), currentShader(0) {}
+    Context() : shaders(), textures(), currentShader(0) {}
 
     ///
     /// @brief Destructor of context
@@ -45,6 +46,12 @@ public:
     /// @return shader program id
     PlatformId shaderFromFile(const std::string& name, const std::string& vertex, const std::string& fragment);
 
+    /// 
+    /// @brief Destroy the shader
+    /// @param name Shader name
+    /// 
+    void shaderDestroy(const std::string& name);
+
     ///
     /// @brief Use shader
     /// @param name shader name
@@ -57,6 +64,13 @@ public:
     /// @param value uniform value
     ///
     void shaderUniform(const std::string& name, float value) const;
+
+    ///
+    /// @brief Shader uniform1i
+    /// @param name uniform name
+    /// @param value uniform value
+    ///
+    void shaderUniform(const std::string& name, int value) const;
 
     ///
     /// @brief Shader uniform3fv
@@ -136,4 +150,34 @@ public:
     /// @param indices Specifies a pointer to the location where the indices are stored
     ///
     void drawElements(OpenGL::DrawMode mode, size_t count, OpenGL::AttribType type, const void* indices);
+
+    /// 
+    /// @brief Create a new empty texture
+    /// @param name Texture name
+    /// @param width Texture width
+    /// @param height Texture height
+    /// @return Texture id
+    /// 
+    PlatformId textureNew(const std::string& name, int width, int height);
+
+    /// 
+    /// @brief Create a new texture from file
+    /// @param name Texture name
+    /// @param filename Filename
+    /// @return Texture id
+    /// 
+    PlatformId textureNew(const std::string& name, const std::string& filename);
+
+    ///
+    /// @brief Destroy the texture
+    /// @param name Texture name
+    /// 
+    void textureDestroy(const std::string& name);
+
+    /// 
+    /// @brief Use the texture specified by name
+    /// @param name Texture name
+    /// @param slot To which slot bind the texture
+    /// 
+    void textureUse(const std::string& name, unsigned char slot = 0) const;
 };

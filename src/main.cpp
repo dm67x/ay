@@ -14,16 +14,21 @@ int main(void)
         "gl_Position = vec4(-1.0f + x*2.0f, -1.0f+y*2.0f, 0.0f, 1.0f); uv = vec2(x, y); }", 
         "#version 320 es\n"
         "precision mediump float;\n"
+        "in vec2 uv;\n"
         "out vec4 fragOut;\n"
+        "uniform sampler2D logoTexture;\n"
         "uniform vec3 bg;\n"
-        "void main() { fragOut = vec4(bg, 1); }");
+        "void main() { fragOut = texture(logoTexture, uv) * vec4(bg, 1); }");
 
     PlatformId vao = ctx->vaoNew();
+    ctx->textureNew("logo", "../../assets/logo.png");
 
     while (windowIsOpen()) {
         ctx->clear();
         ctx->shaderUse("base");
-        ctx->shaderUniform("bg", Vec3(0.25f, 0.5f, 0.25f));
+        ctx->shaderUniform("bg", Vec3(1.f, 1.f, 1.f));
+        ctx->textureUse("logo");
+        ctx->shaderUniform("logoTexture", 0);
         ctx->vaoBind(vao);
         ctx->drawArrays(OpenGL::DrawMode::TRIANGLES, 0, 6);
         ctx->vaoBind(0);
