@@ -6,11 +6,11 @@
 
 Context::~Context() {
     for (auto it = shaders.begin(); it != shaders.end(); it++) {
-        Platform::destroyProgram(it->second);
+        Platform::shaderDestroy(it->second);
     }
 
     for (auto it = textures.begin(); it != textures.end(); it++) {
-        Platform::destroyTexture(it->second);
+        Platform::textureDestroy(it->second);
     }
 }
 
@@ -19,40 +19,10 @@ void Context::clear(float r, float g, float b, float a) const {
 }
 
 PlatformId Context::shaderFromMemory(const std::string& name, const std::string& vertex, const std::string& fragment) {
-    PlatformId id = Platform::createProgram();
-    PlatformId vid = Platform::createVertexShader();
-    PlatformId fid = Platform::createFragmentShader();
-    std::string log = "";
-    
-    Platform::shaderSource(vid, vertex);
-    Platform::compileShader(vid);
-    log = Platform::getShaderLog(vid);
-    if (log.size() > 0) {
-        std::cerr << "Vertex: " << log << std::endl;
-        return 0;
+    PlatformId id = Platform::shaderNew(vertex, fragment);
+    if (id != 0) {
+        shaders.insert(std::make_pair(name, id));
     }
-
-    Platform::shaderSource(fid, fragment);
-    Platform::compileShader(fid);
-    log = Platform::getShaderLog(fid);
-    if (log.size() > 0) {
-        std::cerr << "Fragment: " << log << std::endl;
-        return 0;
-    }
-
-    Platform::attachShader(id, vid);
-    Platform::attachShader(id, fid);
-    Platform::linkProgram(id);
-    log = Platform::getProgramLog(id);
-    if (log.size() > 0) {
-        std::cerr << "Program: " << log << std::endl;
-        return 0;
-    }
-    Platform::detachShader(id, vid);
-    Platform::detachShader(id, fid);
-    Platform::destroyShader(vid);
-    Platform::destroyShader(fid);
-    shaders.insert(std::make_pair(name, id));
     return id;
 }
 
@@ -89,7 +59,7 @@ PlatformId Context::shaderFromFile(const std::string& name, const std::string& v
 void Context::shaderDestroy(const std::string& name) {
     auto it = shaders.find(name);
     if (it != shaders.end()) {
-        Platform::destroyShader(it->second);
+        Platform::shaderDestroy(it->second);
         shaders.erase(it);
     }
 }
@@ -99,19 +69,19 @@ void Context::shaderUse(const std::string& name) {
     if (shader != shaders.end()) {
         currentShader = shader->second;
     }
-    Platform::useProgram(currentShader);
+    Platform::shaderUse(currentShader);
 }
 
 void Context::shaderUniform(const std::string& name, float value) const {
-    Platform::uniform1f(currentShader, name, value);
+    Platform::shaderUniform1f(currentShader, name, value);
 }
 
 void Context::shaderUniform(const std::string& name, int value) const {
-    Platform::uniform1i(currentShader, name, value);
+    Platform::shaderUniform1i(currentShader, name, value);
 }
 
 void Context::shaderUniform(const std::string& name, const Vec3& value) const {
-    Platform::uniform3fv(currentShader, name, new float[3] { value.x, value.y, value.z });
+    Platform::shaderUniform3fv(currentShader, name, new float[3] { value.x, value.y, value.z });
 }
 
 PlatformId Context::vaoNew() const {
@@ -155,14 +125,7 @@ void Context::drawElements(Platform::DrawMode mode, size_t count, Platform::Attr
 }
 
 PlatformId Context::textureNew(const std::string& name, int width, int height) {
-    PlatformId id = Platform::createTexture();
-    Platform::textureBind(id);
-    Platform::textureMinParameter(id, Platform::TextureFiltering::LINEAR);
-    Platform::textureMagParameter(id, Platform::TextureFiltering::LINEAR);
-    Platform::textureWrapSParameter(id, Platform::TextureWrap::REPEAT);
-    Platform::textureWrapTParameter(id, Platform::TextureWrap::REPEAT);
-    Platform::textureData(0, Platform::TextureFormat::RGBA, Platform::TextureFormat::RGBA, width, height, Platform::TextureType::UNSIGNED_BYTE, nullptr);
-    Platform::textureBind(0);
+    PlatformId id = Platform::textureNew(width, height, nullptr, Platform::TextureParameters());
     textures.insert(std::make_pair(name, id));
     return id;
 }
@@ -177,20 +140,10 @@ PlatformId Context::textureNew(const std::string& name, const std::string& filen
         return 0;
     }
 
-    PlatformId id = Platform::createTexture();
-    Platform::textureBind(id);
-    Platform::textureMinParameter(id, Platform::TextureFiltering::LINEAR);
-    Platform::textureMagParameter(id, Platform::TextureFiltering::LINEAR);
-    Platform::textureWrapSParameter(id, Platform::TextureWrap::REPEAT);
-    Platform::textureWrapTParameter(id, Platform::TextureWrap::REPEAT);
-    Platform::textureData(0,
-        Platform::TextureFormat::RGBA,
-        channels == 4 ? Platform::TextureFormat::RGBA : Platform::TextureFormat::RGB,
-        width, height, 
-        Platform::TextureType::UNSIGNED_BYTE, data);
-    Platform::textureGenMipmap();
-    Platform::textureBind(0);
-
+    Platform::TextureParameters params;
+    params.dataFormat = channels == 4 ? Platform::TextureFormat::RGBA : Platform::TextureFormat::RGB;
+    params.mipMap = true;
+    PlatformId id = Platform::textureNew(width, height, data, params);
     stbi_image_free(data);
     textures.insert(std::make_pair(name, id));
     return id;
@@ -199,7 +152,7 @@ PlatformId Context::textureNew(const std::string& name, const std::string& filen
 void Context::textureDestroy(const std::string& name) {
     auto it = textures.find(name);
     if (it != textures.end()) {
-        Platform::destroyTexture(it->second);
+        Platform::textureDestroy(it->second);
         textures.erase(it);
     }
 }
@@ -210,6 +163,5 @@ void Context::textureUse(const std::string& name, unsigned char slot) const {
         return;
     }
     
-    Platform::textureActiveUnit(slot);
-    Platform::textureBind(it->second);
+    Platform::textureUse(it->second, slot);
 }

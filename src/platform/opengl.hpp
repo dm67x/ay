@@ -14,7 +14,7 @@
     expr;\
     Error err = OpenGL::getError();\
     if (err != Error::NO_ERROR) {\
-        std::cerr << "GLError at line: " << __LINE__ << std::endl;\
+        std::cerr << "OpenGL error at line: " << __LINE__ << std::endl;\
     } }
 #endif
 
@@ -169,12 +169,68 @@ private:
 
     ///
     /// @brief Create a new shader program
-    /// @return Shader program id
-    /// 
-    inline static PlatformId createProgram() {
-        PlatformId id;
+    /// @param vertex vertex source
+    /// @param fragment fragment source
+    /// @return id Program id
+    ///
+    static PlatformId shaderNew(const std::string& vertex, const std::string& fragment) {
+        PlatformId id, vid, fid;
         glCheckError(id = glCreateProgram());
+        glCheckError(vid = glCreateShader(GL_VERTEX_SHADER));
+        glCheckError(fid = glCreateShader(GL_FRAGMENT_SHADER));
+        std::string log = "";
+
+        const GLchar* vsrc = (const GLchar*)vertex.c_str();
+        glCheckError(glShaderSource(vid, 1, &vsrc, nullptr));
+
+        const GLchar* fsrc = (const GLchar*)fragment.c_str();
+        glCheckError(glShaderSource(fid, 1, &fsrc, nullptr));
+
+        glCheckError(glCompileShader(vid));
+        log = getShaderLog(vid);
+        if (log.size() > 0) {
+            std::cerr << "Vertex: " << log << std::endl;
+            return 0;
+        }
+
+        glCheckError(glCompileShader(fid));
+        log = getShaderLog(fid);
+        if (log.size() > 0) {
+            std::cerr << "Fragment: " << log << std::endl;
+            return 0;
+        }
+
+        glCheckError(glAttachShader(id, vid));
+        glCheckError(glAttachShader(id, fid));
+        glCheckError(glLinkProgram(id));
+
+        log = getProgramLog(id);
+        if (log.size() > 0) {
+            std::cerr << "Program: " << log << std::endl;
+            return 0;
+        }
+
+        glCheckError(glDetachShader(id, vid));
+        glCheckError(glDetachShader(id, fid));
+        glCheckError(glDeleteShader(vid));
+        glCheckError(glDeleteShader(fid));
         return id;
+    }
+
+    ///
+    /// @brief Destroy shader program
+    /// @param id Program id
+    ///
+    inline static void shaderDestroy(PlatformId id) {
+        glCheckError(glDeleteProgram(id));
+    }
+
+    ///
+    /// @brief Use shader program
+    /// @param id program id
+    ///
+    inline static void shaderUse(PlatformId id) {
+        glCheckError(glUseProgram(id));
     }
 
     ///
@@ -191,52 +247,12 @@ private:
     }
 
     ///
-    /// @brief Attach shader to the program
-    /// @param pid Program id
-    /// @param sid Shader id
-    /// @return program id
-    ///
-    inline static PlatformId attachShader(PlatformId pid, PlatformId sid) {
-        glCheckError(glAttachShader(pid, sid));
-        return pid;
-    }
-
-    ///
-    /// @brief Detach shader to the program
-    /// @param pid Program id
-    /// @param sid Shader id
-    /// @return program id
-    ///
-    inline static PlatformId detachShader(PlatformId pid, PlatformId sid) {
-        glCheckError(glDetachShader(pid, sid));
-        return pid;
-    }
-
-    ///
-    /// @brief Link program
-    /// @param id Program id
-    /// @return program id
-    ///
-    inline static PlatformId linkProgram(PlatformId id) {
-        glCheckError(glLinkProgram(id));
-        return id;
-    }
-
-    ///
-    /// @brief Destroy program
-    /// @param id Program id
-    ///
-    inline static void destroyProgram(PlatformId id) {
-        glCheckError(glDeleteProgram(id));
-    }
-
-    ///
     /// @brief Uniform1f
     /// @param id Program id
     /// @param name Uniform name
     /// @param value Value
     ///
-    inline static PlatformId uniform1f(PlatformId id, const std::string& name, float value) {
+    inline static PlatformId shaderUniform1f(PlatformId id, const std::string& name, float value) {
         GLint loc;
         glCheckError(loc = glGetUniformLocation(id, name.c_str()));
         glCheckError(glUniform1f(loc, value));
@@ -249,7 +265,7 @@ private:
     /// @param name Uniform name
     /// @param value Value
     ///
-    inline static PlatformId uniform1i(PlatformId id, const std::string& name, int value) {
+    inline static PlatformId shaderUniform1i(PlatformId id, const std::string& name, int value) {
         GLint loc;
         glCheckError(loc = glGetUniformLocation(id, name.c_str()));
         glCheckError(glUniform1i(loc, value));
@@ -262,7 +278,7 @@ private:
     /// @param name Uniform name
     /// @param value Value
     ///
-    inline static PlatformId uniform3fv(PlatformId id, const std::string& name, float value[3]) {
+    inline static PlatformId shaderUniform3fv(PlatformId id, const std::string& name, float value[3]) {
         GLint loc;
         glCheckError(loc = glGetUniformLocation(id, name.c_str()));
         glCheckError(glUniform3fv(loc, 1, value));
@@ -275,7 +291,7 @@ private:
     /// @param name Uniform name
     /// @param value Value
     ///
-    inline static PlatformId uniform4fv(PlatformId id, const std::string& name, float value[4]) {
+    inline static PlatformId shaderUniform4fv(PlatformId id, const std::string& name, float value[4]) {
         GLint loc;
         glCheckError(loc = glGetUniformLocation(id, name.c_str()));
         glCheckError(glUniform4fv(loc, 1, value));
@@ -289,60 +305,10 @@ private:
     /// @param value Value
     /// @param transpose Transpose matrix
     ///
-    inline static PlatformId uniformMatrix4fv(PlatformId id, const std::string& name, float value[16], bool transpose = false) {
+    inline static PlatformId shaderUniformMatrix4fv(PlatformId id, const std::string& name, float value[16], bool transpose = false) {
         GLint loc;
         glCheckError(loc = glGetUniformLocation(id, name.c_str()));
         glCheckError(glUniformMatrix4fv(loc, 1, transpose, value));
-        return id;
-    }
-
-    ///
-    /// @brief Create a new vertex shader
-    /// @return Shader id
-    /// 
-    inline static PlatformId createVertexShader() {
-        PlatformId id;
-        glCheckError(id = glCreateShader(GL_VERTEX_SHADER));
-        return id;
-    }
-
-    ///
-    /// @brief Create a new fragment shader
-    /// @return Shader id
-    /// 
-    inline static PlatformId createFragmentShader() {
-        PlatformId id;
-        glCheckError(id = glCreateShader(GL_FRAGMENT_SHADER));
-        return id;
-    }
-
-    ///
-    /// @brief Destroy shader
-    /// @param id Shader id
-    ///
-    inline static void destroyShader(PlatformId id) {
-        glCheckError(glDeleteShader(id));
-    }
-
-    ///
-    /// @brief Set shader source
-    /// @param id shader id
-    /// @param src shader source
-    /// @return shader id
-    ///
-    inline static PlatformId shaderSource(PlatformId id, const std::string& src) {
-        const GLchar* c_src = (const GLchar*)src.c_str();
-        glCheckError(glShaderSource(id, 1, &c_src, nullptr));
-        return id;
-    }
-
-    ///
-    /// @brief Compile shader
-    /// @param id shader id
-    /// @return shader id
-    ///
-    inline static PlatformId compileShader(PlatformId id) {
-        glCheckError(glCompileShader(id));
         return id;
     }
 
@@ -359,23 +325,50 @@ private:
         return std::string(log.begin(), log.end());
     }
 
-    ///
-    /// @brief Bind program
-    /// @param id program id
-    /// @return program id
-    ///
-    inline static PlatformId useProgram(PlatformId id) {
-        glCheckError(glUseProgram(id));
-        return id;
-    }
+    struct TextureParameters {
+        TextureFiltering mag;
+        TextureFiltering min;
+        TextureWrap wrapS;
+        TextureWrap wrapT;
+        TextureFormat internalFormat;
+        TextureFormat dataFormat;
+        TextureType dataType;
+        int levelOfDetail;
+        bool mipMap;
+
+        TextureParameters()
+            : mag(TextureFiltering::LINEAR),
+            min(TextureFiltering::LINEAR),
+            wrapS(TextureWrap::REPEAT),
+            wrapT(TextureWrap::REPEAT),
+            internalFormat(TextureFormat::RGBA),
+            dataFormat(TextureFormat::RGBA),
+            dataType(TextureType::UNSIGNED_BYTE),
+            levelOfDetail(0),
+            mipMap(false)
+        {
+        }
+    };
 
     ///
     /// @brief Create a new texture
     /// @return texture id
     ///
-    inline static PlatformId createTexture() {
+    inline static PlatformId textureNew(int width, int height, const void* data, TextureParameters params) {
         PlatformId id;
         glCheckError(glGenTextures(1, &id));
+        glCheckError(glBindTexture(GL_TEXTURE_2D, id));
+        glCheckError(glTexImage2D(GL_TEXTURE_2D, params.levelOfDetail, 
+            (GLenum)params.internalFormat, width, height, 0, (GLenum)params.dataFormat, 
+            (GLenum)params.dataType, data));
+        glCheckError(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, (GLint)params.min));
+        glCheckError(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, (GLint)params.mag));
+        glCheckError(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, (GLint)params.wrapT));
+        glCheckError(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, (GLint)params.wrapS));
+        if (params.mipMap) {
+            glCheckError(glGenerateMipmap(GL_TEXTURE_2D));
+        }
+        glCheckError(glBindTexture(GL_TEXTURE_2D, id));
         return id;
     }
 
@@ -383,91 +376,27 @@ private:
     /// @brief Destroy the texture
     /// @param id texture id
     ///
-    inline static void destroyTexture(PlatformId id) {
+    inline static void textureDestroy(PlatformId id) {
         glCheckError(glDeleteTextures(1, &id));
-    }
-
-    ///
-    /// @brief Set the texture data
-    /// @param lod Specifies the level-of-detail number. Level 0 is the base image level.
-    /// @param internalFormat Specifies the number of color components in the texture
-    /// @param format Specifies the format of the pixel data
-    /// @param width Texture width
-    /// @param height Texture height
-    /// @param type Specifies the data type of the pixel data
-    /// @param data Specifies a pointer to the image data in memory
-    ///
-    inline static void textureData(int lod, TextureFormat internalFormat, TextureFormat format, int width, int height, TextureType type, const void* data) {
-        glCheckError(glTexImage2D(GL_TEXTURE_2D, lod, (GLenum)internalFormat, width, height, 0, (GLenum)format, (GLenum)type, data));
-    }
-
-    ///
-    /// @brief Texture MIN filter
-    /// @param id texture id
-    /// @param filter filter parameter
-    /// @return texture id
-    ///
-    inline static PlatformId textureMinParameter(PlatformId id, TextureFiltering filter) {
-        glCheckError(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, (GLint)filter));
-        return id;
-    }
-
-    ///
-    /// @brief Texture MAG filter
-    /// @param id texture id
-    /// @param filter filter parameter
-    /// @return texture id
-    ///
-    inline static PlatformId textureMagParameter(PlatformId id, TextureFiltering filter) {
-        glCheckError(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, (GLint)filter));
-        return id;
-    }
-
-    ///
-    /// @brief Texture wrap S
-    /// @param id texture id
-    /// @param wrap wrap parameter
-    /// @return texture id
-    ///
-    inline static PlatformId textureWrapSParameter(PlatformId id, TextureWrap wrap) {
-        glCheckError(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, (GLint)wrap));
-        return id;
-    }
-
-    ///
-    /// @brief Texture wrap T
-    /// @param id texture id
-    /// @param wrap wrap parameter
-    /// @return texture id
-    ///
-    inline static PlatformId textureWrapTParameter(PlatformId id, TextureWrap wrap) {
-        glCheckError(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, (GLint)wrap));
-        return id;
     }
 
     ///
     /// @brief Bind texture
     /// @param id texture id
-    /// @return texture id
     ///
-    inline static PlatformId textureBind(PlatformId id) {
+    inline static void textureUse(PlatformId id, unsigned char slot = 0) {
+        glCheckError(glActiveTexture(GL_TEXTURE0 + slot));
         glCheckError(glBindTexture(GL_TEXTURE_2D, id));
+    }
+
+    inline static PlatformId createFramebuffer() {
+        PlatformId id;
+        glCheckError(glGenFramebuffers(1, &id));
         return id;
     }
 
-    ///
-    /// @brief Active texture at slot (slot)
-    /// @param slot texture slot
-    ///
-    inline static void textureActiveUnit(unsigned char slot) {
-        glCheckError(glActiveTexture(GL_TEXTURE0 + slot));
-    }
-
-    ///
-    /// @brief Generate mipmap
-    ///
-    inline static void textureGenMipmap() {
-        glCheckError(glGenerateMipmap(GL_TEXTURE_2D));
+    inline static void destroyFramebuffer(PlatformId id) {
+        glCheckError(glDeleteFramebuffers(1, &id));
     }
 
     ///
