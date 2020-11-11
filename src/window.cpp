@@ -24,14 +24,14 @@ void createWindow(int width, int height) {
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1);
 
-    if (!OpenGL::loadContext()) {
+    if (!Platform::loadContext()) {
         std::cerr << "cannot create OpenGL context" << std::endl;
         glfwDestroyWindow(window);
         glfwTerminate();
         std::exit(EXIT_FAILURE);
     }
 
-    std::cout << OpenGL::getVersion() << std::endl << OpenGL::getVendor() << std::endl;
+    std::cout << Platform::getVersion() << std::endl << Platform::getVendor() << std::endl;
 }
 
 void destroyWindow() {

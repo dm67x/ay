@@ -139,19 +139,19 @@ void Context::bufferBind(PlatformId id, Platform::BufferMode mode) const {
 }
 
 void Context::bufferData(Platform::BufferMode mode, size_t size, const void* data, Platform::BufferTarget target) const {
-    OpenGL::bufferData(mode, size, data, target);
+    Platform::bufferData(mode, size, data, target);
 }
 
 void Context::bufferAttribArray(PlatformId id, int size, Platform::AttribType type, size_t stride, const void* ptr) {
-    OpenGL::vertexAttribArray(id, size, type, stride, ptr);
+    Platform::vertexAttribArray(id, size, type, stride, ptr);
 }
 
 void Context::drawArrays(Platform::DrawMode mode, int first, size_t count) const {
-    OpenGL::drawArrays(mode, first, count);
+    Platform::drawArrays(mode, first, count);
 }
 
 void Context::drawElements(Platform::DrawMode mode, size_t count, Platform::AttribType type, const void* indices) {
-    OpenGL::drawElements(mode, count, type, indices);
+    Platform::drawElements(mode, count, type, indices);
 }
 
 PlatformId Context::textureNew(const std::string& name, int width, int height) {

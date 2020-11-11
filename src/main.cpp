@@ -30,7 +30,7 @@ int main(void)
         ctx->textureUse("logo");
         ctx->shaderUniform("logoTexture", 0);
         ctx->vaoBind(vao);
-        ctx->drawArrays(OpenGL::DrawMode::TRIANGLES, 0, 6);
+        ctx->drawArrays(Platform::DrawMode::TRIANGLES, 0, 6);
         ctx->vaoBind(0);
     }
 
