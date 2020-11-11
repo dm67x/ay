@@ -155,12 +155,12 @@ void Context::drawElements(Platform::DrawMode mode, size_t count, Platform::Attr
 }
 
 PlatformId Context::textureNew(const std::string& name, int width, int height) {
-    PlatformId id = OpenGL::createTexture();
+    PlatformId id = Platform::createTexture();
     Platform::textureBind(id);
-    Platform::textureMinParameter(id, OpenGL::TextureFiltering::LINEAR);
-    Platform::textureMagParameter(id, OpenGL::TextureFiltering::LINEAR);
-    Platform::textureWrapSParameter(id, OpenGL::TextureWrap::REPEAT);
-    Platform::textureWrapTParameter(id, OpenGL::TextureWrap::REPEAT);
+    Platform::textureMinParameter(id, Platform::TextureFiltering::LINEAR);
+    Platform::textureMagParameter(id, Platform::TextureFiltering::LINEAR);
+    Platform::textureWrapSParameter(id, Platform::TextureWrap::REPEAT);
+    Platform::textureWrapTParameter(id, Platform::TextureWrap::REPEAT);
     Platform::textureData(0, Platform::TextureFormat::RGBA, Platform::TextureFormat::RGBA, width, height, Platform::TextureType::UNSIGNED_BYTE, nullptr);
     Platform::textureBind(0);
     textures.insert(std::make_pair(name, id));
@@ -177,12 +177,12 @@ PlatformId Context::textureNew(const std::string& name, const std::string& filen
         return 0;
     }
 
-    PlatformId id = OpenGL::createTexture();
+    PlatformId id = Platform::createTexture();
     Platform::textureBind(id);
-    Platform::textureMinParameter(id, OpenGL::TextureFiltering::LINEAR);
-    Platform::textureMagParameter(id, OpenGL::TextureFiltering::LINEAR);
-    Platform::textureWrapSParameter(id, OpenGL::TextureWrap::REPEAT);
-    Platform::textureWrapTParameter(id, OpenGL::TextureWrap::REPEAT);
+    Platform::textureMinParameter(id, Platform::TextureFiltering::LINEAR);
+    Platform::textureMagParameter(id, Platform::TextureFiltering::LINEAR);
+    Platform::textureWrapSParameter(id, Platform::TextureWrap::REPEAT);
+    Platform::textureWrapTParameter(id, Platform::TextureWrap::REPEAT);
     Platform::textureData(0,
         Platform::TextureFormat::RGBA,
         channels == 4 ? Platform::TextureFormat::RGBA : Platform::TextureFormat::RGB,
