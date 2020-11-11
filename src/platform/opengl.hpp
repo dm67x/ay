@@ -528,3 +528,5 @@ private:
         glCheckError(glDrawElements((GLenum)mode, (GLsizei)count, (GLenum)type, indices));
     }
 };
+
+#undef glCheckError
