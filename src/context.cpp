@@ -6,52 +6,52 @@
 
 Context::~Context() {
     for (auto it = shaders.begin(); it != shaders.end(); it++) {
-        OpenGL::destroyProgram(it->second);
+        Platform::destroyProgram(it->second);
     }
 
     for (auto it = textures.begin(); it != textures.end(); it++) {
-        OpenGL::destroyTexture(it->second);
+        Platform::destroyTexture(it->second);
     }
 }
 
 void Context::clear(float r, float g, float b, float a) const {
-    OpenGL::clear(r, g, b, a);
+    Platform::clear(r, g, b, a);
 }
 
 PlatformId Context::shaderFromMemory(const std::string& name, const std::string& vertex, const std::string& fragment) {
-    PlatformId id = OpenGL::createProgram();
-    PlatformId vid = OpenGL::createVertexShader();
-    PlatformId fid = OpenGL::createFragmentShader();
+    PlatformId id = Platform::createProgram();
+    PlatformId vid = Platform::createVertexShader();
+    PlatformId fid = Platform::createFragmentShader();
     std::string log = "";
     
-    OpenGL::shaderSource(vid, vertex);
-    OpenGL::compileShader(vid);
-    log = OpenGL::getShaderLog(vid);
+    Platform::shaderSource(vid, vertex);
+    Platform::compileShader(vid);
+    log = Platform::getShaderLog(vid);
     if (log.size() > 0) {
         std::cerr << "Vertex: " << log << std::endl;
         return 0;
     }
 
-    OpenGL::shaderSource(fid, fragment);
-    OpenGL::compileShader(fid);
-    log = OpenGL::getShaderLog(fid);
+    Platform::shaderSource(fid, fragment);
+    Platform::compileShader(fid);
+    log = Platform::getShaderLog(fid);
     if (log.size() > 0) {
         std::cerr << "Fragment: " << log << std::endl;
         return 0;
     }
 
-    OpenGL::attachShader(id, vid);
-    OpenGL::attachShader(id, fid);
-    OpenGL::linkProgram(id);
-    log = OpenGL::getProgramLog(id);
+    Platform::attachShader(id, vid);
+    Platform::attachShader(id, fid);
+    Platform::linkProgram(id);
+    log = Platform::getProgramLog(id);
     if (log.size() > 0) {
         std::cerr << "Program: " << log << std::endl;
         return 0;
     }
-    OpenGL::detachShader(id, vid);
-    OpenGL::detachShader(id, fid);
-    OpenGL::destroyShader(vid);
-    OpenGL::destroyShader(fid);
+    Platform::detachShader(id, vid);
+    Platform::detachShader(id, fid);
+    Platform::destroyShader(vid);
+    Platform::destroyShader(fid);
     shaders.insert(std::make_pair(name, id));
     return id;
 }
@@ -89,7 +89,7 @@ PlatformId Context::shaderFromFile(const std::string& name, const std::string& v
 void Context::shaderDestroy(const std::string& name) {
     auto it = shaders.find(name);
     if (it != shaders.end()) {
-        OpenGL::destroyShader(it->second);
+        Platform::destroyShader(it->second);
         shaders.erase(it);
     }
 }
@@ -99,70 +99,70 @@ void Context::shaderUse(const std::string& name) {
     if (shader != shaders.end()) {
         currentShader = shader->second;
     }
-    OpenGL::useProgram(currentShader);
+    Platform::useProgram(currentShader);
 }
 
 void Context::shaderUniform(const std::string& name, float value) const {
-    OpenGL::uniform1f(currentShader, name, value);
+    Platform::uniform1f(currentShader, name, value);
 }
 
 void Context::shaderUniform(const std::string& name, int value) const {
-    OpenGL::uniform1i(currentShader, name, value);
+    Platform::uniform1i(currentShader, name, value);
 }
 
 void Context::shaderUniform(const std::string& name, const Vec3& value) const {
-    OpenGL::uniform3fv(currentShader, name, new float[3] { value.x, value.y, value.z });
+    Platform::uniform3fv(currentShader, name, new float[3] { value.x, value.y, value.z });
 }
 
 PlatformId Context::vaoNew() const {
-    return OpenGL::createVertexArray();
+    return Platform::createVertexArray();
 }
 
 void Context::vaoDestroy(PlatformId id) const {
-    OpenGL::destroyVertexArray(id);
+    Platform::destroyVertexArray(id);
 }
 
 void Context::vaoBind(PlatformId id) const {
-    OpenGL::bindVertexArray(id);
+    Platform::bindVertexArray(id);
 }
 
 PlatformId Context::bufferNew() const {
-    return OpenGL::createBuffer();
+    return Platform::createBuffer();
 }
 
 void Context::bufferDestroy(PlatformId id) const {
-    OpenGL::destroyBuffer(id);
+    Platform::destroyBuffer(id);
 }
 
-void Context::bufferBind(PlatformId id, OpenGL::BufferMode mode) const {
-    OpenGL::bindBuffer(id, mode);
+void Context::bufferBind(PlatformId id, Platform::BufferMode mode) const {
+    Platform::bindBuffer(id, mode);
 }
 
-void Context::bufferData(OpenGL::BufferMode mode, size_t size, const void* data, OpenGL::BufferTarget target) const {
+void Context::bufferData(Platform::BufferMode mode, size_t size, const void* data, Platform::BufferTarget target) const {
     OpenGL::bufferData(mode, size, data, target);
 }
 
-void Context::bufferAttribArray(PlatformId id, int size, OpenGL::AttribType type, size_t stride, const void* ptr) {
+void Context::bufferAttribArray(PlatformId id, int size, Platform::AttribType type, size_t stride, const void* ptr) {
     OpenGL::vertexAttribArray(id, size, type, stride, ptr);
 }
 
-void Context::drawArrays(OpenGL::DrawMode mode, int first, size_t count) const {
+void Context::drawArrays(Platform::DrawMode mode, int first, size_t count) const {
     OpenGL::drawArrays(mode, first, count);
 }
 
-void Context::drawElements(OpenGL::DrawMode mode, size_t count, OpenGL::AttribType type, const void* indices) {
+void Context::drawElements(Platform::DrawMode mode, size_t count, Platform::AttribType type, const void* indices) {
     OpenGL::drawElements(mode, count, type, indices);
 }
 
 PlatformId Context::textureNew(const std::string& name, int width, int height) {
     PlatformId id = OpenGL::createTexture();
-    OpenGL::textureBind(id);
-    OpenGL::textureMinParameter(id, OpenGL::TextureFiltering::LINEAR);
-    OpenGL::textureMagParameter(id, OpenGL::TextureFiltering::LINEAR);
-    OpenGL::textureWrapSParameter(id, OpenGL::TextureWrap::REPEAT);
-    OpenGL::textureWrapTParameter(id, OpenGL::TextureWrap::REPEAT);
-    OpenGL::textureData(0, OpenGL::TextureFormat::RGBA, OpenGL::TextureFormat::RGBA, width, height, OpenGL::TextureType::UNSIGNED_BYTE, nullptr);
-    OpenGL::textureBind(0);
+    Platform::textureBind(id);
+    Platform::textureMinParameter(id, OpenGL::TextureFiltering::LINEAR);
+    Platform::textureMagParameter(id, OpenGL::TextureFiltering::LINEAR);
+    Platform::textureWrapSParameter(id, OpenGL::TextureWrap::REPEAT);
+    Platform::textureWrapTParameter(id, OpenGL::TextureWrap::REPEAT);
+    Platform::textureData(0, Platform::TextureFormat::RGBA, Platform::TextureFormat::RGBA, width, height, Platform::TextureType::UNSIGNED_BYTE, nullptr);
+    Platform::textureBind(0);
     textures.insert(std::make_pair(name, id));
     return id;
 }
@@ -178,18 +178,18 @@ PlatformId Context::textureNew(const std::string& name, const std::string& filen
     }
 
     PlatformId id = OpenGL::createTexture();
-    OpenGL::textureBind(id);
-    OpenGL::textureMinParameter(id, OpenGL::TextureFiltering::LINEAR);
-    OpenGL::textureMagParameter(id, OpenGL::TextureFiltering::LINEAR);
-    OpenGL::textureWrapSParameter(id, OpenGL::TextureWrap::REPEAT);
-    OpenGL::textureWrapTParameter(id, OpenGL::TextureWrap::REPEAT);
-    OpenGL::textureData(0, 
-        OpenGL::TextureFormat::RGBA, 
-        channels == 4 ? OpenGL::TextureFormat::RGBA : OpenGL::TextureFormat::RGB, 
+    Platform::textureBind(id);
+    Platform::textureMinParameter(id, OpenGL::TextureFiltering::LINEAR);
+    Platform::textureMagParameter(id, OpenGL::TextureFiltering::LINEAR);
+    Platform::textureWrapSParameter(id, OpenGL::TextureWrap::REPEAT);
+    Platform::textureWrapTParameter(id, OpenGL::TextureWrap::REPEAT);
+    Platform::textureData(0,
+        Platform::TextureFormat::RGBA,
+        channels == 4 ? Platform::TextureFormat::RGBA : Platform::TextureFormat::RGB,
         width, height, 
-        OpenGL::TextureType::UNSIGNED_BYTE, data);
-    OpenGL::textureGenMipmap();
-    OpenGL::textureBind(0);
+        Platform::TextureType::UNSIGNED_BYTE, data);
+    Platform::textureGenMipmap();
+    Platform::textureBind(0);
 
     stbi_image_free(data);
     textures.insert(std::make_pair(name, id));
@@ -199,7 +199,7 @@ PlatformId Context::textureNew(const std::string& name, const std::string& filen
 void Context::textureDestroy(const std::string& name) {
     auto it = textures.find(name);
     if (it != textures.end()) {
-        OpenGL::destroyTexture(it->second);
+        Platform::destroyTexture(it->second);
         textures.erase(it);
     }
 }
@@ -210,6 +210,6 @@ void Context::textureUse(const std::string& name, unsigned char slot) const {
         return;
     }
     
-    OpenGL::textureActiveUnit(slot);
-    OpenGL::textureBind(it->second);
+    Platform::textureActiveUnit(slot);
+    Platform::textureBind(it->second);
 }

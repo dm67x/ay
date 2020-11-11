@@ -113,7 +113,7 @@ public:
     /// @param id buffer id
     /// @param mode buffer target mode
     ///
-    void bufferBind(PlatformId id, OpenGL::BufferMode mode) const;
+    void bufferBind(PlatformId id, Platform::BufferMode mode) const;
 
     ///
     /// @brief Set buffer data
@@ -122,7 +122,7 @@ public:
     /// @param data data
     /// @param target buffer data target mode
     ///
-    void bufferData(OpenGL::BufferMode mode, size_t size, const void* data, OpenGL::BufferTarget target) const;
+    void bufferData(Platform::BufferMode mode, size_t size, const void* data, Platform::BufferTarget target) const;
 
     ///
     /// @brief VertexAttribArray
@@ -132,7 +132,7 @@ public:
     /// @param stride Specifies the byte offset between consecutive generic vertex attributes
     /// @param ptr Specifies a offset of the first component of the first generic vertex attribute
     ///
-    void bufferAttribArray(PlatformId id, int size, OpenGL::AttribType type, size_t stride, const void* ptr);    
+    void bufferAttribArray(PlatformId id, int size, Platform::AttribType type, size_t stride, const void* ptr);
 
     ///
     /// @brief Draw arrays
@@ -140,7 +140,7 @@ public:
     /// @param first Specifies the starting index in the enabled arrays
     /// @param count Specifies the number of indices to be rendered
     ///
-    void drawArrays(OpenGL::DrawMode mode, int first, size_t count) const;
+    void drawArrays(Platform::DrawMode mode, int first, size_t count) const;
 
     ///
     /// @brief Draw elements call
@@ -149,7 +149,7 @@ public:
     /// @param type Specifies the type of the values in indices
     /// @param indices Specifies a pointer to the location where the indices are stored
     ///
-    void drawElements(OpenGL::DrawMode mode, size_t count, OpenGL::AttribType type, const void* indices);
+    void drawElements(Platform::DrawMode mode, size_t count, Platform::AttribType type, const void* indices);
 
     /// 
     /// @brief Create a new empty texture

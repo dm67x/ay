@@ -577,3 +577,5 @@ private:
 };
 
 #undef glCheckError
+
+using Platform = OpenGL;
