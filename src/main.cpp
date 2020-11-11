@@ -4,8 +4,8 @@
 
 int main(void)
 {
-    createWindow(1280, 900);
-    Context* ctx = new Context();
+    Window window(1280, 900);
+    Context* ctx = window.getCtx();
     ctx->shaderFromMemory("base", 
         "#version 320 es\n"
         "layout(location = 0) out vec2 uv;\n"
@@ -19,21 +19,18 @@ int main(void)
         "uniform sampler2D logoTexture;\n"
         "void main() { fragOut = texture(logoTexture, uv) * vec4(1); }");
 
-    PlatformId vao = ctx->vaoNew();
-    ctx->textureNew("logo", "../../assets/logo.png");
+    auto vao = ctx->vertexArrayObjectNew();
+    ctx->texture2DNew("logo", "../../assets/logo.png");
 
-    while (windowIsOpen()) {
+    while (window.isOpen()) {
         ctx->clear();
-        ctx->viewport(0, 0, windowGetWidth(), windowGetHeight());
+        ctx->viewport(0, 0, 1280, 900);
         ctx->shaderUse("base");
-        ctx->textureUse("logo");
+        ctx->texture2DGet("logo")->use();
         ctx->shaderUniform("logoTexture", 0);
-        ctx->vaoUse(vao);
-        ctx->drawArrays(Platform::DrawMode::TRIANGLES, 0, 6);
-        ctx->vaoUse(0);
+        vao->use();
+        vao->drawArrays(0, 6);
     }
 
-    delete ctx;
-    destroyWindow();
     return 0;
 }

@@ -1,27 +1,54 @@
 #pragma once
 
+#include "platform/platform.hpp"
 #include "platform/opengl.hpp"
 #include <map>
+#include <array>
 
 struct Vec3;
 
 class Context {
-    std::map<std::string, PlatformId> shaders;
-    std::map<std::string, PlatformId> textures;
-    std::map<std::string, PlatformId> renderbuffers;
-    std::map<std::string, PlatformId> framebuffers;
-    PlatformId currentShader;
+    Platform* platform;
+    std::map<std::string, ShaderProgram*> shaders;
+    std::map<std::string, Texture2D*> textures;
+    std::map<std::string, Renderbuffer*> renderbuffers;
+    std::map<std::string, Framebuffer*> framebuffers;
+    ShaderProgram* currentShader;
 
 public:
     ///
     /// @brief Constructor of context
     ///
-    Context() : shaders(), textures(), renderbuffers(), framebuffers(), currentShader(0) {}
+    Context() 
+        : platform(new OpenGL()), 
+        shaders(), 
+        textures(), 
+        renderbuffers(), 
+        framebuffers(), 
+        currentShader(nullptr) 
+    {
+    }
 
     ///
     /// @brief Destructor of context
     ///
     ~Context();
+
+    ///
+    /// @brief Get OpenGL Version
+    /// @return Version
+    ///
+    inline const std::string getVersion() {
+        return platform->getVersion();
+    }
+
+    ///
+    /// @brief Get Vendor
+    /// @return Vendor
+    ///
+    inline const std::string getVendor() {
+        return platform->getVendor();
+    }
 
     ///
     /// @brief Clear screen
@@ -47,7 +74,7 @@ public:
     /// @param vertex vertex shader
     /// @param fragment fragment shader
     /// @return shader program id
-    PlatformId shaderFromMemory(const std::string& name, const std::string& vertex, const std::string& fragment);
+    void shaderFromMemory(const std::string& name, const std::string& vertex, const std::string& fragment);
 
     ///
     /// @brief Create shader from file
@@ -55,7 +82,7 @@ public:
     /// @param vertex vertex shader
     /// @param fragment fragment shader
     /// @return shader program id
-    PlatformId shaderFromFile(const std::string& name, const std::string& vertex, const std::string& fragment);
+    void shaderFromFile(const std::string& name, const std::string& vertex, const std::string& fragment);
 
     /// 
     /// @brief Destroy the shader
@@ -65,7 +92,7 @@ public:
 
     ///
     /// @brief Use shader
-    /// @param name shader name
+    /// @param name Shader name
     ///
     void shaderUse(const std::string& name);
 
@@ -92,75 +119,15 @@ public:
 
     ///
     /// @brief Create a new vao
+    /// @return VertexArrayObject instance
     ///
-    PlatformId vaoNew() const;
-
-    ///
-    /// @brief Destroy a vao
-    /// @param id vao id
-    ///
-    void vaoDestroy(PlatformId id) const;
-
-    ///
-    /// @brief Bind vao
-    /// @param id vao id
-    ///
-    void vaoUse(PlatformId id) const;
+    VertexArrayObject* vertexArrayObjectNew() const;
 
     ///
     /// @brief Create a new buffer
-    /// @return buffer id
+    /// @return Buffer instance
     ///
-    PlatformId bufferNew() const;
-
-    ///
-    /// @brief Destroy the buffer specified by id
-    /// @param id buffer to destroy
-    ///
-    void bufferDestroy(PlatformId id) const;
-
-    ///
-    /// @brief Bind buffer
-    /// @param id buffer id
-    /// @param mode buffer target mode
-    ///
-    void bufferUse(PlatformId id, Platform::BufferMode mode) const;
-
-    ///
-    /// @brief Set buffer data
-    /// @param mode buffer target mode
-    /// @param size buffer size
-    /// @param data data
-    /// @param target buffer data target mode
-    ///
-    void bufferData(Platform::BufferMode mode, size_t size, const void* data, Platform::BufferTarget target) const;
-
-    ///
-    /// @brief VertexAttribArray
-    /// @param id Specifies the index of the generic vertex attribute to be modified
-    /// @param size Specifies the number of components per generic vertex attribute
-    /// @param type Specifies the data type of each component in the array
-    /// @param stride Specifies the byte offset between consecutive generic vertex attributes
-    /// @param ptr Specifies a offset of the first component of the first generic vertex attribute
-    ///
-    void bufferAttribArray(PlatformId id, int size, Platform::AttribType type, size_t stride, const void* ptr);
-
-    ///
-    /// @brief Draw arrays
-    /// @param mode Draw mode
-    /// @param first Specifies the starting index in the enabled arrays
-    /// @param count Specifies the number of indices to be rendered
-    ///
-    void drawArrays(Platform::DrawMode mode, int first, size_t count) const;
-
-    ///
-    /// @brief Draw elements call
-    /// @param mode Specifies what kind of primitives to render
-    /// @param count Specifies the number of elements to be rendered
-    /// @param type Specifies the type of the values in indices
-    /// @param indices Specifies a pointer to the location where the indices are stored
-    ///
-    void drawElements(Platform::DrawMode mode, size_t count, Platform::AttribType type, const void* indices);
+    Buffer* bufferNew() const;
 
     /// 
     /// @brief Create a new empty texture
@@ -168,34 +135,27 @@ public:
     /// @param width Texture width
     /// @param height Texture height
     /// 
-    void textureNew(const std::string& name, int width, int height);
+    void texture2DNew(const std::string& name, int width, int height);
 
     /// 
     /// @brief Create a new texture from file
     /// @param name Texture name
     /// @param filename Filename
     /// 
-    void textureNew(const std::string& name, const std::string& filename);
+    void texture2DNew(const std::string& name, const std::string& filename);
 
     ///
     /// @brief Destroy the texture
     /// @param name Texture name
     /// 
-    void textureDestroy(const std::string& name);
-
-    /// 
-    /// @brief Use the texture specified by name
-    /// @param name Texture name
-    /// @param slot To which slot bind the texture
-    /// 
-    void textureUse(const std::string& name, unsigned char slot = 0) const;
+    void texture2DDestroy(const std::string& name);
 
     /// 
     /// @brief Get the texture by name
     /// @param name Texture name
     /// @return Texture id
     /// 
-    PlatformId textureGet(const std::string& name) const;
+    Texture2D* texture2DGet(const std::string& name) const;
 
     /// 
     /// @brief Create a new renderbuffer
@@ -216,14 +176,14 @@ public:
     /// @param name Renderbuffer name
     /// @return Renderbuffer id
     /// 
-    PlatformId renderbufferGet(const std::string& name) const;
+    Renderbuffer* renderbufferGet(const std::string& name) const;
 
     /// 
     /// @brief Create a new framebuffer
     /// @param name Framebuffer name
     /// @param params Framebuffer parameters
     /// 
-    void framebufferNew(const std::string& name, const std::vector<PlatformId>& colorAttachments, PlatformId depthStencilAttachment = 0);
+    void framebufferNew(const std::string& name, const std::array<Texture2D*, 32>& colorAttachments, Renderbuffer* depthStencilAttachment = nullptr);
 
     /// 
     /// @brief Destroy the framebuffer
@@ -232,8 +192,8 @@ public:
     void framebufferDestroy(const std::string& name);
 
     /// 
-    /// @brief Use the framebuffer
+    /// @brief Get the framebuffer
     /// @param name Framebuffer name
     ///
-    void framebufferUse(const std::string& name) const;
+    Framebuffer* framebufferGet(const std::string& name) const;
 };

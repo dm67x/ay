@@ -1,9 +1,9 @@
 #include "window.hpp"
-#include "platform/opengl.hpp"
+#include "context.hpp"
 #include <iostream>
 #include <cstdlib>
 
-void createWindow(int width, int height) {
+Window::Window(int width, int height) : window(nullptr), ctx(nullptr) {
     if (!glfwInit()) {
         std::cerr << "cannot init GLFW" << std::endl;
         std::exit(EXIT_FAILURE);
@@ -14,7 +14,7 @@ void createWindow(int width, int height) {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    GLFWwindow* window = glfwCreateWindow(width, height, "Ay", nullptr, nullptr);
+    window = glfwCreateWindow(width, height, "Ay", nullptr, nullptr);
     if (!window) {
         std::cerr << "cannot create window" << std::endl;
         glfwTerminate();
@@ -24,42 +24,22 @@ void createWindow(int width, int height) {
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1);
 
-    if (!Platform::loadContext()) {
-        std::cerr << "cannot create OpenGL context" << std::endl;
-        glfwDestroyWindow(window);
-        glfwTerminate();
-        std::exit(EXIT_FAILURE);
-    }
-
-    std::cout << Platform::getVersion() << std::endl << Platform::getVendor() << std::endl;
+    ctx = new Context();
+    std::cout << ctx->getVersion() << std::endl << ctx->getVendor() << std::endl;
 }
 
-void destroyWindow() {
-    glfwDestroyWindow(getWindow());
+Window::~Window() {
+    delete ctx;
+    glfwDestroyWindow(window);
     glfwTerminate();
 }
 
-GLFWwindow* getWindow() {
-    return glfwGetCurrentContext();
-}
-
-bool windowIsOpen() {
-    GLFWwindow* window = getWindow();
+bool Window::isOpen() const {
     glfwPollEvents();
     glfwSwapBuffers(window);
     return !glfwWindowShouldClose(window);
 }
 
-int windowGetWidth() {
-    GLFWwindow* window = getWindow();
-    int width;
-    glfwGetWindowSize(window, &width, nullptr);
-    return width;
-}
-
-int windowGetHeight() {
-    GLFWwindow* window = getWindow();
-    int height;
-    glfwGetWindowSize(window, nullptr, &height);
-    return height;
+Context* Window::getCtx() const {
+    return ctx;
 }

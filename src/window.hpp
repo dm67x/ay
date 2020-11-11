@@ -1,39 +1,34 @@
 #pragma once
 
 struct GLFWwindow;
+class Context;
 
-///
-/// @brief Create a new window
-/// @param width Width
-/// @param height Height
-///
-void createWindow(int width, int height);
+class Window {
+    GLFWwindow* window;
+    Context* ctx;
 
-///
-/// @brief Destroy the window
-///
-void destroyWindow();
+public:
+    /// 
+    /// @brief Constructor
+    /// @param width Window width
+    /// @param height Window height
+    /// 
+    explicit Window(int width, int height);
+    
+    /// 
+    /// @brief Destructor
+    /// 
+    ~Window();
 
-///
-/// @brief Get current window
-/// @return The current window
-///
-GLFWwindow* getWindow();
+    /// 
+    /// @brief IsOpen
+    /// @return True if window is open false otherwise
+    /// 
+    bool isOpen() const;
 
-///
-/// @brief Get the window state
-/// @return True if window is open false otherwise
-///
-bool windowIsOpen();
-
-///
-/// @brief Get window width
-/// @return window width
-///
-int windowGetWidth();
-
-///
-/// @brief Get window height
-/// @return window height
-///
-int windowGetHeight();
+    ///
+    /// @brief Get context
+    /// @return Context
+    ///
+    Context* getCtx() const;
+};
