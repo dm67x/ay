@@ -21,8 +21,9 @@ int main(void)
     PlatformId vao = ctx->vaoNew();
 
     while (windowIsOpen()) {
+        ctx->clear();
         ctx->shaderUse("base");
-        ctx->shaderUniform("bg", Vec3(0, 1, 1));
+        ctx->shaderUniform("bg", Vec3(0.25f, 0.5f, 0.25f));
         ctx->vaoBind(vao);
         ctx->drawArrays(OpenGL::DrawMode::TRIANGLES, 0, 6);
         ctx->vaoBind(0);

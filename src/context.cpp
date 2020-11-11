@@ -9,6 +9,10 @@ Context::~Context() {
     }
 }
 
+void Context::clear(float r, float g, float b, float a) const {
+    OpenGL::clear(r, g, b, a);
+}
+
 PlatformId Context::shaderFromMemory(const std::string& name, const std::string& vertex, const std::string& fragment) {
     PlatformId id = OpenGL::createProgram();
     PlatformId vid = OpenGL::createVertexShader();

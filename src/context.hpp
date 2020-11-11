@@ -21,6 +21,15 @@ public:
     ~Context();
 
     ///
+    /// @brief Clear screen
+    /// @param r Red
+    /// @param g Green
+    /// @param b Blue
+    /// @param a Alpha
+    /// 
+    void clear(float r = 0.f, float g = 0.f, float b = 0.f, float a = 1.f) const;
+
+    ///
     /// @brief Create shader from memory
     /// @param name shader name
     /// @param vertex vertex shader

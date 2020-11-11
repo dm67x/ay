@@ -119,6 +119,18 @@ private:
     }
 
     ///
+    /// @brief Clear screen
+    /// @param r Red
+    /// @param g Green
+    /// @param b Blue
+    /// @param a Alpha
+    /// 
+    inline static void clear(float r, float g, float b, float a) {
+        glClearColor(r, g, b, a);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    }
+
+    ///
     /// @brief Create a new shader program
     /// @return Shader program id
     /// 
