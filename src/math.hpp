@@ -2,6 +2,8 @@
 
 #include <cmath>
 #include <cstring>
+#include <limits>
+#include <cassert>
 
 #define PI 3.14159265358979323846
 
@@ -391,10 +393,10 @@ struct Mat4 {
     }
 
     ///
-    /// @brief Transpose matrix
+    /// @brief Translation matrix
     /// @return Matrix4 result
     ///
-    static Mat4 transpose(const Vec3& position) {
+    static Mat4 translate(const Vec3& position) {
         Mat4 result = Mat4::identity();
         result.r1[3] = position.x;
         result.r2[3] = position.y;
@@ -451,5 +453,46 @@ struct Mat4 {
         result.r2[0] = std::sin(angle);
         result.r2[1] = std::cos(angle);
         return result;
+    }
+
+    ///
+    /// @brief Perspective projection matrix (LH)
+    /// @param fov Field of View
+    /// @param aspect Aspect ratio
+    /// @param zNear Near plane clip
+    /// @param zFar Far plane clip
+    /// @return Matrix4
+    ///
+    static Mat4 perspective(float fov, float aspect, float zNear, float zFar) {
+        assert(std::abs(aspect - std::numeric_limits<float>::epsilon()) > 0.f);
+        const float halfFOV = std::tan(fov * 0.5f);
+        Mat4 matrix;
+        matrix.r1[0] = 1.f / (aspect * halfFOV);
+        matrix.r2[1] = 1.f / halfFOV;
+        matrix.r3[2] = zFar / (zFar - zNear);
+        matrix.r3[3] = 1.f;
+        matrix.r4[2] = -(zFar * zNear) / (zFar - zNear);
+        return matrix;
+    }
+
+    ///
+    /// @brief Orthographic projection matrix (LH)
+    /// @param left Left
+    /// @param right Right
+    /// @param bottom Bottom
+    /// @param top Top
+    /// @param zNear Near plane clip
+    /// @param zFar Far plane clip
+    /// @return Matrix4
+    ///
+    static Mat4 ortho(float left, float right, float bottom, float top, float zNear, float zFar) {
+        Mat4 matrix = Mat4::identity();
+        matrix.r1[0] = 0.5f * (right - left);
+        matrix.r2[1] = 0.5f * (top - bottom);
+        matrix.r3[2] = 1.f / (zFar - zNear);
+        matrix.r4[0] = -(right + left) / (right - left);
+        matrix.r4[1] = -(top + bottom) / (top - bottom);
+        matrix.r4[2] = -zNear / (zFar - zNear);
+        return matrix;
     }
 };
