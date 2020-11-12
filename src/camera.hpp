@@ -1,6 +1,9 @@
 #pragma once
 
 #include "math.hpp"
+#include <string>
+
+class Context;
 
 class Camera {
     float zNear;
@@ -8,17 +11,18 @@ class Camera {
     Vec3 position;
     Vec3 viewDirection;
     Vec3 up;
+    Context* ctx;
 
 protected:
-    Camera(float near, float far) 
-        : zNear(near), zFar(far), position(), viewDirection(0.f, 0.f, 1.f), up(0.f, 1.f, 0.f)
+    Camera(Context* ctx, float near, float far) 
+        : ctx(ctx), zNear(near), zFar(far), position(), viewDirection(0.f, 0.f, 1.f), up(0.f, 1.f, 0.f)
     {
     }
 
 public:
     virtual void move() = 0;
     virtual void update() = 0;
-    virtual void renderToTexture() = 0;
+    virtual void renderToTexture(const std::string& name) = 0;
 };
 
 class PerspectiveCamera : public Camera {
@@ -26,8 +30,8 @@ class PerspectiveCamera : public Camera {
     float aspect;
 
 public:
-    PerspectiveCamera(float fov, float aspect, float near, float far)
-        : fov(fov), aspect(aspect), Camera(near, far)
+    PerspectiveCamera(Context* ctx, float fov, float aspect, float near, float far)
+        : fov(fov), aspect(aspect), Camera(ctx, near, far)
     {
     }
 };
@@ -39,8 +43,8 @@ class OrthographicCamera : public Camera {
     float top;
 
 public:
-    OrthographicCamera(float left, float right, float bottom, float top, float near, float far)
-        : left(left), right(right), bottom(bottom), top(top), Camera(near, far)
+    OrthographicCamera(Context* ctx, float left, float right, float bottom, float top, float near, float far)
+        : left(left), right(right), bottom(bottom), top(top), Camera(ctx, near, far)
     {
     }
 };
