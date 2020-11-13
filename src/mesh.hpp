@@ -11,6 +11,18 @@ struct Vertex {
     Vec3 normal;
     float u;
     float v;
+
+    ///
+    /// @brief Constructor
+    /// @param position Vec3
+    /// @param normal Vec3
+    /// @param u Texture coordinates (u, v)
+    /// @param v Texture coordinates (u, v)
+    ///
+    Vertex(Vec3 position, Vec3 normal, float u, float v)
+        : position(position), normal(normal), u(u), v(v)
+    {
+    }
 };
 
 class Mesh : public Object {
@@ -23,13 +35,14 @@ class Mesh : public Object {
 
     friend class MeshFactory;
 
-public:
+private:
     ///
     /// @brief Constructor
     /// @param ctx Context pointer
     ///
     Mesh(Context* ctx);
 
+public:
     ///
     /// @brief Destructor
     ///

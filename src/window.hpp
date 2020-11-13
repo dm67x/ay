@@ -30,5 +30,5 @@ public:
     /// @brief Get context
     /// @return Context
     ///
-    Context* getCtx() const;
+    Context* getContext() const;
 };

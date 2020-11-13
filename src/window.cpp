@@ -41,6 +41,6 @@ bool Window::isOpen() const {
     return !glfwWindowShouldClose(window);
 }
 
-Context* Window::getCtx() const {
+Context* Window::getContext() const {
     return ctx;
 }
