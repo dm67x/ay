@@ -5,7 +5,7 @@
 
 Window::Window(int width, int height) : window(nullptr), ctx(nullptr) {
     if (!glfwInit()) {
-        std::cerr << "cannot init GLFW" << std::endl;
+        spdlog::critical("cannot init GLFW");
         std::exit(EXIT_FAILURE);
     }
 
@@ -16,7 +16,7 @@ Window::Window(int width, int height) : window(nullptr), ctx(nullptr) {
 
     window = glfwCreateWindow(width, height, "Ay", nullptr, nullptr);
     if (!window) {
-        std::cerr << "cannot create window" << std::endl;
+        spdlog::critical("cannot create window");
         glfwTerminate();
         std::exit(EXIT_FAILURE);
     }
@@ -25,7 +25,8 @@ Window::Window(int width, int height) : window(nullptr), ctx(nullptr) {
     glfwSwapInterval(1);
 
     ctx = new Context();
-    std::cout << ctx->getVersion() << std::endl << ctx->getVendor() << std::endl;
+    spdlog::info("{}", ctx->getVersion());
+    spdlog::info("{}", ctx->getVendor());
 }
 
 Window::~Window() {

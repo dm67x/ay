@@ -29,14 +29,14 @@ public:
         glCheckError(glCompileShader(vid));
         log = getShaderLog(vid);
         if (log.size() > 0) {
-            std::cerr << "Vertex: " << log << std::endl;
+            spdlog::error("Vertex shader: {}", log);
             return;
         }
 
         glCheckError(glCompileShader(fid));
         log = getShaderLog(fid);
         if (log.size() > 0) {
-            std::cerr << "Fragment: " << log << std::endl;
+            spdlog::error("Fragment shader: {}", log);
             return;
         }
 
@@ -46,7 +46,7 @@ public:
 
         log = getProgramLog(id);
         if (log.size() > 0) {
-            std::cerr << "Program: " << log << std::endl;
+            spdlog::error("Program: {}", log);
             return;
         }
 

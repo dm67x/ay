@@ -1,7 +1,7 @@
 #pragma once
 
 #include <glad.h>
-#include <iostream>
+#include <spdlog/spdlog.h>
 
 #ifdef NDEBUG
 #define glCheckError(expr) expr
@@ -10,7 +10,7 @@
     expr;\
     OpenGLHelper::Error err = OpenGLHelper::getError();\
     if (err != OpenGLHelper::Error::NO_ERROR) {\
-        std::cerr << "OpenGL error at line: " << __LINE__ << std::endl;\
+        spdlog::error("OpenGL error in {} at line: {}", __FILE__, __LINE__); \
     } }
 #endif
 

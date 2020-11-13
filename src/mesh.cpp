@@ -8,7 +8,8 @@ Mesh::Mesh(Context* ctx)
     ebo(nullptr), 
     vbo(nullptr), 
     vertices(), 
-    indices() 
+    indices(),
+    isBuilded(false)
 {
     vao = ctx->vertexArrayObjectNew();
     ebo = ctx->bufferNew();
@@ -41,7 +42,9 @@ void Mesh::render(float deltaTime) {
     VertexArrayObject::reset();
 }
 
-void Mesh::build() const {
+void Mesh::build() {
+    if (isBuilded) return;
+
     vao->use();
     vbo->use(BufferMode::ARRAY);
     vbo->set(BufferMode::ARRAY, sizeof(Vertex) * vertices.size(), vertices.data(), BufferTarget::STATIC_DRAW);
@@ -52,4 +55,6 @@ void Mesh::build() const {
     ebo->set(BufferMode::ELEMENT_ARRAY, sizeof(unsigned int) * indices.size(), indices.data(), BufferTarget::STATIC_DRAW);
     Buffer::reset(BufferMode::ELEMENT_ARRAY);
     VertexArrayObject::reset();
+
+    isBuilded = true;
 }

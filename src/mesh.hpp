@@ -19,6 +19,7 @@ class Mesh : public Object {
     Buffer* vbo;
     std::vector<Vertex> vertices;
     std::vector<unsigned int> indices;
+    bool isBuilded;
 
     friend class MeshFactory;
 
@@ -50,5 +51,5 @@ private:
     ///
     /// @brief Build the mesh
     ///
-    void build() const;
+    void build();
 };

@@ -45,7 +45,7 @@ public:
         GLenum status;
         glCheckError(status = glCheckFramebufferStatus(GL_FRAMEBUFFER));
         if (status != GL_FRAMEBUFFER_COMPLETE) {
-            std::cerr << "The framebuffer is not complete" << std::endl;
+            spdlog::error("The framebuffer is not complete");
             return;
         }
 

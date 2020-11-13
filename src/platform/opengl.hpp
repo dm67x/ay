@@ -11,7 +11,6 @@
 #include "opengl/buffer.hpp"
 
 #include <sstream>
-#include <iostream>
 #include <cstdio>
 
 class OpenGL : public Platform {
@@ -23,7 +22,7 @@ class OpenGL : public Platform {
     ///
     OpenGL() {
         if (!gladLoadGLES2Loader((GLADloadproc)glfwGetProcAddress)) {
-            std::cerr << "cannot initialize glad" << std::endl;
+            spdlog::critical("cannot initialize glad");
             std::exit(EXIT_FAILURE);
         }
     }

@@ -1,6 +1,5 @@
 #include "context.hpp"
 #include "math.hpp"
-#include <iostream>
 #include <fstream>
 #include <streambuf>
 #include <stb_image.h>
@@ -39,14 +38,14 @@ void Context::shaderFromMemory(const std::string& name, const std::string& verte
 void Context::shaderFromFile(const std::string& name, const std::string& vertex, const std::string& fragment) {
     std::ifstream vfile(vertex, std::ifstream::binary);
     if (!vfile.is_open()) {
-        std::cerr << "cannot open file: " << vertex << std::endl;
+        spdlog::error("cannot open file: {}", vertex);
         return;
     }
     std::string vsrc((std::istreambuf_iterator<char>(vfile)), std::istreambuf_iterator<char>());
 
     std::ifstream ffile(fragment, std::ifstream::binary);
     if (!ffile.is_open()) {
-        std::cerr << "cannot open file: " << fragment << std::endl;
+        spdlog::error("cannot open file: {}", fragment);
         return;
     }
     std::string fsrc((std::istreambuf_iterator<char>(ffile)), std::istreambuf_iterator<char>());
@@ -109,7 +108,7 @@ void Context::texture2DNew(const std::string& name, const std::string& filename)
     int width, height, channels;
     unsigned char* data = stbi_load(filename.c_str(), &width, &height, &channels, 0);
     if (!data) {
-        std::cerr << "cannot load data from " << filename << std::endl;
+        spdlog::error("cannot load data from {}", filename);
         return;
     }
 
