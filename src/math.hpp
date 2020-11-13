@@ -64,6 +64,15 @@ struct Vec3 {
     }
 
     ///
+    /// @brief Negative vector
+    /// @param v1 vector
+    /// @return Negative vector
+    ///
+    friend Vec3 operator-(const Vec3& v1) {
+        return Vec3(-v1.x, -v1.y, -v1.z);
+    }
+
+    ///
     /// @brief Multiply vector coordinates by a float number
     /// @param v1 The vector
     /// @param v2 The number

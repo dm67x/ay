@@ -1,14 +1,29 @@
 #pragma once
 
-class Context;
+#include "object.hpp"
 
-class Scene {
-    const Context& ctx;
-
+class Scene : public Object {
 public:
     ///
-    /// @brief Build a new scene
+    /// @brief Create a new scene
     /// @param ctx The context
     ///
-    Scene(const Context& ctx) : ctx(ctx) {}
+    Scene(Context* ctx) : Object(ctx) {}
+
+    ///
+    /// @brief Destructor
+    ///
+    virtual ~Scene();
+
+    ///
+    /// @brief Update called each frame
+    /// @param deltaTime Elapsed time between each frame
+    ///
+    void update(float deltaTime) override;
+
+    ///
+    /// @brief Render called each frame
+    /// @param deltaTime Elapsed time between each frame
+    ///
+    void render(float deltaTime) override;
 };
