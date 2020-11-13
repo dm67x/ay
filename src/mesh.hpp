@@ -33,7 +33,7 @@ class Mesh : public Object {
     std::vector<unsigned int> indices;
     bool isBuilded;
 
-    friend class MeshFactory;
+    friend struct MeshFactory;
 
 private:
     ///

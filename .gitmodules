@@ -4,3 +4,6 @@
 [submodule "extern/spdlog"]
 	path = extern/spdlog
 	url = git@github.com:gabime/spdlog.git
+[submodule "extern/tinyobjloader"]
+	path = extern/tinyobjloader
+	url = git@github.com:tinyobjloader/tinyobjloader.git

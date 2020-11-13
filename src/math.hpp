@@ -4,8 +4,9 @@
 #include <cstring>
 #include <limits>
 #include <cassert>
+#include <ostream>
 
-#define PI 3.14159265358979323846
+#define PI 3.14159265358979323846f
 
 ///
 /// @brief Radians to Degrees
@@ -42,6 +43,17 @@ struct Vec3 {
     /// @param z
     ///
     Vec3(float x, float y, float z) : x(x), y(y), z(z) {}
+
+    ///
+    /// @brief Format for output values in console
+    /// @param out Out stream
+    /// @param v Vec3
+    /// @return Out stream
+    ///
+    friend std::ostream& operator<<(std::ostream& out, const Vec3& v) {
+        out << "(" << v.x << ", " << v.y << ", " << v.z << ")";
+        return out;
+    }
 
     ///
     /// @brief Add two vectors
@@ -392,7 +404,7 @@ struct Mat4 {
     /// @brief Inverse matrix
     /// @return Matrix4 result
     ///
-    Mat4 inverse() const {
+    inline Mat4 inverse() const {
         float determinant = this->determinant();
         if (determinant > 0.f || determinant < 0.f) {
             return this->adjugate() * (1.f / this->determinant());
@@ -419,9 +431,9 @@ struct Mat4 {
     ///
     static Mat4 scale(const Vec3& scale) {
         Mat4 result = Mat4::identity();
-        result.r1[3] = scale.x;
-        result.r2[3] = scale.y;
-        result.r3[3] = scale.z;
+        result.r1[0] = scale.x;
+        result.r2[1] = scale.y;
+        result.r3[2] = scale.z;
         return result;
     }
 
