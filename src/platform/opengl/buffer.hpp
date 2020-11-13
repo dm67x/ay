@@ -53,6 +53,14 @@ public:
     }
 
     ///
+    /// @brief Use buffer
+    /// @param mode Buffer target mode
+    ///
+    inline static void reset(BufferMode mode) {
+        glCheckError(glBindBuffer((GLenum)mode, 0));
+    }
+
+    ///
     /// @brief Set buffer data
     /// @param mode Buffer target mode
     /// @param size Buffer size

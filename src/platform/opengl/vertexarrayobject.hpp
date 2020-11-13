@@ -53,6 +53,13 @@ public:
     }
 
     ///
+    /// @brief Reset
+    ///
+    inline static void reset() {
+        glCheckError(glBindVertexArray(0));
+    }
+
+    ///
     /// @brief Draw arrays call
     /// @param mode Draw mode
     /// @param first Specifies the starting index in the enabled arrays

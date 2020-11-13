@@ -6,6 +6,7 @@
 #include <array>
 
 struct Vec3;
+struct Mat4;
 
 class Context {
     Platform* platform;
@@ -116,6 +117,13 @@ public:
     /// @param value uniform value
     ///
     void shaderUniform(const std::string& name, const Vec3& value) const;
+
+    ///
+    /// @brief Shader uniformMatrix4fv
+    /// @param name uniform name
+    /// @param value uniform value
+    ///
+    void shaderUniform(const std::string& name, const Mat4& value) const;
 
     ///
     /// @brief Create a new vao

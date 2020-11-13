@@ -81,6 +81,15 @@ void Context::shaderUniform(const std::string& name, const Vec3& value) const {
     currentShader->uniform3f(name, new float[3] { value.x, value.y, value.z });
 }
 
+void Context::shaderUniform(const std::string& name, const Mat4& value) const {
+    float values[16];
+    std::memcpy(values, value.r1, sizeof(value.r1));
+    std::memcpy(values + 4, value.r2, sizeof(value.r2));
+    std::memcpy(values + 8, value.r3, sizeof(value.r3));
+    std::memcpy(values + 12, value.r4, sizeof(value.r4));
+    currentShader->uniformMatrix(name, &values[0]);
+}
+
 VertexArrayObject* Context::vertexArrayObjectNew() const {
     return platform->newVertexArrayObject();
 }

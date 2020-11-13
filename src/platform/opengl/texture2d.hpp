@@ -109,4 +109,11 @@ public:
         glCheckError(glActiveTexture(GL_TEXTURE0 + slot));
         glCheckError(glBindTexture(GL_TEXTURE_2D, id));
     }
+
+    ///
+    /// @brief Reset
+    ///
+    inline static void reset() {
+        glCheckError(glBindTexture(GL_TEXTURE_2D, 0));
+    }
 };
