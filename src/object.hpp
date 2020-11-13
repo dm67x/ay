@@ -23,15 +23,12 @@ public:
     Object(Context* ctx, Object* parent = nullptr) 
         : ctx(ctx), parent(parent), children() 
     {
-        start();
     }
 
     ///
     /// @brief Destructor
     ///
-    virtual ~Object() {
-        destroy();
-    }
+    virtual ~Object() {}
 
     ///
     /// @brief Add child
@@ -62,16 +59,6 @@ public:
             children.erase(it);
         }
     }
-
-    ///
-    /// @brief Start called once after the creation of the object
-    ///
-    virtual void start() {};
-
-    ///
-    /// @brief Destroy called once before the destruction of the object
-    ///
-    virtual void destroy() {};
 
     ///
     /// @brief Update called each frame

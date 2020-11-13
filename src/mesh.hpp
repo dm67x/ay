@@ -1,24 +1,38 @@
 #pragma once
 
 #include "object.hpp"
+#include "math.hpp"
+
+class VertexArrayObject;
+class Buffer;
+
+struct Vertex {
+    Vec3 position;
+    Vec3 normal;
+    float u;
+    float v;
+};
 
 class Mesh : public Object {
+    VertexArrayObject* vao;
+    Buffer* ebo;
+    Buffer* vbo;
+    std::vector<Vertex> vertices;
+    std::vector<unsigned int> indices;
+
+    friend class MeshFactory;
+
 public:
     ///
     /// @brief Constructor
     /// @param ctx Context pointer
     ///
-    Mesh(Context* ctx) : Object(ctx) {}
+    Mesh(Context* ctx);
 
     ///
-    /// @brief Start called once after the creation of the object
+    /// @brief Destructor
     ///
-    void start() override;
-
-    ///
-    /// @brief Destroy called once before the destruction of the object
-    ///
-    void destroy() override;
+    ~Mesh() override;
 
     ///
     /// @brief Update called each frame
@@ -31,4 +45,10 @@ public:
     /// @param deltaTime Elapsed time between each frame
     ///
     void render(float deltaTime) override;
+
+private:
+    ///
+    /// @brief Build the mesh
+    ///
+    void build() const;
 };
