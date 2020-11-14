@@ -1,6 +1,5 @@
 #include "window.hpp"
 #include "context.hpp"
-#include "math.hpp"
 #include "mesh_factory.hpp"
 #include "camera.hpp"
 

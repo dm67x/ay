@@ -1,6 +1,5 @@
 #pragma once
 
-#include <GLFW/glfw3.h>
 #include "platform.hpp"
 #include "opengl/helper.hpp"
 #include "opengl/shader.hpp"
@@ -10,6 +9,8 @@
 #include "opengl/vertexarrayobject.hpp"
 #include "opengl/buffer.hpp"
 
+#define GLFW_INCLUDE_NONE
+#include <GLFW/glfw3.h>
 #include <sstream>
 #include <cstdio>
 

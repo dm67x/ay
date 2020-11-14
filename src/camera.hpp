@@ -6,12 +6,12 @@
 
 class Camera {
 protected:
+    Context* ctx;
     float zNear;
     float zFar;
     Vec3 position;
     Vec3 viewDirection;
     Vec3 up;
-    Context* ctx;
 
 protected:
     Camera(Context* ctx, float near, float far) 
@@ -65,7 +65,7 @@ class PerspectiveCamera : public Camera {
 
 public:
     PerspectiveCamera(Context* ctx, float fov, float aspect, float near, float far)
-        : fov(fov), aspect(aspect), Camera(ctx, near, far)
+        : Camera(ctx, near, far), fov(fov), aspect(aspect)
     {
     }
 
@@ -83,7 +83,7 @@ class OrthographicCamera : public Camera {
 
 public:
     OrthographicCamera(Context* ctx, float left, float right, float bottom, float top, float near, float far)
-        : left(left), right(right), bottom(bottom), top(top), Camera(ctx, near, far)
+        : Camera(ctx, near, far), left(left), right(right), bottom(bottom), top(top)
     {
     }
 
