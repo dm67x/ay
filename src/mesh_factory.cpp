@@ -70,6 +70,8 @@ Mesh* MeshFactory::fromFile(Context* ctx, const std::string& filename) {
         return mesh;
     }
 
+    bool normalExists = false;
+
     for (size_t s = 0; s < shapes.size(); s++) {
         size_t index_offset = 0;
         for (size_t f = 0; f < shapes[s].mesh.num_face_vertices.size(); f++) {
@@ -79,26 +81,42 @@ Mesh* MeshFactory::fromFile(Context* ctx, const std::string& filename) {
                 tinyobj::real_t vx = attrib.vertices[3*idx.vertex_index+0];
                 tinyobj::real_t vy = attrib.vertices[3*idx.vertex_index+1];
                 tinyobj::real_t vz = attrib.vertices[3*idx.vertex_index+2];
-                tinyobj::real_t nx = attrib.normals[3*idx.normal_index+0];
-                tinyobj::real_t ny = attrib.normals[3*idx.normal_index+1];
-                tinyobj::real_t nz = attrib.normals[3*idx.normal_index+2];
-                tinyobj::real_t tx = attrib.texcoords[2*idx.texcoord_index+0];
-                tinyobj::real_t ty = attrib.texcoords[2*idx.texcoord_index+1];
+                tinyobj::real_t nx = 0.f;
+                tinyobj::real_t ny = 0.f;
+                tinyobj::real_t nz = 0.f;
+                tinyobj::real_t tx = 0.f;
+                tinyobj::real_t ty = 0.f;
+
+                if (idx.normal_index > 0) {
+                    nx = attrib.normals[3 * idx.normal_index + 0];
+                    ny = attrib.normals[3 * idx.normal_index + 1];
+                    nz = attrib.normals[3 * idx.normal_index + 2];
+                    normalExists = true;
+                }
+
+                if (idx.texcoord_index > 0) {
+                    tx = attrib.texcoords[2 * idx.texcoord_index + 0];
+                    ty = attrib.texcoords[2 * idx.texcoord_index + 1];
+                }
 
                 Mesh::Vertex vert(Vec3(vx, vy, vz), Vec3(nx, ny, nz), tx, ty);
                 auto it = std::find(mesh->vertices.begin(), mesh->vertices.end(), vert);
                 if (it != mesh->vertices.end()) {
-                    mesh->indices.push_back(static_cast<unsigned int>(it - mesh->vertices.begin()));
+                    const size_t index = it - mesh->vertices.begin();
+                    mesh->indices.push_back(static_cast<unsigned int>(index));
                 }
                 else {
                     mesh->vertices.push_back(vert);
-                    mesh->indices.push_back(static_cast<unsigned int>(index_offset + v));
+                    mesh->indices.push_back(static_cast<unsigned int>(mesh->vertices.size() - 1));
                 }
             }
             index_offset += fv;
         }
     }
 
+    if (!normalExists) {
+        mesh->computeNormals();
+    }
     mesh->build();
     return mesh;
 }

@@ -12,15 +12,11 @@ int main(void)
     ctx->texture2DNew("albedo_wall", "../../assets/albedo_wall.png");
 
     std::vector<Mesh*> models;
-
-    for (int i = 0; i < 10; i++) {
-        Mesh* model = MeshFactory::cube(ctx);
-        model->transform.scale = Vec3(0.5f, 0.5f, 0.5f);
-        model->transform.position.z = 3.f;
-        model->transform.rotation.x = -45.f;
-        model->transform.position.x = static_cast<float>(i * 2 - 5);
-        models.push_back(model);
-    }
+    models.push_back(MeshFactory::fromFile(ctx, "../../assets/bunny.obj"));
+    Mesh* _model = models.back();
+    _model->transform.scale = Vec3(2.f, 2.f, 2.f);
+    _model->transform.position.z = 1.f;
+    _model->transform.rotation.x = -45.f;
 
     float angle = 0.f;
 
