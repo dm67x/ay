@@ -494,7 +494,10 @@ struct Mat4 {
     /// @return Matrix4
     ///
     static Mat4 perspective(float fov, float aspect, float zNear, float zFar) {
-        assert(std::abs(aspect - std::numeric_limits<float>::epsilon()) > 0.f);
+        if (std::abs(aspect - std::numeric_limits<float>::epsilon()) <= 0.f) {
+            return Mat4::identity();
+        }
+
         const float halfFOV = std::tan(fov * 0.5f);
         Mat4 matrix;
         matrix.r1[0] = 1.f / (aspect * halfFOV);

@@ -15,7 +15,6 @@ add_subdirectory(extern/glfw)
 add_subdirectory(extern/glad)
 add_subdirectory(extern/stb)
 add_subdirectory(extern/spdlog)
-add_subdirectory(extern/tinyobjloader)
 
 include_directories(extern/glad)
 include_directories(extern/stb)
@@ -27,7 +26,7 @@ add_executable(ay
     "src/context.cpp" 
     "src/mesh_factory.cpp" 
     "src/camera.cpp")
-target_link_libraries(ay PRIVATE glad glfw stb spdlog tinyobjloader OpenGL::GL)
+target_link_libraries(ay PRIVATE glad glfw stb spdlog OpenGL::GL)
 target_compile_options(ay PRIVATE
     $<$<CXX_COMPILER_ID:MSVC>:/W4 /WX>
     $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wall -Wextra -pedantic -Werror>

@@ -26,6 +26,8 @@ class OpenGL : public Platform {
             spdlog::critical("cannot initialize glad");
             std::exit(EXIT_FAILURE);
         }
+
+        glCheckError(glEnable(GL_DEPTH_TEST));
     }
 
     ///
