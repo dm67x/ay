@@ -8,8 +8,7 @@ Mesh::Mesh(Context* ctx)
     ebo(nullptr), 
     vbo(nullptr), 
     vertices(), 
-    indices(),
-    isBuilded(false)
+    indices()
 {
     vao = ctx->vertexArrayObjectNew();
     ebo = ctx->bufferNew();
@@ -52,23 +51,6 @@ void Mesh::render(float deltaTime) {
     }
 }
 
-void Mesh::build() {
-    if (isBuilded) return;
-
-    vao->use();
-    vbo->use(BufferMode::ARRAY);
-    vbo->set(BufferMode::ARRAY, sizeof(Vertex) * vertices.size(), vertices.data(), BufferTarget::STATIC_DRAW);
-    vbo->attribArray(0, 3, AttribType::FLOAT, sizeof(Vertex), (void*)offsetof(Vertex, position));
-    vbo->attribArray(1, 3, AttribType::FLOAT, sizeof(Vertex), (void*)offsetof(Vertex, normal));
-    vbo->attribArray(2, 2, AttribType::FLOAT, sizeof(Vertex), (void*)offsetof(Vertex, u));
-    ebo->use(BufferMode::ELEMENT_ARRAY);
-    ebo->set(BufferMode::ELEMENT_ARRAY, sizeof(unsigned int) * indices.size(), indices.data(), BufferTarget::STATIC_DRAW);
-    Buffer::reset(BufferMode::ELEMENT_ARRAY);
-    VertexArrayObject::reset();
-
-    isBuilded = true;
-}
-
 void Mesh::computeNormals() {
     // Get faces
     for (size_t i = 0; i < indices.size(); i += 3) {
@@ -83,8 +65,7 @@ void Mesh::computeNormals() {
         Vec3 v1v2 = v2 - v1;
         Vec3 v1v3 = v3 - v1;
 
-        Vec3 normal = v1v2 * v1v3;
-        normal = normal.normalize();
+        Vec3 normal = (v1v2 * v1v3).normalize();
 
         vertices[v1i].normal = normal;
         vertices[v2i].normal = normal;

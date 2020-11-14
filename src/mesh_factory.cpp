@@ -1,8 +1,7 @@
 #include "mesh_factory.hpp"
-#define TINYGLTF_IMPLEMENTATION
-#include "tiny_gltf.h"
+#include "context.hpp"
 #include <spdlog/spdlog.h>
-#include <algorithm>
+#include "tiny_gltf.h"
 
 Mesh* MeshFactory::plane(Context* ctx) {
     Mesh* plane = new Mesh(ctx);
@@ -13,7 +12,19 @@ Mesh* MeshFactory::plane(Context* ctx) {
         Vertex(Vec3(-1.f, -1.f, 0.f), Vec3(0.f, 0.f, 1.f), 0.f, 1.f)
     };
     plane->indices = { 0, 2, 1, 0, 3, 2 };
-    plane->build();
+    
+    // Build
+    plane->vao->use();
+    plane->vbo->use(BufferMode::ARRAY);
+    plane->vbo->set(BufferMode::ARRAY, sizeof(Vertex) * plane->vertices.size(), plane->vertices.data(), BufferTarget::STATIC_DRAW);
+    plane->vbo->attribArray(0, 3, AttribType::FLOAT, sizeof(Vertex), (void*)offsetof(Vertex, position));
+    plane->vbo->attribArray(1, 3, AttribType::FLOAT, sizeof(Vertex), (void*)offsetof(Vertex, normal));
+    plane->vbo->attribArray(2, 2, AttribType::FLOAT, sizeof(Vertex), (void*)offsetof(Vertex, u));
+    plane->ebo->use(BufferMode::ELEMENT_ARRAY);
+    plane->ebo->set(BufferMode::ELEMENT_ARRAY, sizeof(unsigned int) * plane->indices.size(), plane->indices.data(), BufferTarget::STATIC_DRAW);
+    Buffer::reset(BufferMode::ELEMENT_ARRAY);
+    VertexArrayObject::reset();
+
     return plane;
 }
 
@@ -45,7 +56,19 @@ Mesh* MeshFactory::cube(Context* ctx) {
         4, 5, 9, 4, 9, 11
     };
     cube->computeNormals();
-    cube->build();
+    
+    // Build
+    cube->vao->use();
+    cube->vbo->use(BufferMode::ARRAY);
+    cube->vbo->set(BufferMode::ARRAY, sizeof(Vertex) * cube->vertices.size(), cube->vertices.data(), BufferTarget::STATIC_DRAW);
+    cube->vbo->attribArray(0, 3, AttribType::FLOAT, sizeof(Vertex), (void*)offsetof(Vertex, position));
+    cube->vbo->attribArray(1, 3, AttribType::FLOAT, sizeof(Vertex), (void*)offsetof(Vertex, normal));
+    cube->vbo->attribArray(2, 2, AttribType::FLOAT, sizeof(Vertex), (void*)offsetof(Vertex, u));
+    cube->ebo->use(BufferMode::ELEMENT_ARRAY);
+    cube->ebo->set(BufferMode::ELEMENT_ARRAY, sizeof(unsigned int) * cube->indices.size(), cube->indices.data(), BufferTarget::STATIC_DRAW);
+    Buffer::reset(BufferMode::ELEMENT_ARRAY);
+    VertexArrayObject::reset();
+
     return cube;
 }
 

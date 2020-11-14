@@ -42,7 +42,6 @@ class Mesh : public Object {
     Buffer* vbo;
     std::vector<Vertex> vertices;
     std::vector<unsigned int> indices;
-    bool isBuilded;
 
 private:
     ///
@@ -70,11 +69,6 @@ public:
     void render(float deltaTime) override;
 
 private:
-    ///
-    /// @brief Build the mesh
-    ///
-    void build();
-
     ///
     /// @brief Compute the normals
     /// 
