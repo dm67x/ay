@@ -74,16 +74,16 @@ public:
     /// @param name shader name
     /// @param vertex vertex shader
     /// @param fragment fragment shader
-    /// @return shader program id
-    void shaderFromMemory(const std::string& name, const std::string& vertex, const std::string& fragment);
+    /// @return ShaderProgram instance
+    ShaderProgram* shaderFromMemory(const std::string& name, const std::string& vertex, const std::string& fragment);
 
     ///
     /// @brief Create shader from file
     /// @param name shader name
     /// @param vertex vertex shader
     /// @param fragment fragment shader
-    /// @return shader program id
-    void shaderFromFile(const std::string& name, const std::string& vertex, const std::string& fragment);
+    /// @return ShaderProgram instance
+    ShaderProgram* shaderFromFile(const std::string& name, const std::string& vertex, const std::string& fragment);
 
     /// 
     /// @brief Destroy the shader
@@ -142,15 +142,17 @@ public:
     /// @param name Texture name
     /// @param width Texture width
     /// @param height Texture height
+    /// @return Texture2D instance
     /// 
-    void texture2DNew(const std::string& name, int width, int height);
+    Texture2D* texture2DNew(const std::string& name, int width, int height);
 
     /// 
     /// @brief Create a new texture from file
     /// @param name Texture name
     /// @param filename Filename
+    /// @return Texture2D instance
     /// 
-    void texture2DNew(const std::string& name, const std::string& filename);
+    Texture2D* texture2DNew(const std::string& name, const std::string& filename);
 
     ///
     /// @brief Destroy the texture
@@ -170,8 +172,9 @@ public:
     /// @param name Renderbuffer name
     /// @param width Width
     /// @param height Height
+    /// @return Renderbuffer instance
     /// 
-    void renderbufferNew(const std::string& name, int width, int height);
+    Renderbuffer* renderbufferNew(const std::string& name, int width, int height);
 
     /// 
     /// @brief Destroy the renderbuffer
@@ -190,8 +193,9 @@ public:
     /// @brief Create a new framebuffer
     /// @param name Framebuffer name
     /// @param params Framebuffer parameters
+    /// @return Framebuffer instance
     /// 
-    void framebufferNew(const std::string& name, const std::array<Texture2D*, 32>& colorAttachments, Renderbuffer* depthStencilAttachment = nullptr);
+    Framebuffer* framebufferNew(const std::string& name, const std::array<Texture2D*, 32>& colorAttachments, Renderbuffer* depthStencilAttachment = nullptr);
 
     /// 
     /// @brief Destroy the framebuffer

@@ -25,7 +25,8 @@ add_executable(ay
     "src/window.cpp" 
     "src/mesh.cpp" 
     "src/context.cpp" 
-    "src/mesh_factory.cpp")
+    "src/mesh_factory.cpp" 
+    "src/camera.cpp")
 target_link_libraries(ay PRIVATE glad glfw stb spdlog tinyobjloader OpenGL::GL)
 target_compile_options(ay PRIVATE
     $<$<CXX_COMPILER_ID:MSVC>:/W4 /WX>

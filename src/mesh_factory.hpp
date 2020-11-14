@@ -12,6 +12,13 @@ struct MeshFactory {
     static Mesh* plane(Context* ctx);
 
     ///
+    /// @brief Create a new cube mesh
+    /// @param ctx Context
+    /// @return Cube mesh
+    ///
+    static Mesh* cube(Context* ctx);
+
+    ///
     /// @brief Create a new mesh from file (obj)
     /// @param ctx Context
     /// @param filename Filename

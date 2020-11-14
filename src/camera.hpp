@@ -1,11 +1,11 @@
 #pragma once
 
 #include "math.hpp"
+#include "context.hpp"
 #include <string>
 
-class Context;
-
 class Camera {
+protected:
     float zNear;
     float zFar;
     Vec3 position;
@@ -20,9 +20,43 @@ protected:
     }
 
 public:
-    virtual void move() = 0;
-    virtual void update() = 0;
-    virtual void renderToTexture(const std::string& name) = 0;
+    /// 
+    /// @brief Destructor
+    /// 
+    virtual ~Camera() {}
+
+    /// 
+    /// @brief Update (move, render, ...)
+    /// @param deltaTime Elapsed time between each frame
+    /// 
+    virtual void update(float deltaTime) = 0;
+
+    /// 
+    /// @brief Render to a Texture2D
+    /// @param name Texture name
+    /// 
+    inline virtual void renderToTexture(const std::string& name) {
+        (void)name;
+        /*Texture2D* texture = ctx->texture2DGet(name);
+        if (!texture) {
+            spdlog::error("Texture [{}] didn't exist inside the context. Create the texture before rendering to it.", name);
+            return;
+        }
+        
+        Framebuffer* framebuffer = ctx->framebufferGet("camera");
+        if (!framebuffer) {
+            Renderbuffer* rb = ctx->renderbufferNew("camera", );
+            framebuffer = ctx->framebufferNew("camera", { texture }, rb);
+        }*/
+    }
+
+    /// 
+    /// @brief Set camera aspect ratio (for PerspectiveCamera)
+    /// @param aspectRatio Aspect ratio
+    /// 
+    inline virtual void setAspectRatio(float aspectRatio) {
+        (void)aspectRatio;
+    }
 };
 
 class PerspectiveCamera : public Camera {
@@ -33,6 +67,11 @@ public:
     PerspectiveCamera(Context* ctx, float fov, float aspect, float near, float far)
         : fov(fov), aspect(aspect), Camera(ctx, near, far)
     {
+    }
+
+    void update(float deltaTime) override;
+    inline void setAspectRatio(float aspectRatio) override { 
+        this->aspect = aspectRatio;
     }
 };
 
@@ -47,4 +86,6 @@ public:
         : left(left), right(right), bottom(bottom), top(top), Camera(ctx, near, far)
     {
     }
+
+    void update(float deltaTime) override;
 };

@@ -44,3 +44,9 @@ bool Window::isOpen() const {
 Context* Window::getContext() const {
     return ctx;
 }
+
+std::pair<int, int> Window::getSize() const {
+    int w, h;
+    glfwGetWindowSize(window, &w, &h);
+    return std::make_pair(w, h);
+}

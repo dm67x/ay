@@ -1,6 +1,7 @@
 #pragma once
 
 #include "helper.hpp"
+#include <utility>
 
 enum class TextureWrap {
     REPEAT = GL_REPEAT,
@@ -68,6 +69,8 @@ struct TextureParameters {
 
 class Texture2D {
     GLuint id;
+    int width;
+    int height;
 
     friend class Framebuffer;
 
@@ -93,6 +96,9 @@ public:
             glCheckError(glGenerateMipmap(GL_TEXTURE_2D));
         }
         glCheckError(glBindTexture(GL_TEXTURE_2D, id));
+
+        this->width = width;
+        this->height = height;
     }
 
     ///
@@ -115,5 +121,12 @@ public:
     ///
     inline static void reset() {
         glCheckError(glBindTexture(GL_TEXTURE_2D, 0));
+    }
+
+    ///
+    /// @brief Get texture size
+    /// 
+    inline std::pair<int, int> getSize() const {
+        return std::make_pair(width, height);
     }
 };

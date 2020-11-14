@@ -45,6 +45,15 @@ struct Vec3 {
     Vec3(float x, float y, float z) : x(x), y(y), z(z) {}
 
     ///
+    /// @brief Equal operator
+    /// @param v Vec3
+    /// @return True if equal false otherwise
+    ///
+    inline bool operator==(const Vec3& v) {
+        return x == v.x && y == v.y && z == v.z;
+    }
+
+    ///
     /// @brief Format for output values in console
     /// @param out Out stream
     /// @param v Vec3

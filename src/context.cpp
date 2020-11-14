@@ -30,26 +30,27 @@ void Context::viewport(int x, int y, int w, int h) const {
     platform->viewport(x, y, w, h);
 }
 
-void Context::shaderFromMemory(const std::string& name, const std::string& vertex, const std::string& fragment) {
+ShaderProgram* Context::shaderFromMemory(const std::string& name, const std::string& vertex, const std::string& fragment) {
     auto program = platform->newProgram(vertex, fragment);
     shaders.insert(std::make_pair(name, program));
+    return program;
 }
 
-void Context::shaderFromFile(const std::string& name, const std::string& vertex, const std::string& fragment) {
+ShaderProgram* Context::shaderFromFile(const std::string& name, const std::string& vertex, const std::string& fragment) {
     std::ifstream vfile(vertex, std::ifstream::binary);
     if (!vfile.is_open()) {
         spdlog::error("cannot open file: {}", vertex);
-        return;
+        return nullptr;
     }
     std::string vsrc((std::istreambuf_iterator<char>(vfile)), std::istreambuf_iterator<char>());
 
     std::ifstream ffile(fragment, std::ifstream::binary);
     if (!ffile.is_open()) {
         spdlog::error("cannot open file: {}", fragment);
-        return;
+        return nullptr;
     }
     std::string fsrc((std::istreambuf_iterator<char>(ffile)), std::istreambuf_iterator<char>());
-    shaderFromMemory(name, vsrc, fsrc);
+    return shaderFromMemory(name, vsrc, fsrc);
 }
 
 void Context::shaderDestroy(const std::string& name) {
@@ -86,7 +87,7 @@ void Context::shaderUniform(const std::string& name, const Mat4& value) const {
     std::memcpy(values + 4, value.r2, sizeof(value.r2));
     std::memcpy(values + 8, value.r3, sizeof(value.r3));
     std::memcpy(values + 12, value.r4, sizeof(value.r4));
-    currentShader->uniformMatrix(name, &values[0]);
+    currentShader->uniformMatrix(name, &values[0], true);
 }
 
 VertexArrayObject* Context::vertexArrayObjectNew() const {
@@ -97,27 +98,30 @@ Buffer* Context::bufferNew() const {
     return platform->newBuffer();
 }
 
-void Context::texture2DNew(const std::string& name, int width, int height) {
+Texture2D* Context::texture2DNew(const std::string& name, int width, int height) {
     auto tex = platform->newTexture2D(width, height, nullptr, TextureParameters());
     textures.insert(std::make_pair(name, tex));
+    return tex;
 }
 
-void Context::texture2DNew(const std::string& name, const std::string& filename) {
+Texture2D* Context::texture2DNew(const std::string& name, const std::string& filename) {
     stbi_set_flip_vertically_on_load(true);
 
     int width, height, channels;
     unsigned char* data = stbi_load(filename.c_str(), &width, &height, &channels, 0);
     if (!data) {
         spdlog::error("cannot load data from {}", filename);
-        return;
+        return nullptr;
     }
 
     TextureParameters params;
+    params.internalFormat = channels == 4 ? TextureFormat::RGBA : TextureFormat::RGB;
     params.dataFormat = channels == 4 ? TextureFormat::RGBA : TextureFormat::RGB;
     params.mipMap = true;
     auto tex = platform->newTexture2D(width, height, data, params);
     stbi_image_free(data);
     textures.insert(std::make_pair(name, tex));
+    return tex;
 }
 
 void Context::texture2DDestroy(const std::string& name) {
@@ -136,9 +140,10 @@ Texture2D* Context::texture2DGet(const std::string& name) const {
     return nullptr;
 }
 
-void Context::renderbufferNew(const std::string& name, int width, int height) {
+Renderbuffer* Context::renderbufferNew(const std::string& name, int width, int height) {
     auto rb = platform->newRenderbuffer(width, height);
     renderbuffers.insert(std::make_pair(name, rb));
+    return rb;
 }
 
 void Context::renderbufferDestroy(const std::string& name) {
@@ -157,7 +162,7 @@ Renderbuffer* Context::renderbufferGet(const std::string& name) const {
     return nullptr;
 }
 
-void Context::framebufferNew(const std::string& name, const std::array<Texture2D*, 32>& colorAttachments, Renderbuffer* depthStencilAttachment) {
+Framebuffer* Context::framebufferNew(const std::string& name, const std::array<Texture2D*, 32>& colorAttachments, Renderbuffer* depthStencilAttachment) {
     FramebufferParameters params;
     for (size_t i = 0; i < colorAttachments.size(); i++) {
         params.colorAttachments[i] = colorAttachments[i];
@@ -165,6 +170,7 @@ void Context::framebufferNew(const std::string& name, const std::array<Texture2D
     params.depthStencilAttachment = depthStencilAttachment;
     auto fb = platform->newFramebuffer(params);
     framebuffers.insert(std::make_pair(name, fb));
+    return fb;
 }
 
 void Context::framebufferDestroy(const std::string& name) {

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <utility>
+
 struct GLFWwindow;
 class Context;
 
@@ -31,4 +33,10 @@ public:
     /// @return Context
     ///
     Context* getContext() const;
+
+    ///
+    /// @brief Get window size
+    /// @return (Width, Height)
+    ///
+    std::pair<int, int> getSize() const;
 };
