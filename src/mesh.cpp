@@ -20,10 +20,16 @@ Mesh::~Mesh() {
     delete vao;
     delete vbo;
     delete ebo;
+
+    for (auto mesh : children) {
+        delete mesh;
+    }
 }
 
 void Mesh::update(float deltaTime) {
-    (void)deltaTime;
+    for (auto mesh : children) {
+        mesh->update(deltaTime);
+    }
 }
 
 void Mesh::render(float deltaTime) {
@@ -40,6 +46,10 @@ void Mesh::render(float deltaTime) {
     vao->drawElements(DrawMode::TRIANGLES, indices.size(), DrawType::UNSIGNED_INT, nullptr);
     Buffer::reset(BufferMode::ELEMENT_ARRAY);
     VertexArrayObject::reset();
+
+    for (auto mesh : children) {
+        mesh->render(deltaTime);
+    }
 }
 
 void Mesh::build() {
