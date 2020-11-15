@@ -77,6 +77,14 @@ struct Color {
     }
 
     ///
+    /// @brief Yellow color
+    /// @return Color color
+    ///
+    inline static Color yellow() {
+        return Color(1.f, 1.f, 0.f);
+    }
+
+    ///
     /// @brief Mix two colors
     /// @param c1 Color
     /// @param c2 Color

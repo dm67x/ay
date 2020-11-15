@@ -13,10 +13,10 @@ struct MainScene : public Scene {
     {
         ctx->shaderFromFile("base", "../../assets/phong.vert.glsl", "../../assets/phong.frag.glsl");
         ctx->texture2DNew("albedo_wall", "../../assets/albedo_wall.png");
-        Mesh* mesh = MeshFactory::fromFile(ctx, "../../assets/xbox.glb");
-        mesh->transform.scale = Vec3(.5f, .5f, .5f);
-        mesh->transform.position.z = 10.f;
-        //mesh->transform.rotation.x = 90.f;
+        Mesh* mesh = MeshFactory::fromFile(ctx, "../../assets/buddha.glb");
+        mesh->transform.scale = Vec3(2.f, 2.f, 2.f);
+        mesh->transform.position.z = 2.f;
+        mesh->transform.rotation.x = 90.f;
         meshes.push_back(mesh);
     }
 
@@ -61,9 +61,9 @@ int main(void)
     light->power = 40.f;
 
     Light* light2 = scene.createLight();
-    light2->position = Vec3(2.f, 1.f, 1.f);
-    light2->color = Color::red();
-    light2->power = 40.f;
+    light2->position = Vec3(-1.f, 1.f, 1.f);
+    light2->color = Color::yellow();
+    light2->power = 45.f;
 
     while (window.isOpen()) {
         scene.render(0.f);
