@@ -11,11 +11,12 @@ struct MainScene : public Scene {
     MainScene(Context* ctx, int width, int height)
         : Scene(ctx, width, height), angle(0.f), meshes()
     {
-        ctx->shaderFromFile("base", "../../assets/basic.vert.glsl", "../../assets/basic.frag.glsl");
+        ctx->shaderFromFile("base", "../../assets/phong.vert.glsl", "../../assets/phong.frag.glsl");
         ctx->texture2DNew("albedo_wall", "../../assets/albedo_wall.png");
         Mesh* mesh = MeshFactory::fromFile(ctx, "../../assets/xbox.glb");
-        mesh->transform.scale = Vec3(.25f, .25f, .25f);
-        mesh->transform.position.z = 3.f;
+        mesh->transform.scale = Vec3(.5f, .5f, .5f);
+        mesh->transform.position.z = 10.f;
+        //mesh->transform.rotation.x = 90.f;
         meshes.push_back(mesh);
     }
 

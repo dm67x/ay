@@ -5,34 +5,36 @@
 
 Mesh* MeshFactory::plane(Context* ctx) {
     Mesh* plane = new Mesh(ctx);
-    plane->vertices = {
+    std::vector<Vertex> vertices = {
         Vertex(Vec3(-1.f, 1.f, 0.f), Vec3(0.f, 0.f, 1.f), 0.f, 0.f),
         Vertex(Vec3(1.f, 1.f, 0.f), Vec3(0.f, 0.f, 1.f), 1.f, 0.f),
         Vertex(Vec3(1.f, -1.f, 0.f), Vec3(0.f, 0.f, 1.f), 1.f, 1.f),
         Vertex(Vec3(-1.f, -1.f, 0.f), Vec3(0.f, 0.f, 1.f), 0.f, 1.f)
     };
-    plane->indices = { 0, 2, 1, 0, 3, 2 };
+    std::vector<unsigned int> indices = { 0, 2, 1, 0, 3, 2 };
     
     // Build
     plane->vao->use();
     plane->vbos.insert(std::make_pair(0, ctx->bufferNew()));
     auto vbo = plane->vbos[0];
     vbo->use(BufferMode::ARRAY);
-    vbo->set(BufferMode::ARRAY, sizeof(Vertex) * plane->vertices.size(), plane->vertices.data(), BufferTarget::STATIC_DRAW);
+    vbo->set(BufferMode::ARRAY, sizeof(Vertex) * vertices.size(), vertices.data(), BufferTarget::STATIC_DRAW);
     vbo->attribArray(0, 3, AttribType::FLOAT, sizeof(Vertex), (void*)offsetof(Vertex, position));
     vbo->attribArray(1, 3, AttribType::FLOAT, sizeof(Vertex), (void*)offsetof(Vertex, normal));
     vbo->attribArray(2, 2, AttribType::FLOAT, sizeof(Vertex), (void*)offsetof(Vertex, u));
     plane->ebo->use(BufferMode::ELEMENT_ARRAY);
-    plane->ebo->set(BufferMode::ELEMENT_ARRAY, sizeof(unsigned int) * plane->indices.size(), plane->indices.data(), BufferTarget::STATIC_DRAW);
+    plane->ebo->set(BufferMode::ELEMENT_ARRAY, sizeof(unsigned int) * indices.size(), indices.data(), BufferTarget::STATIC_DRAW);
     Buffer::reset(BufferMode::ELEMENT_ARRAY);
     VertexArrayObject::reset();
+
+    plane->indicesCount = indices.size();
 
     return plane;
 }
 
 Mesh* MeshFactory::cube(Context* ctx) {
     Mesh* cube = new Mesh(ctx);
-    cube->vertices = {
+    std::vector<Vertex> vertices = {
         Vertex(Vec3(-1.f, 1.f, -1.f), Vec3(), 0.25f, 0.f), // v1
         Vertex(Vec3(-1.f, 1.f, 1.f), Vec3(), 0.75f, 0.f), // v2
         Vertex(Vec3(1.f, 1.f, 1.f), Vec3(), 0.75f, 0.25f), // v3
@@ -49,7 +51,7 @@ Mesh* MeshFactory::cube(Context* ctx) {
         Vertex(Vec3(-1.f, -1.f, 1.f), Vec3(), 1.f, 0.5f), // v52
         Vertex(Vec3(-1.f, -1.f, -1.f), Vec3(), 0.f, 0.5f) // v62
     };
-    cube->indices = {
+    std::vector<unsigned int> indices = {
         0, 2, 1, 0, 3, 2,
         2, 3, 6, 2, 6, 7,
         7, 6, 5, 7, 5, 4,
@@ -57,21 +59,23 @@ Mesh* MeshFactory::cube(Context* ctx) {
         10, 2, 7, 10, 7, 12,
         4, 5, 9, 4, 9, 11
     };
-    cube->computeNormals();
+    cube->computeNormals(vertices, indices, vertices);
     
     // Build
     cube->vao->use();
     cube->vbos.insert(std::make_pair(0, ctx->bufferNew()));
     auto vbo = cube->vbos[0];
     vbo->use(BufferMode::ARRAY);
-    vbo->set(BufferMode::ARRAY, sizeof(Vertex) * cube->vertices.size(), cube->vertices.data(), BufferTarget::STATIC_DRAW);
+    vbo->set(BufferMode::ARRAY, sizeof(Vertex) * vertices.size(), vertices.data(), BufferTarget::STATIC_DRAW);
     vbo->attribArray(0, 3, AttribType::FLOAT, sizeof(Vertex), (void*)offsetof(Vertex, position));
     vbo->attribArray(1, 3, AttribType::FLOAT, sizeof(Vertex), (void*)offsetof(Vertex, normal));
     vbo->attribArray(2, 2, AttribType::FLOAT, sizeof(Vertex), (void*)offsetof(Vertex, u));
     cube->ebo->use(BufferMode::ELEMENT_ARRAY);
-    cube->ebo->set(BufferMode::ELEMENT_ARRAY, sizeof(unsigned int) * cube->indices.size(), cube->indices.data(), BufferTarget::STATIC_DRAW);
+    cube->ebo->set(BufferMode::ELEMENT_ARRAY, sizeof(unsigned int) * indices.size(), indices.data(), BufferTarget::STATIC_DRAW);
     Buffer::reset(BufferMode::ELEMENT_ARRAY);
     VertexArrayObject::reset();
+
+    cube->indicesCount = indices.size();
 
     return cube;
 }

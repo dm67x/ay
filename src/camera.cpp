@@ -10,4 +10,5 @@ void OrthographicCamera::update(float deltaTime) {
     (void)deltaTime;
     Mat4 projection = Mat4::ortho(left, right, bottom, top, zNear, zFar);
     ctx->shaderUniform("projectionViewMatrix", projection);
+    ctx->shaderUniform("cameraPosition", position);
 }

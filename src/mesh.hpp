@@ -39,8 +39,6 @@ class Mesh : public Object {
     VertexArrayObject* vao;
     Buffer* ebo;
     std::map<int, Buffer*> vbos;
-    std::vector<Vertex> vertices;
-    std::vector<unsigned int> indices;
     DrawMode drawMode;
     DrawType drawType;
     size_t indicesCount;
@@ -73,6 +71,9 @@ public:
 private:
     ///
     /// @brief Compute the normals
+    /// @param vertices (In) vertices
+    /// @param indices (In) indices
+    /// @param output (Out) updated vertices
     /// 
-    void computeNormals();
+    static void computeNormals(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices, std::vector<Vertex>& output);
 };

@@ -6,8 +6,6 @@ Mesh::Mesh(Context* ctx)
     vao(nullptr), 
     ebo(nullptr), 
     vbos(), 
-    vertices(), 
-    indices(),
     drawMode(DrawMode::TRIANGLES),
     drawType(DrawType::UNSIGNED_INT),
     indicesCount(0)
@@ -44,9 +42,10 @@ void Mesh::render(float deltaTime) {
     }
 
     ctx->shaderUniform("modelMatrix", _transform);
+    ctx->shaderUniform("normalMatrix", _transform.inverse().transpose());
     vao->use();
     ebo->use(BufferMode::ELEMENT_ARRAY);
-    vao->drawElements(drawMode, indices.size() > 0 ? indices.size() : indicesCount, drawType, nullptr);
+    vao->drawElements(drawMode, indicesCount, drawType, nullptr);
     Buffer::reset(BufferMode::ELEMENT_ARRAY);
     VertexArrayObject::reset();
 
@@ -55,12 +54,18 @@ void Mesh::render(float deltaTime) {
     }
 }
 
-void Mesh::computeNormals() {
+void Mesh::computeNormals(
+    const std::vector<Vertex>& vertices, 
+    const std::vector<unsigned int>& indices, 
+    std::vector<Vertex>& output) 
+{
+    output = vertices;
+
     // Get faces
     for (size_t i = 0; i < indices.size(); i += 3) {
         unsigned int v1i = indices[i];
-        unsigned int v2i = indices[i+1];
-        unsigned int v3i = indices[i+2];
+        unsigned int v2i = indices[i + 1];
+        unsigned int v3i = indices[i + 2];
 
         Vec3 v1 = vertices[v1i].position;
         Vec3 v2 = vertices[v2i].position;
@@ -71,8 +76,8 @@ void Mesh::computeNormals() {
 
         Vec3 normal = (v1v2 * v1v3).normalize();
 
-        vertices[v1i].normal = normal;
-        vertices[v2i].normal = normal;
-        vertices[v3i].normal = normal;
+        output[v1i].normal = normal;
+        output[v2i].normal = normal;
+        output[v3i].normal = normal;
     }
 }
