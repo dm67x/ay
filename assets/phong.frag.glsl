@@ -20,6 +20,7 @@ struct Light {
     float power;
 };
 
+uniform int lightsCount;
 uniform Light lights[16];
 
 const vec3 ambientColor = vec3(0.1, 0.1, 0.1);
@@ -28,7 +29,7 @@ const vec3 specColor = vec3(1.0, 1.0, 1.0);
 const float shininess = 16.0;
 const float screenGamma = 2.2;
 
-vec3 computeLight(Light light, Camera camera) {
+vec3 computePointLight(Light light, Camera camera) {
     vec3 normal = normalize(normalOut);
     vec3 lightDir = light.position - positionOut;
     float distance = length(lightDir);
@@ -54,6 +55,9 @@ vec3 computeLight(Light light, Camera camera) {
 }
 
 void main() {
-    vec3 light0 = computeLight(lights[0], camera);
-    fragOut = vec4(light0, 1.0);
+    vec3 color = vec3(0, 0, 0);
+    for (int i = 0; i < lightsCount; i++) {
+        color += computePointLight(lights[i], camera);
+    }
+    fragOut = vec4(color, 1.0);
 }

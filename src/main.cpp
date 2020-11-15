@@ -60,6 +60,11 @@ int main(void)
     light->color = Color::white();
     light->power = 40.f;
 
+    Light* light2 = scene.createLight();
+    light2->position = Vec3(2.f, 1.f, 1.f);
+    light2->color = Color::red();
+    light2->power = 40.f;
+
     while (window.isOpen()) {
         scene.render(0.f);
     }

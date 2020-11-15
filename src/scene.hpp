@@ -112,5 +112,6 @@ public:
             ctx->shaderUniform(ss.str() + ".position", light->position);
             ctx->shaderUniform(ss.str() + ".power", light->power);
         }
+        ctx->shaderUniform("lightsCount", static_cast<int>(numberOfLights));
     }
 };
