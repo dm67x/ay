@@ -1,24 +1,28 @@
 #include "mesh.hpp"
-#include "context.hpp"
 #include <iostream>
 
 Mesh::Mesh(Context* ctx) 
     : Object(ctx), 
     vao(nullptr), 
     ebo(nullptr), 
-    vbo(nullptr), 
+    vbos(), 
     vertices(), 
-    indices()
+    indices(),
+    drawMode(DrawMode::TRIANGLES),
+    drawType(DrawType::UNSIGNED_INT),
+    indicesCount(0)
 {
     vao = ctx->vertexArrayObjectNew();
     ebo = ctx->bufferNew();
-    vbo = ctx->bufferNew();
 }
 
 Mesh::~Mesh() {
     delete vao;
-    delete vbo;
     delete ebo;
+
+    for (auto vbo : vbos) {
+        delete vbo.second;
+    }
 
     for (auto mesh : children) {
         delete mesh;
@@ -42,7 +46,7 @@ void Mesh::render(float deltaTime) {
     ctx->shaderUniform("modelMatrix", _transform);
     vao->use();
     ebo->use(BufferMode::ELEMENT_ARRAY);
-    vao->drawElements(DrawMode::TRIANGLES, indices.size(), DrawType::UNSIGNED_INT, nullptr);
+    vao->drawElements(drawMode, indices.size() > 0 ? indices.size() : indicesCount, drawType, nullptr);
     Buffer::reset(BufferMode::ELEMENT_ARRAY);
     VertexArrayObject::reset();
 

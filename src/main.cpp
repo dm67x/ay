@@ -13,10 +13,9 @@ struct MainScene : public Scene {
     {
         ctx->shaderFromFile("base", "../../assets/basic.vert.glsl", "../../assets/basic.frag.glsl");
         ctx->texture2DNew("albedo_wall", "../../assets/albedo_wall.png");
-        Mesh* mesh = MeshFactory::fromFile(ctx, "../../assets/buddha.glb");
+        Mesh* mesh = MeshFactory::fromFile(ctx, "../../assets/xbox.glb");
         mesh->transform.scale = Vec3(.25f, .25f, .25f);
         mesh->transform.position.z = 3.f;
-        mesh->transform.rotation.x = -45.f;
         meshes.push_back(mesh);
     }
 

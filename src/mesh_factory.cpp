@@ -15,11 +15,13 @@ Mesh* MeshFactory::plane(Context* ctx) {
     
     // Build
     plane->vao->use();
-    plane->vbo->use(BufferMode::ARRAY);
-    plane->vbo->set(BufferMode::ARRAY, sizeof(Vertex) * plane->vertices.size(), plane->vertices.data(), BufferTarget::STATIC_DRAW);
-    plane->vbo->attribArray(0, 3, AttribType::FLOAT, sizeof(Vertex), (void*)offsetof(Vertex, position));
-    plane->vbo->attribArray(1, 3, AttribType::FLOAT, sizeof(Vertex), (void*)offsetof(Vertex, normal));
-    plane->vbo->attribArray(2, 2, AttribType::FLOAT, sizeof(Vertex), (void*)offsetof(Vertex, u));
+    plane->vbos.insert(std::make_pair(0, ctx->bufferNew()));
+    auto vbo = plane->vbos[0];
+    vbo->use(BufferMode::ARRAY);
+    vbo->set(BufferMode::ARRAY, sizeof(Vertex) * plane->vertices.size(), plane->vertices.data(), BufferTarget::STATIC_DRAW);
+    vbo->attribArray(0, 3, AttribType::FLOAT, sizeof(Vertex), (void*)offsetof(Vertex, position));
+    vbo->attribArray(1, 3, AttribType::FLOAT, sizeof(Vertex), (void*)offsetof(Vertex, normal));
+    vbo->attribArray(2, 2, AttribType::FLOAT, sizeof(Vertex), (void*)offsetof(Vertex, u));
     plane->ebo->use(BufferMode::ELEMENT_ARRAY);
     plane->ebo->set(BufferMode::ELEMENT_ARRAY, sizeof(unsigned int) * plane->indices.size(), plane->indices.data(), BufferTarget::STATIC_DRAW);
     Buffer::reset(BufferMode::ELEMENT_ARRAY);
@@ -59,11 +61,13 @@ Mesh* MeshFactory::cube(Context* ctx) {
     
     // Build
     cube->vao->use();
-    cube->vbo->use(BufferMode::ARRAY);
-    cube->vbo->set(BufferMode::ARRAY, sizeof(Vertex) * cube->vertices.size(), cube->vertices.data(), BufferTarget::STATIC_DRAW);
-    cube->vbo->attribArray(0, 3, AttribType::FLOAT, sizeof(Vertex), (void*)offsetof(Vertex, position));
-    cube->vbo->attribArray(1, 3, AttribType::FLOAT, sizeof(Vertex), (void*)offsetof(Vertex, normal));
-    cube->vbo->attribArray(2, 2, AttribType::FLOAT, sizeof(Vertex), (void*)offsetof(Vertex, u));
+    cube->vbos.insert(std::make_pair(0, ctx->bufferNew()));
+    auto vbo = cube->vbos[0];
+    vbo->use(BufferMode::ARRAY);
+    vbo->set(BufferMode::ARRAY, sizeof(Vertex) * cube->vertices.size(), cube->vertices.data(), BufferTarget::STATIC_DRAW);
+    vbo->attribArray(0, 3, AttribType::FLOAT, sizeof(Vertex), (void*)offsetof(Vertex, position));
+    vbo->attribArray(1, 3, AttribType::FLOAT, sizeof(Vertex), (void*)offsetof(Vertex, normal));
+    vbo->attribArray(2, 2, AttribType::FLOAT, sizeof(Vertex), (void*)offsetof(Vertex, u));
     cube->ebo->use(BufferMode::ELEMENT_ARRAY);
     cube->ebo->set(BufferMode::ELEMENT_ARRAY, sizeof(unsigned int) * cube->indices.size(), cube->indices.data(), BufferTarget::STATIC_DRAW);
     Buffer::reset(BufferMode::ELEMENT_ARRAY);
@@ -90,6 +94,71 @@ Mesh* MeshFactory::fromFile(Context* ctx, const std::string& filename) {
     if (!ret) {
         spdlog::error("Failed to parse {}", filename);
         return parent;
+    }
+
+    // Get only geometry for now
+    auto scene = model.scenes[model.defaultScene];
+    for (auto nodeIndex : scene.nodes) {
+        auto node = model.nodes[nodeIndex];
+        auto mesh = model.meshes[node.mesh];
+        for (auto primitive : mesh.primitives) {
+            Mesh* finalMesh = new Mesh(ctx);
+            finalMesh->vao->use();
+
+            // VBOs
+            for (auto &attribute : primitive.attributes) {
+                auto accessor = model.accessors[attribute.second];
+                auto bufferView = model.bufferViews[accessor.bufferView];
+                auto buffer = model.buffers[bufferView.buffer];
+                int stride = accessor.ByteStride(bufferView);
+
+                if (bufferView.target != (int)BufferMode::ARRAY) {
+                    continue;
+                }
+
+                int index = -1;
+                if (attribute.first == "POSITION") {
+                    index = 0;
+                }
+                else if (attribute.first == "NORMAL") {
+                    index = 1;
+                }
+                else if (attribute.first == "TEXCOORD_0") {
+                    index = 2;
+                }
+
+                if (index >= 0) {
+                    auto it = finalMesh->vbos.find(index);
+                    if (it == finalMesh->vbos.end()) {
+                        finalMesh->vbos.insert(std::make_pair(index, ctx->bufferNew()));
+                        it = finalMesh->vbos.find(index);
+                        it->second->use(BufferMode::ARRAY);
+                        it->second->set(BufferMode::ARRAY, bufferView.byteLength, buffer.data.data() + bufferView.byteOffset, BufferTarget::STATIC_DRAW);
+                    }
+
+                    it->second->attribArray(
+                        (unsigned int)index, 
+                        accessor.type, 
+                        (AttribType)accessor.componentType, 
+                        (size_t)stride, 
+                        (void*)accessor.byteOffset);
+                }
+            }
+
+            // EBO (indices)
+            finalMesh->ebo->use(BufferMode::ELEMENT_ARRAY);
+            auto accessor = model.accessors[primitive.indices];
+            auto indicesBufferView = model.bufferViews[accessor.bufferView];
+            auto indicesBuffer = model.buffers[indicesBufferView.buffer];
+            finalMesh->ebo->set(BufferMode::ELEMENT_ARRAY, indicesBufferView.byteLength, indicesBuffer.data.data() + indicesBufferView.byteOffset, BufferTarget::STATIC_DRAW);
+            Buffer::reset(BufferMode::ELEMENT_ARRAY);
+            VertexArrayObject::reset();
+
+            finalMesh->drawMode = (DrawMode)primitive.mode;
+            finalMesh->indicesCount = accessor.count;
+            finalMesh->drawType = (DrawType)accessor.componentType;
+            parent->addChild(finalMesh);
+        }
     }
 
     spdlog::info("Mesh {} loaded successfully", filename);

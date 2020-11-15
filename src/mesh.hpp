@@ -2,9 +2,8 @@
 
 #include "object.hpp"
 #include "math.hpp"
-
-class VertexArrayObject;
-class Buffer;
+#include "context.hpp"
+#include <map>
 
 struct Vertex {
     Vec3 position;
@@ -39,9 +38,12 @@ class Mesh : public Object {
 
     VertexArrayObject* vao;
     Buffer* ebo;
-    Buffer* vbo;
+    std::map<int, Buffer*> vbos;
     std::vector<Vertex> vertices;
     std::vector<unsigned int> indices;
+    DrawMode drawMode;
+    DrawType drawType;
+    size_t indicesCount;
 
 private:
     ///
