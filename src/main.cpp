@@ -26,12 +26,9 @@ struct MainScene : public Scene {
         }
     }
 
-    void update(float deltaTime) override {
-        (void)deltaTime;
-        angle += 1.f;
-    }
-
     void render(float deltaTime) override {
+        angle += 1.f;
+
         ctx->clear();
         ctx->viewport(0, 0, width, height);
         ctx->shaderUse("base");
@@ -58,9 +55,12 @@ int main(void)
     MainScene scene(ctx, 1280, 900);
     scene.createPerspectiveCamera("mainCamera", 90.f, 0.1f, 100.f);
     scene.setMainCamera("mainCamera");
+    Light* light = scene.createLight();
+    light->position = Vec3(1.f, 1.f, 1.f);
+    light->color = Color::white();
+    light->power = 40.f;
 
     while (window.isOpen()) {
-        scene.update(0.f);
         scene.render(0.f);
     }
 

@@ -57,12 +57,6 @@ public:
     ~Mesh() override;
 
     ///
-    /// @brief Update called each frame
-    /// @param deltaTime Elapsed time between each frame
-    ///
-    void update(float deltaTime) override;
-
-    ///
     /// @brief Render called each frame
     /// @param deltaTime Elapsed time between each frame
     ///

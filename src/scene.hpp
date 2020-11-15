@@ -2,12 +2,15 @@
 
 #include "object.hpp"
 #include "camera.hpp"
+#include "light.hpp"
 #include <map>
 #include <string>
 
 class Scene : public Object {
     std::map<std::string, Camera*> cameras;
     Camera* mainCamera;
+    std::array<Light*, 16> lights;
+    size_t numberOfLights;
 
 protected:
     int width;
@@ -19,7 +22,7 @@ public:
     /// @param ctx The context
     ///
     Scene(Context* ctx, int width, int height) 
-        : Object(ctx), cameras(), mainCamera(nullptr), width(width), height(height)
+        : Object(ctx), cameras(), mainCamera(nullptr), lights(), numberOfLights(0), width(width), height(height)
     {
     }
 
@@ -29,6 +32,10 @@ public:
     virtual ~Scene() override {
         for (auto camera : cameras) {
             delete camera.second;
+        }
+
+        for (auto light : lights) {
+            delete light;
         }
     }
 
@@ -75,10 +82,19 @@ public:
     }
 
     ///
-    /// @brief Update called each frame
-    /// @param deltaTime Elapsed time between each frame
+    /// @brief Create a new light source
+    /// @return Light Light
     ///
-    virtual void update(float deltaTime) override = 0;
+    inline Light* createLight() {
+        if (lights.size() <= numberOfLights) {
+            spdlog::error("You created more than 16 lights");
+            return nullptr;
+        }
+
+        Light* light = new Light();
+        lights.at(numberOfLights++) = light;
+        return light;
+    }
 
     ///
     /// @brief Render called each frame
@@ -86,5 +102,15 @@ public:
     ///
     virtual void render(float deltaTime) override {
         mainCamera->update(deltaTime);
+
+        // lights
+        for (size_t i = 0; i < numberOfLights; i++) {
+            auto light = lights[i];
+            std::stringstream ss;
+            ss << "lights[" << i << "]";
+            ctx->shaderUniform(ss.str() + ".color", light->color.toVec());
+            ctx->shaderUniform(ss.str() + ".position", light->position);
+            ctx->shaderUniform(ss.str() + ".power", light->power);
+        }
     }
 };

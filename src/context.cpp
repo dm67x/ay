@@ -81,6 +81,10 @@ void Context::shaderUniform(const std::string& name, const Vec3& value) const {
     currentShader->uniform3f(name, new float[3] { value.x, value.y, value.z });
 }
 
+void Context::shaderUniform(const std::string& name, const Vec4& value) const {
+    currentShader->uniform4f(name, new float[4]{ value.x, value.y, value.z, value.w });
+}
+
 void Context::shaderUniform(const std::string& name, const Mat4& value) const {
     float values[16];
     std::memcpy(values, value.r1, sizeof(value.r1));

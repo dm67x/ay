@@ -61,12 +61,6 @@ public:
     }
 
     ///
-    /// @brief Update called each frame
-    /// @param deltaTime Elapsed time between each frame
-    ///
-    virtual void update(float deltaTime) = 0;
-
-    ///
     /// @brief Render called each frame
     /// @param deltaTime Elapsed time between each frame
     ///

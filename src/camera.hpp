@@ -35,7 +35,7 @@ public:
     /// @brief Render to a Texture2D
     /// @param name Texture name
     /// 
-    inline virtual void renderToTexture(const std::string& name) {
+    virtual void renderToTexture(const std::string& name) {
         (void)name;
         /*Texture2D* texture = ctx->texture2DGet(name);
         if (!texture) {
@@ -54,7 +54,7 @@ public:
     /// @brief Set camera aspect ratio (for PerspectiveCamera)
     /// @param aspectRatio Aspect ratio
     /// 
-    inline virtual void setAspectRatio(float aspectRatio) {
+    virtual void setAspectRatio(float aspectRatio) {
         (void)aspectRatio;
     }
 };

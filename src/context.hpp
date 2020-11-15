@@ -6,6 +6,7 @@
 #include <array>
 
 struct Vec3;
+struct Vec4;
 struct Mat4;
 
 class Context {
@@ -117,6 +118,13 @@ public:
     /// @param value uniform value
     ///
     void shaderUniform(const std::string& name, const Vec3& value) const;
+
+    ///
+    /// @brief Shader uniform4fv
+    /// @param name uniform name
+    /// @param value uniform value
+    ///
+    void shaderUniform(const std::string& name, const Vec4& value) const;
 
     ///
     /// @brief Shader uniformMatrix4fv

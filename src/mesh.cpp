@@ -27,12 +27,6 @@ Mesh::~Mesh() {
     }
 }
 
-void Mesh::update(float deltaTime) {
-    for (auto mesh : children) {
-        mesh->update(deltaTime);
-    }
-}
-
 void Mesh::render(float deltaTime) {
     (void)deltaTime;
 
