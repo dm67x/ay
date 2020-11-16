@@ -5,6 +5,7 @@
 #include "light.hpp"
 #include <map>
 #include <string>
+#include <functional>
 
 class Scene : public Object {
     std::map<std::string, Camera*> cameras;
@@ -17,19 +18,31 @@ protected:
     int height;
 
 public:
+    std::function<void(Scene*, float)> onRender;
+    std::function<void(Scene*)> onDestroy;
+
+public:
     ///
     /// @brief Create a new scene
     /// @param ctx The context
     ///
     Scene(Context* ctx, int width, int height) 
-        : Object(ctx), cameras(), mainCamera(nullptr), lights(), numberOfLights(0), width(width), height(height)
+        : Object(ctx), 
+        cameras(), 
+        mainCamera(nullptr), 
+        lights(), 
+        numberOfLights(0), 
+        width(width), 
+        height(height),
+        onRender([](Scene*, float) {}),
+        onDestroy([](Scene*) {})
     {
     }
 
     ///
     /// @brief Destructor
     ///
-    virtual ~Scene() override {
+    ~Scene() override {
         for (auto camera : cameras) {
             delete camera.second;
         }
@@ -37,6 +50,8 @@ public:
         for (auto light : lights) {
             delete light;
         }
+
+        onDestroy(this);
     }
 
     ///
@@ -100,8 +115,10 @@ public:
     /// @brief Render called each frame
     /// @param deltaTime Elapsed time between each frame
     ///
-    virtual void render(float deltaTime) override {
+    void render(float deltaTime) override {
         mainCamera->update(deltaTime);
+
+        onRender(this, deltaTime);
 
         // lights
         for (size_t i = 0; i < numberOfLights; i++) {
