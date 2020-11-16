@@ -24,7 +24,6 @@ add_executable(ay
     "src/window.cpp" 
     "src/mesh.cpp" 
     "src/context.cpp" 
-    "src/mesh_factory.cpp" 
     "src/camera.cpp"
     "src/tiny_gltf.cpp")
 target_link_libraries(ay PRIVATE glad glfw stb spdlog OpenGL::GL)
