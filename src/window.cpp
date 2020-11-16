@@ -40,13 +40,3 @@ bool Window::isOpen() const {
     glfwSwapBuffers(window);
     return !glfwWindowShouldClose(window);
 }
-
-Context* Window::getContext() const {
-    return ctx;
-}
-
-std::pair<int, int> Window::getSize() const {
-    int w, h;
-    glfwGetWindowSize(window, &w, &h);
-    return std::make_pair(w, h);
-}

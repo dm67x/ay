@@ -11,16 +11,41 @@ Mesh::Mesh(Context* ctx)
     drawMode(GL_TRIANGLES),
     drawType(GL_UNSIGNED_INT),
     indicesCount(0),
+    axisVao(0),
+    axisBuffer(0),
+    isDebugMode(false),
     cloneOf(nullptr)
 {
     vao = ctx->vaoNew();
     ebo = ctx->bufferNew();
+
+    // create axis
+    axisVao = ctx->vaoNew();
+    axisBuffer = ctx->bufferNew();
+
+    float axis[] = {
+        0.f, 0.f, 0.f, 1.f, 0.f, 0.f,
+        1.f, 0.f, 0.f, 1.f, 0.f, 0.f,
+        0.f, 0.f, 0.f, 0.f, 1.f, 0.f,
+        0.f, 1.f, 0.f, 0.f, 1.f, 0.f,
+        0.f, 0.f, 0.f, 0.f, 0.f, 1.f,
+        0.f, 0.f, 1.f, 0.f, 0.f, 1.f
+    };
+
+    ctx->vaoUse(axisVao);
+    ctx->bufferUse<BufferUsage::ARRAY>(axisBuffer);
+    ctx->bufferData<BufferUsage::ARRAY, BufferTarget::STATIC_DRAW>(sizeof(axis), &axis);
+    ctx->bufferAttribute(0, GL_FLOAT, 3, 6 * sizeof(float), nullptr);
+    ctx->bufferAttribute(3, GL_FLOAT, 3, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+    ctx->bufferUse<BufferUsage::ARRAY>(0);
+    ctx->vaoUse(0);
 }
 
 Mesh::~Mesh() {
     if (cloneOf != nullptr) {
         ctx->vaoDispose(vao);
         ctx->bufferDispose(ebo);
+        ctx->bufferDispose(axisBuffer);
 
         for (auto vbo : vbos) {
             ctx->bufferDispose(vbo.second);
@@ -222,10 +247,23 @@ void Mesh::render(float deltaTime) {
 
     ctx->shaderUniform("modelMatrix", _transform);
     ctx->shaderUniform("normalMatrix", _transform.inverse().transpose());
+    ctx->shaderUniform("isAxis", 0);
     ctx->vaoUse(vao);
     ctx->bufferUse<BufferUsage::ELEMENT>(ebo);
-    ctx->draw<DrawMethod::ELEMENT>(DrawParameters((GLenum)drawMode, (GLenum)drawType, (GLsizei)indicesCount, nullptr));
+    if (isDebugMode) {
+        ctx->draw<DrawMethod::ELEMENT>(DrawParameters(GL_LINES, (GLenum)drawType, (GLsizei)indicesCount, nullptr));
+    }
+    else {
+        ctx->draw<DrawMethod::ELEMENT>(DrawParameters((GLenum)drawMode, (GLenum)drawType, (GLsizei)indicesCount, nullptr));
+    }
     ctx->bufferUse<BufferUsage::ELEMENT>(0);
+
+    if (isDebugMode) {
+        ctx->vaoUse(axisVao);
+        ctx->shaderUniform("isAxis", 1);
+        ctx->draw<DrawMethod::ARRAY>(DrawParameters(GL_LINES, 0, 6));
+    }
+
     ctx->vaoUse(0);
 
     for (auto mesh : children) {

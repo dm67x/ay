@@ -7,8 +7,10 @@ in VS_OUT {
     vec3 position;
     vec3 normal;
     vec2 uv;
+    vec3 color;
 } fs_in;
 
+uniform bool isAxis;
 uniform sampler2D albedo;
 
 struct Light {
@@ -56,5 +58,10 @@ void main() {
     for (int i = 0; i < lightsCount; i++) {
         color += computePointLight(lights[i]);
     }
-    fragOut = vec4(color, 1.0);
+
+    if (isAxis) {
+        fragOut = vec4(fs_in.color, 1.0);
+    } else {
+        fragOut = vec4(color, 1.0);
+    }
 }

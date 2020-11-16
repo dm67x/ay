@@ -41,6 +41,9 @@ class Mesh : public Object {
     int drawMode;
     int drawType;
     size_t indicesCount;
+    VAO axisVao;
+    Buffer axisBuffer; // x, y, z
+    bool isDebugMode; // for debugging
     const Mesh* cloneOf;
 
 private:
@@ -89,6 +92,19 @@ public:
     /// @param deltaTime Elapsed time between each frame
     ///
     void render(float deltaTime) override;
+
+    ///
+    /// @brief Activate or deactivate debug mode
+    /// @param value Bool
+    ///
+    inline void setDebug(bool value) {
+        isDebugMode = value;
+
+        for (auto child : children) {
+            auto childMesh = static_cast<Mesh*>(child);
+            childMesh->setDebug(value);
+        }
+    }
 
 private:
     ///

@@ -16,7 +16,7 @@ int main(void)
 
     ctx->shaderFromFile("blinn-phong", "../../assets/phong.vert.glsl", "../../assets/phong.frag.glsl");
 
-    Mesh* mesh = Mesh::fromFile(ctx, "../../assets/scene.glb");
+    Mesh* mesh = Mesh::fromFile(ctx, "../../assets/xbox.glb");
     mesh->transform.scale = Vec3(0.5f, 0.5f, 0.5f);
     mesh->transform.position.z = 5.f;
 
@@ -25,7 +25,7 @@ int main(void)
     Light* light = scene.createLight();
     light->position = Vec3(0.f, 0.f, -2.f);
     light->color = Color::white();
-    light->power = 80.f;
+    light->power = 40.f;
 
     scene.onRender = [&](Scene* scene, float deltaTime) {
         (void)scene;
@@ -41,6 +41,14 @@ int main(void)
     auto start = std::chrono::steady_clock::now();
 
     while (window.isOpen()) {
+        if (window.isKeyPressed(GLFW_KEY_B)) {
+            mesh->setDebug(true);
+        }
+
+        if (window.isKeyPressed(GLFW_KEY_N)) {
+            mesh->setDebug(false);
+        }
+
         ctx->clear();
         ctx->viewport(0, 0, WIDTH, HEIGHT);
         ctx->shaderUse("blinn-phong");

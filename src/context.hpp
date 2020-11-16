@@ -61,11 +61,11 @@ struct DrawParameters {
     GLsizei count;
     GLvoid* offset;
 
-    DrawParameters(GLenum mode, GLint first, GLsizei count, GLvoid* offset)
+    DrawParameters(GLenum mode, GLint first, GLsizei count)
         : mode(mode),
         first(first),
         count(count),
-        offset(offset)
+        offset(nullptr)
     {
     }
 
