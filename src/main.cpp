@@ -3,6 +3,7 @@
 #include "mesh.hpp"
 #include "camera.hpp"
 #include "scene.hpp"
+#include <chrono>
 
 int main(void)
 {
@@ -14,29 +15,22 @@ int main(void)
     Scene scene(ctx, WIDTH, HEIGHT);
 
     ctx->shaderFromFile("blinn-phong", "../../assets/phong.vert.glsl", "../../assets/phong.frag.glsl");
-    Mesh* mesh = Mesh::fromFile(ctx, "../../assets/xbox.glb");
-    //Mesh* meshClone = mesh->clone();
-    mesh->transform.scale = Vec3(.25f, .25f, .25f);
-    mesh->transform.position.z = 3.f;
+
+    Mesh* mesh = Mesh::fromFile(ctx, "../../assets/scene.glb");
+    mesh->transform.scale = Vec3(0.5f, 0.5f, 0.5f);
+    mesh->transform.position.z = 5.f;
 
     scene.createPerspectiveCamera("mainCamera", 90.f, 0.1f, 100.f);
     scene.setMainCamera("mainCamera");
     Light* light = scene.createLight();
-    light->position = Vec3(5.f, 1.f, 1.f);
-    light->color = Color::red();
-    light->power = 40.f;
-
-    Light* light2 = scene.createLight();
-    light2->position = Vec3(-5.f, 1.f, 1.f);
-    light2->color = Color::green();
-    light2->power = 45.f;
+    light->position = Vec3(0.f, 0.f, -2.f);
+    light->color = Color::white();
+    light->power = 80.f;
 
     scene.onRender = [&](Scene* scene, float deltaTime) {
         (void)scene;
-        (void)deltaTime;
-
-        mesh->transform.rotation.y += 1.f;
-        mesh->render(0.f);
+        mesh->transform.rotation.y += 100.f * deltaTime;
+        mesh->render(deltaTime);
     };
 
     scene.onDestroy = [&](Scene* scene) {
@@ -44,12 +38,21 @@ int main(void)
         delete mesh;
     };
 
+    auto start = std::chrono::steady_clock::now();
+
     while (window.isOpen()) {
         ctx->clear();
         ctx->viewport(0, 0, WIDTH, HEIGHT);
         ctx->shaderUse("blinn-phong");
 
-        scene.render(0.f);
+        auto end = std::chrono::steady_clock::now();
+        std::chrono::duration<float> diff = end - start;
+        start = end;
+
+        const float elapsedTime = diff.count();
+        spdlog::info("FPS: {}", 1.f / elapsedTime);
+
+        scene.render(elapsedTime);
     }
 
     return 0;

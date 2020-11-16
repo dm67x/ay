@@ -5,23 +5,26 @@
 
 Mesh::Mesh(Context* ctx) 
     : Object(ctx), 
-    vao(nullptr), 
-    ebo(nullptr), 
+    vao(0), 
+    ebo(0), 
     vbos(), 
-    drawMode(DrawMode::TRIANGLES),
-    drawType(DrawType::UNSIGNED_INT),
-    indicesCount(0)
+    drawMode(GL_TRIANGLES),
+    drawType(GL_UNSIGNED_INT),
+    indicesCount(0),
+    cloneOf(nullptr)
 {
-    vao = ctx->vertexArrayObjectNew();
+    vao = ctx->vaoNew();
     ebo = ctx->bufferNew();
 }
 
 Mesh::~Mesh() {
-    delete vao;
-    delete ebo;
+    if (cloneOf != nullptr) {
+        ctx->vaoDispose(vao);
+        ctx->bufferDispose(ebo);
 
-    for (auto vbo : vbos) {
-        delete vbo.second;
+        for (auto vbo : vbos) {
+            ctx->bufferDispose(vbo.second);
+        }
     }
 
     for (auto mesh : children) {
@@ -31,23 +34,21 @@ Mesh::~Mesh() {
 
 Mesh* Mesh::clone() const {
     Mesh* mesh = new Mesh(ctx);
-    mesh->vao->use();
-    for (auto oVbo : vbos) {
-        Buffer* vbo = ctx->bufferNew();
-        mesh->vbos.insert(std::make_pair(oVbo.first, vbo));
-        vbo->copy(*oVbo.second);
-        vbo->use(BufferMode::ARRAY);
-    }
-    ebo->copy(*mesh->ebo);
-    VertexArrayObject::reset();
+    ctx->vaoDispose(mesh->vao);
+    ctx->bufferDispose(mesh->ebo);
 
+    mesh->vao = vao;
+    mesh->ebo = ebo;
+    mesh->vbos = vbos;
     mesh->drawMode = drawMode;
     mesh->drawType = drawType;
+    mesh->cloneOf = this;
     mesh->indicesCount = indicesCount;
 
     for (auto child : children) {
-        Mesh* childMesh = static_cast<Mesh*>(child)->clone();
-        mesh->addChild(childMesh);
+        auto childMesh = static_cast<Mesh*>(child);
+        Mesh* cloneChildMesh = childMesh->clone();
+        mesh->addChild(cloneChildMesh);
     }
     return mesh;
 }
@@ -63,18 +64,18 @@ Mesh* Mesh::plane(Context* ctx) {
     std::vector<unsigned int> indices = { 0, 2, 1, 0, 3, 2 };
 
     // Build
-    plane->vao->use();
-    plane->vbos.insert(std::make_pair(0, ctx->bufferNew()));
-    auto vbo = plane->vbos[0];
-    vbo->use(BufferMode::ARRAY);
-    vbo->set(BufferMode::ARRAY, sizeof(Vertex) * vertices.size(), vertices.data(), BufferTarget::STATIC_DRAW);
-    vbo->attribArray(0, 3, AttribType::FLOAT, sizeof(Vertex), (void*)offsetof(Vertex, position));
-    vbo->attribArray(1, 3, AttribType::FLOAT, sizeof(Vertex), (void*)offsetof(Vertex, normal));
-    vbo->attribArray(2, 2, AttribType::FLOAT, sizeof(Vertex), (void*)offsetof(Vertex, u));
-    plane->ebo->use(BufferMode::ELEMENT_ARRAY);
-    plane->ebo->set(BufferMode::ELEMENT_ARRAY, sizeof(unsigned int) * indices.size(), indices.data(), BufferTarget::STATIC_DRAW);
-    Buffer::reset(BufferMode::ELEMENT_ARRAY);
-    VertexArrayObject::reset();
+    ctx->vaoUse(plane->vao);
+    Buffer vbo = ctx->bufferNew();
+    plane->vbos.insert(std::make_pair(0, vbo));
+    ctx->bufferUse<BufferUsage::ARRAY>(vbo);
+    ctx->bufferData<BufferUsage::ARRAY, BufferTarget::STATIC_DRAW>((GLsizeiptr)(sizeof(Vertex) * vertices.size()), vertices.data());
+    ctx->bufferAttribute(0, GL_FLOAT, (GLint)3, (GLsizei)sizeof(Vertex), (GLvoid*)offsetof(Vertex, position));
+    ctx->bufferAttribute(1, GL_FLOAT, (GLint)3, (GLsizei)sizeof(Vertex), (GLvoid*)offsetof(Vertex, normal));
+    ctx->bufferAttribute(2, GL_FLOAT, (GLint)3, (GLsizei)sizeof(Vertex), (GLvoid*)offsetof(Vertex, u));
+    ctx->bufferUse<BufferUsage::ELEMENT>(plane->ebo);
+    ctx->bufferData<BufferUsage::ELEMENT, BufferTarget::STATIC_DRAW>((GLsizeiptr)(sizeof(unsigned int) * indices.size()), indices.data());
+    ctx->bufferUse<BufferUsage::ELEMENT>(0);
+    ctx->vaoUse(0);
 
     plane->indicesCount = indices.size();
     return plane;
@@ -110,18 +111,18 @@ Mesh* Mesh::cube(Context* ctx) {
     cube->computeNormals(vertices, indices, vertices);
 
     // Build
-    cube->vao->use();
-    cube->vbos.insert(std::make_pair(0, ctx->bufferNew()));
-    auto vbo = cube->vbos[0];
-    vbo->use(BufferMode::ARRAY);
-    vbo->set(BufferMode::ARRAY, sizeof(Vertex) * vertices.size(), vertices.data(), BufferTarget::STATIC_DRAW);
-    vbo->attribArray(0, 3, AttribType::FLOAT, sizeof(Vertex), (void*)offsetof(Vertex, position));
-    vbo->attribArray(1, 3, AttribType::FLOAT, sizeof(Vertex), (void*)offsetof(Vertex, normal));
-    vbo->attribArray(2, 2, AttribType::FLOAT, sizeof(Vertex), (void*)offsetof(Vertex, u));
-    cube->ebo->use(BufferMode::ELEMENT_ARRAY);
-    cube->ebo->set(BufferMode::ELEMENT_ARRAY, sizeof(unsigned int) * indices.size(), indices.data(), BufferTarget::STATIC_DRAW);
-    Buffer::reset(BufferMode::ELEMENT_ARRAY);
-    VertexArrayObject::reset();
+    ctx->vaoUse(cube->vao);
+    Buffer vbo = ctx->bufferNew();
+    cube->vbos.insert(std::make_pair(0, vbo));
+    ctx->bufferUse<BufferUsage::ARRAY>(vbo);
+    ctx->bufferData<BufferUsage::ARRAY, BufferTarget::STATIC_DRAW>((GLsizeiptr)(sizeof(Vertex) * vertices.size()), vertices.data());
+    ctx->bufferAttribute(0, GL_FLOAT, (GLint)3, (GLsizei)sizeof(Vertex), (GLvoid*)offsetof(Vertex, position));
+    ctx->bufferAttribute(1, GL_FLOAT, (GLint)3, (GLsizei)sizeof(Vertex), (GLvoid*)offsetof(Vertex, normal));
+    ctx->bufferAttribute(2, GL_FLOAT, (GLint)3, (GLsizei)sizeof(Vertex), (GLvoid*)offsetof(Vertex, u));
+    ctx->bufferUse<BufferUsage::ELEMENT>(cube->ebo);
+    ctx->bufferData<BufferUsage::ELEMENT, BufferTarget::STATIC_DRAW>((GLsizeiptr)(sizeof(unsigned int) * indices.size()), indices.data());
+    ctx->bufferUse<BufferUsage::ELEMENT>(0);
+    ctx->vaoUse(0);
 
     cube->indicesCount = indices.size();
     return cube;
@@ -154,7 +155,7 @@ Mesh* Mesh::fromFile(Context* ctx, const std::string& filename) {
         auto mesh = model.meshes[node.mesh];
         for (auto primitive : mesh.primitives) {
             Mesh* finalMesh = new Mesh(ctx);
-            finalMesh->vao->use();
+            ctx->vaoUse(finalMesh->vao);
 
             // VBOs
             for (auto& attribute : primitive.attributes) {
@@ -163,7 +164,7 @@ Mesh* Mesh::fromFile(Context* ctx, const std::string& filename) {
                 auto buffer = model.buffers[bufferView.buffer];
                 int stride = accessor.ByteStride(bufferView);
 
-                if (bufferView.target != (int)BufferMode::ARRAY) {
+                if (bufferView.target != (int)BufferUsage::ARRAY) {
                     continue;
                 }
 
@@ -183,31 +184,26 @@ Mesh* Mesh::fromFile(Context* ctx, const std::string& filename) {
                     if (it == finalMesh->vbos.end()) {
                         finalMesh->vbos.insert(std::make_pair(index, ctx->bufferNew()));
                         it = finalMesh->vbos.find(index);
-                        it->second->use(BufferMode::ARRAY);
-                        it->second->set(BufferMode::ARRAY, bufferView.byteLength, buffer.data.data() + bufferView.byteOffset, BufferTarget::STATIC_DRAW);
+                        ctx->bufferUse<BufferUsage::ARRAY>(it->second);
+                        ctx->bufferData<BufferUsage::ARRAY, BufferTarget::STATIC_DRAW>((GLsizeiptr)(bufferView.byteLength), buffer.data.data() + bufferView.byteOffset);
                     }
 
-                    it->second->attribArray(
-                        (unsigned int)index,
-                        accessor.type,
-                        (AttribType)accessor.componentType,
-                        (size_t)stride,
-                        (void*)accessor.byteOffset);
+                    ctx->bufferAttribute(index, (GLenum)accessor.componentType, (GLint)accessor.type, (GLsizei)stride, (GLvoid*)accessor.byteOffset);
                 }
             }
 
             // EBO (indices)
-            finalMesh->ebo->use(BufferMode::ELEMENT_ARRAY);
+            ctx->bufferUse<BufferUsage::ELEMENT>(finalMesh->ebo);
             auto accessor = model.accessors[primitive.indices];
             auto indicesBufferView = model.bufferViews[accessor.bufferView];
             auto indicesBuffer = model.buffers[indicesBufferView.buffer];
-            finalMesh->ebo->set(BufferMode::ELEMENT_ARRAY, indicesBufferView.byteLength, indicesBuffer.data.data() + indicesBufferView.byteOffset, BufferTarget::STATIC_DRAW);
-            Buffer::reset(BufferMode::ELEMENT_ARRAY);
-            VertexArrayObject::reset();
+            ctx->bufferData<BufferUsage::ELEMENT, BufferTarget::STATIC_DRAW>((GLsizeiptr)(indicesBufferView.byteLength), indicesBuffer.data.data() + indicesBufferView.byteOffset);
+            ctx->bufferUse<BufferUsage::ELEMENT>(0);
+            ctx->vaoUse(0);
 
-            finalMesh->drawMode = (DrawMode)primitive.mode;
+            finalMesh->drawMode = primitive.mode;
             finalMesh->indicesCount = accessor.count;
-            finalMesh->drawType = (DrawType)accessor.componentType;
+            finalMesh->drawType = accessor.componentType;
             parent->addChild(finalMesh);
         }
     }
@@ -226,11 +222,11 @@ void Mesh::render(float deltaTime) {
 
     ctx->shaderUniform("modelMatrix", _transform);
     ctx->shaderUniform("normalMatrix", _transform.inverse().transpose());
-    vao->use();
-    ebo->use(BufferMode::ELEMENT_ARRAY);
-    vao->drawElements(drawMode, indicesCount, drawType, nullptr);
-    Buffer::reset(BufferMode::ELEMENT_ARRAY);
-    VertexArrayObject::reset();
+    ctx->vaoUse(vao);
+    ctx->bufferUse<BufferUsage::ELEMENT>(ebo);
+    ctx->draw<DrawMethod::ELEMENT>(DrawParameters((GLenum)drawMode, (GLenum)drawType, (GLsizei)indicesCount, nullptr));
+    ctx->bufferUse<BufferUsage::ELEMENT>(0);
+    ctx->vaoUse(0);
 
     for (auto mesh : children) {
         mesh->render(deltaTime);

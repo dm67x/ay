@@ -35,12 +35,13 @@ class Mesh : public Object {
         }
     };
 
-    VertexArrayObject* vao;
-    Buffer* ebo;
-    std::map<int, Buffer*> vbos;
-    DrawMode drawMode;
-    DrawType drawType;
+    VAO vao;
+    Buffer ebo;
+    std::map<int, Buffer> vbos;
+    int drawMode;
+    int drawType;
     size_t indicesCount;
+    const Mesh* cloneOf;
 
 private:
     ///

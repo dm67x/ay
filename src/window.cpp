@@ -22,7 +22,7 @@ Window::Window(int width, int height) : window(nullptr), ctx(nullptr) {
     }
 
     glfwMakeContextCurrent(window);
-    glfwSwapInterval(1);
+    glfwSwapInterval(0);
 
     ctx = new Context();
     spdlog::info("{}", ctx->getVersion());

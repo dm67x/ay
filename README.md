@@ -34,5 +34,4 @@ Thanks to all of them!
 - [ ] Skydome
 - [ ] Particles
 - [ ] RenderGraph (json scene format)
-- [ ] DirectX and Vulkan API implementation
 - [ ] RayTracing (Monte Carlo model)
