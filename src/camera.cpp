@@ -9,6 +9,7 @@ void PerspectiveCamera::update(float deltaTime) {
     Mat4 projection = Mat4::perspective(radians(fov), aspect, zNear, zFar);
     ctx->shaderUniform("projectionMatrix", projection.transpose());
     ctx->shaderUniform("viewMatrix", Mat4::translate(position));
+    ctx->shaderUniform("cameraPosition", position);
 }
 
 void OrthographicCamera::update(float deltaTime) {
@@ -16,7 +17,8 @@ void OrthographicCamera::update(float deltaTime) {
 
     Mat4 projection = Mat4::ortho(left, right, bottom, top, zNear, zFar);
     ctx->shaderUniform("projectionMatrix", projection.transpose());
-    ctx->shaderUniform("viewMatrix", Mat4::identity());
+    ctx->shaderUniform("viewMatrix", Mat4::translate(position));
+    ctx->shaderUniform("cameraPosition", position);
 }
 
 void FreeCamera::update(float deltaTime) {

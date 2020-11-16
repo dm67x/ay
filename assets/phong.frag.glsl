@@ -11,6 +11,7 @@ in VS_OUT {
 } fs_in;
 
 uniform bool isAxis;
+uniform vec3 cameraPosition;
 uniform sampler2D albedo;
 
 struct Light {
@@ -39,7 +40,7 @@ vec3 computePointLight(Light light) {
     float specular = 0.0;
 
     if (lambertian > 0.0) {
-        vec3 viewDir = normalize(-fs_in.position);
+        vec3 viewDir = normalize(cameraPosition - fs_in.position);
         vec3 halfDir = normalize(lightDir + viewDir);
         float specAngle = max(dot(halfDir, normal), 0.0);
         specular = pow(specAngle, shininess);
