@@ -12,7 +12,7 @@ int main(void)
 
     Window window(WIDTH, HEIGHT);
     Context* ctx = window.getContext();
-    Scene scene(ctx, WIDTH, HEIGHT);
+    Scene scene(ctx);
 
     ctx->shaderFromFile("blinn-phong", "../../assets/phong.vert.glsl", "../../assets/phong.frag.glsl");
 
@@ -20,7 +20,7 @@ int main(void)
     mesh->transform.scale = Vec3(0.5f, 0.5f, 0.5f);
     mesh->transform.position.z = 5.f;
 
-    scene.createPerspectiveCamera("mainCamera", 90.f, 0.1f, 100.f);
+    scene.createFreeCamera("mainCamera", 90.f, 0.1f, 100.f);
     scene.setMainCamera("mainCamera");
     Light* light = scene.createLight();
     light->position = Vec3(0.f, 0.f, -2.f);

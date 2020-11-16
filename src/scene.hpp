@@ -13,10 +13,6 @@ class Scene : public Object {
     std::array<Light*, 16> lights;
     size_t numberOfLights;
 
-protected:
-    int width;
-    int height;
-
 public:
     std::function<void(Scene*, float)> onRender;
     std::function<void(Scene*)> onDestroy;
@@ -26,14 +22,12 @@ public:
     /// @brief Create a new scene
     /// @param ctx The context
     ///
-    Scene(Context* ctx, int width, int height) 
+    Scene(Context* ctx) 
         : Object(ctx), 
         cameras(), 
         mainCamera(nullptr), 
         lights(), 
         numberOfLights(0), 
-        width(width), 
-        height(height),
         onRender([](Scene*, float) {}),
         onDestroy([](Scene*) {})
     {
@@ -63,7 +57,7 @@ public:
     /// @return Created camera
     ///
     inline Camera* createPerspectiveCamera(const std::string& name, float fov, float zNear, float zFar) {
-        Camera* camera = new PerspectiveCamera(ctx, fov, static_cast<float>(width) / static_cast<float>(height), zNear, zFar);
+        Camera* camera = new PerspectiveCamera(ctx, fov, zNear, zFar);
         cameras.insert(std::make_pair(name, camera));
         return camera;
     }
@@ -81,6 +75,20 @@ public:
     ///
     inline Camera* createOrthographicCamera(const std::string& name, float left, float right, float bottom, float top, float zNear, float zFar) {
         Camera* camera = new OrthographicCamera(ctx, left, right, bottom, top, zNear, zFar);
+        cameras.insert(std::make_pair(name, camera));
+        return camera;
+    }
+
+    ///
+    /// @brief Create a new free camera
+    /// @param name Camera name
+    /// @param fov FOV
+    /// @param zNear zNear
+    /// @param zFar zFar
+    /// @return Created camera
+    ///
+    inline Camera* createFreeCamera(const std::string& name, float fov, float zNear, float zFar) {
+        Camera* camera = new FreeCamera(ctx, fov, zNear, zFar);
         cameras.insert(std::make_pair(name, camera));
         return camera;
     }

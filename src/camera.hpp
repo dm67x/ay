@@ -35,50 +35,18 @@ public:
     /// @param deltaTime Elapsed time between each frame
     /// 
     virtual void update(float deltaTime) = 0;
-
-    /// 
-    /// @brief Render to a Texture2D
-    /// @param name Texture name
-    /// 
-    virtual void renderToTexture(const std::string& name) {
-        (void)name;
-        /*Texture2D* texture = ctx->texture2DGet(name);
-        if (!texture) {
-            spdlog::error("Texture [{}] didn't exist inside the context. Create the texture before rendering to it.", name);
-            return;
-        }
-        
-        Framebuffer* framebuffer = ctx->framebufferGet("camera");
-        if (!framebuffer) {
-            Renderbuffer* rb = ctx->renderbufferNew("camera", );
-            framebuffer = ctx->framebufferNew("camera", { texture }, rb);
-        }*/
-    }
-
-    /// 
-    /// @brief Set camera aspect ratio (for PerspectiveCamera)
-    /// @param aspectRatio Aspect ratio
-    /// 
-    virtual void setAspectRatio(float aspectRatio) {
-        (void)aspectRatio;
-    }
 };
 
 class PerspectiveCamera : public Camera {
     float fov;
-    float aspect;
 
 public:
-    PerspectiveCamera(Context* ctx, float fov, float aspect, float near, float far)
-        : Camera(ctx, near, far), fov(fov), aspect(aspect)
+    PerspectiveCamera(Context* ctx, float fov, float near, float far)
+        : Camera(ctx, near, far), fov(fov)
     {
     }
 
-    void update(float deltaTime) override;
-
-    inline void setAspectRatio(float aspectRatio) override { 
-        this->aspect = aspectRatio;
-    }
+    virtual void update(float deltaTime) override;
 };
 
 class OrthographicCamera : public Camera {
@@ -90,6 +58,17 @@ class OrthographicCamera : public Camera {
 public:
     OrthographicCamera(Context* ctx, float left, float right, float bottom, float top, float near, float far)
         : Camera(ctx, near, far), left(left), right(right), bottom(bottom), top(top)
+    {
+    }
+
+    virtual void update(float deltaTime) override;
+};
+
+struct FreeCamera : public PerspectiveCamera {
+    float speed;
+    
+    FreeCamera(Context* ctx, float fov, float near, float far)
+        : PerspectiveCamera(ctx, fov, near, far), speed(8.f)
     {
     }
 
