@@ -1,18 +1,15 @@
 #version 320 es
 precision mediump float;
 
-in vec3 positionOut;
-in vec2 uvOut;
-in vec3 normalOut;
 out vec4 fragOut;
 
-uniform sampler2D albedo;
-
-struct Camera {
+in VS_OUT {
     vec3 position;
-};
+    vec3 normal;
+    vec2 uv;
+} fs_in;
 
-uniform Camera camera;
+uniform sampler2D albedo;
 
 struct Light {
     vec3 position;
@@ -29,9 +26,9 @@ const vec3 specColor = vec3(1.0, 1.0, 1.0);
 const float shininess = 16.0;
 const float screenGamma = 2.2;
 
-vec3 computePointLight(Light light, Camera camera) {
-    vec3 normal = normalize(normalOut);
-    vec3 lightDir = light.position - positionOut;
+vec3 computePointLight(Light light) {
+    vec3 normal = normalize(fs_in.normal);
+    vec3 lightDir = light.position - fs_in.position;
     float distance = length(lightDir);
     distance = distance * distance;
     lightDir = normalize(lightDir);
@@ -40,7 +37,7 @@ vec3 computePointLight(Light light, Camera camera) {
     float specular = 0.0;
 
     if (lambertian > 0.0) {
-        vec3 viewDir = normalize(camera.position - positionOut);
+        vec3 viewDir = normalize(-fs_in.position);
         vec3 halfDir = normalize(lightDir + viewDir);
         float specAngle = max(dot(halfDir, normal), 0.0);
         specular = pow(specAngle, shininess);
@@ -57,7 +54,7 @@ vec3 computePointLight(Light light, Camera camera) {
 void main() {
     vec3 color = vec3(0, 0, 0);
     for (int i = 0; i < lightsCount; i++) {
-        color += computePointLight(lights[i], camera);
+        color += computePointLight(lights[i]);
     }
     fragOut = vec4(color, 1.0);
 }

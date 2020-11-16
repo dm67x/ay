@@ -8,14 +8,21 @@ out vec3 positionOut;
 out vec3 normalOut;
 out vec2 uvOut;
 
-uniform mat4 projectionViewMatrix;
+out VS_OUT {
+    vec3 position;
+    vec3 normal;
+    vec2 uv;
+} vs_out;
+
+uniform mat4 projectionMatrix;
+uniform mat4 viewMatrix;
 uniform mat4 modelMatrix;
 uniform mat4 normalMatrix;
 
 void main() {
     vec4 worldPos = modelMatrix * vec4(positionIn, 1.0);
-    gl_Position = projectionViewMatrix * worldPos;
-    positionOut = worldPos.xyz / worldPos.w;
-    normalOut = (normalMatrix * vec4(normalIn, 1.0)).xyz;
-    uvOut = uvIn;
+    gl_Position = projectionMatrix * viewMatrix * worldPos;
+    vs_out.position = worldPos.xyz / worldPos.w;
+    vs_out.normal = (normalMatrix * vec4(normalIn, 1.0)).xyz;
+    vs_out.uv = uvIn;
 }
