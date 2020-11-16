@@ -10,7 +10,7 @@
     expr;\
     OpenGLHelper::Error err = OpenGLHelper::getError();\
     if (err != OpenGLHelper::Error::NO_ERROR) {\
-        spdlog::error("OpenGL error in {} at line: {}", __FILE__, __LINE__); \
+        spdlog::error("OpenGL error ({}) in {} at line: {}", OpenGLHelper::errorToString(err), __FILE__, __LINE__); \
     } }
 #endif
 
@@ -51,6 +51,19 @@ class OpenGLHelper {
         case GL_OUT_OF_MEMORY: return Error::OUT_OF_MEMORY;
         case GL_INVALID_FRAMEBUFFER_OPERATION: return Error::INVALID_FRAMEBUFFER_OPERATION;
         default: return Error::NO_ERROR;
+        }
+    }
+
+    inline static std::string errorToString(Error error) {
+        switch (error) {
+        case Error::INVALID_ENUM: return "invalid enum";
+        case Error::INVALID_VALUE: return "invalid value";
+        case Error::INVALID_OPERATION: return "invalid operation";
+        case Error::STACK_OVERFLOW: return "stack overflow";
+        case Error::STACK_UNDERFLOW: return "stack underflow";
+        case Error::OUT_OF_MEMORY: return "out of memory";
+        case Error::INVALID_FRAMEBUFFER_OPERATION: return "invalid framebuffer operation";
+        default: return "no error";
         }
     }
 };

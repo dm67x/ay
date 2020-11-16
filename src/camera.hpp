@@ -7,6 +7,7 @@
 class Camera {
 protected:
     Context* ctx;
+    Buffer* uniformBuffer;
     float zNear;
     float zFar;
     Vec3 position;
@@ -15,7 +16,13 @@ protected:
 
 protected:
     Camera(Context* ctx, float near, float far) 
-        : ctx(ctx), zNear(near), zFar(far), position(), viewDirection(0.f, 0.f, 1.f), up(0.f, 1.f, 0.f)
+        : ctx(ctx), 
+        uniformBuffer(ctx->bufferNew()),
+        zNear(near), 
+        zFar(far), 
+        position(), 
+        viewDirection(0.f, 0.f, 1.f), 
+        up(0.f, 1.f, 0.f)
     {
     }
 

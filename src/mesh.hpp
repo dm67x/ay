@@ -56,6 +56,12 @@ public:
     ~Mesh() override;
 
     ///
+    /// @brief Clone the current mesh
+    /// @return Cloned mesh
+    ///
+    Mesh* clone() const;
+
+    ///
     /// @brief Create a new plane mesh
     /// @param ctx Context
     /// @return Plane mesh

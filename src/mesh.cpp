@@ -29,6 +29,29 @@ Mesh::~Mesh() {
     }
 }
 
+Mesh* Mesh::clone() const {
+    Mesh* mesh = new Mesh(ctx);
+    mesh->vao->use();
+    for (auto oVbo : vbos) {
+        Buffer* vbo = ctx->bufferNew();
+        mesh->vbos.insert(std::make_pair(oVbo.first, vbo));
+        vbo->copy(*oVbo.second);
+        vbo->use(BufferMode::ARRAY);
+    }
+    ebo->copy(*mesh->ebo);
+    VertexArrayObject::reset();
+
+    mesh->drawMode = drawMode;
+    mesh->drawType = drawType;
+    mesh->indicesCount = indicesCount;
+
+    for (auto child : children) {
+        Mesh* childMesh = static_cast<Mesh*>(child)->clone();
+        mesh->addChild(childMesh);
+    }
+    return mesh;
+}
+
 Mesh* Mesh::plane(Context* ctx) {
     Mesh* plane = new Mesh(ctx);
     std::vector<Vertex> vertices = {

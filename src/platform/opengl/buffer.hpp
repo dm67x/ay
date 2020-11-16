@@ -72,6 +72,31 @@ public:
     }
 
     ///
+    /// @brief Set buffer subdata
+    /// @param mode Buffer target mode
+    /// @param offset Specifies the offset into the buffer object's data store where data replacement will begin, measured in bytes
+    /// @param size Specifies the size in bytes of the data store region being replaced
+    /// @param data Data
+    ///
+    inline void setSubData(BufferMode mode, int offset, size_t size, const void* data) {
+        glCheckError(glBufferSubData((GLenum)mode, (GLintptr)offset, (GLsizeiptr)size, data));
+    }
+
+    ///
+    /// @brief Copy a buffer data to another buffer
+    /// @param buffer Other buffer
+    ///
+    inline void copy(Buffer& buffer) {
+        GLint size;
+        glCheckError(glBindBuffer(GL_COPY_READ_BUFFER, id));
+        glCheckError(glGetBufferParameteriv(GL_COPY_READ_BUFFER, GL_BUFFER_SIZE, &size));
+        glCheckError(glBindBuffer(GL_COPY_WRITE_BUFFER, buffer.id));
+        glCheckError(glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, 0, 0, size));
+        glCheckError(glBindBuffer(GL_COPY_WRITE_BUFFER, 0));
+        glCheckError(glBindBuffer(GL_COPY_READ_BUFFER, 0));
+    }
+
+    ///
     /// @brief VertexAttribArray
     /// @param index Specifies the index of the generic vertex attribute to be modified
     /// @param size Specifies the number of components per generic vertex attribute

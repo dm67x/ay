@@ -15,6 +15,7 @@ int main(void)
 
     ctx->shaderFromFile("blinn-phong", "../../assets/phong.vert.glsl", "../../assets/phong.frag.glsl");
     Mesh* mesh = Mesh::fromFile(ctx, "../../assets/xbox.glb");
+    //Mesh* meshClone = mesh->clone();
     mesh->transform.scale = Vec3(.25f, .25f, .25f);
     mesh->transform.position.z = 3.f;
 
