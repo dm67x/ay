@@ -16,7 +16,7 @@ int main(void)
 
     ctx->shaderFromFile("blinn-phong", "../../assets/phong.vert.glsl", "../../assets/phong.frag.glsl");
 
-    Mesh* mesh = Mesh::fromFile(ctx, "../../assets/xbox.glb");
+    Mesh* mesh = Mesh::fromFile(ctx, "../../assets/scene.glb");
     mesh->transform.scale = Vec3(0.5f, 0.5f, 0.5f);
     mesh->transform.position.z = 5.f;
 
@@ -25,7 +25,7 @@ int main(void)
     Light* light = scene.createLight();
     light->position = Vec3(0.f, 0.f, -2.f);
     light->color = Color::white();
-    light->power = 40.f;
+    light->power = 20.f;
 
     scene.onRender = [&](Scene* scene, float deltaTime) {
         (void)scene;

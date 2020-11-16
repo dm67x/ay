@@ -3,6 +3,8 @@
 #include "object.hpp"
 #include "math.hpp"
 #include "context.hpp"
+#include "material.hpp"
+#include "tiny_gltf.h"
 #include <map>
 #include <string>
 
@@ -38,13 +40,13 @@ class Mesh : public Object {
     VAO vao;
     Buffer ebo;
     std::map<int, Buffer> vbos;
+    Material material;
     int drawMode;
     int drawType;
     size_t indicesCount;
     VAO axisVao;
     Buffer axisBuffer; // x, y, z
     bool isDebugMode; // for debugging
-    const Mesh* cloneOf;
 
 private:
     ///
@@ -58,12 +60,6 @@ public:
     /// @brief Destructor
     ///
     ~Mesh() override;
-
-    ///
-    /// @brief Clone the current mesh
-    /// @return Cloned mesh
-    ///
-    Mesh* clone() const;
 
     ///
     /// @brief Create a new plane mesh
@@ -114,4 +110,10 @@ private:
     /// @param output (Out) updated vertices
     /// 
     static void computeNormals(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices, std::vector<Vertex>& output);
+
+    void processNode(tinygltf::Model model, tinygltf::Node node);
+
+    void processMesh(tinygltf::Model model, tinygltf::Mesh mesh);
+
+    void processMaterial(tinygltf::Material mat);
 };

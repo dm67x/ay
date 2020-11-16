@@ -1,20 +1,20 @@
 #include "mesh.hpp"
 #include "context.hpp"
-#include <spdlog/spdlog.h>
 #include "tiny_gltf.h"
+#include <spdlog/spdlog.h>
 
 Mesh::Mesh(Context* ctx) 
     : Object(ctx), 
     vao(0), 
     ebo(0), 
     vbos(), 
+    material(),
     drawMode(GL_TRIANGLES),
     drawType(GL_UNSIGNED_INT),
     indicesCount(0),
     axisVao(0),
     axisBuffer(0),
-    isDebugMode(false),
-    cloneOf(nullptr)
+    isDebugMode(false)
 {
     vao = ctx->vaoNew();
     ebo = ctx->bufferNew();
@@ -42,40 +42,17 @@ Mesh::Mesh(Context* ctx)
 }
 
 Mesh::~Mesh() {
-    if (cloneOf != nullptr) {
-        ctx->vaoDispose(vao);
-        ctx->bufferDispose(ebo);
-        ctx->bufferDispose(axisBuffer);
+    ctx->vaoDispose(vao);
+    ctx->bufferDispose(ebo);
+    ctx->bufferDispose(axisBuffer);
 
-        for (auto vbo : vbos) {
-            ctx->bufferDispose(vbo.second);
-        }
+    for (auto vbo : vbos) {
+        ctx->bufferDispose(vbo.second);
     }
 
     for (auto mesh : children) {
         delete mesh;
     }
-}
-
-Mesh* Mesh::clone() const {
-    Mesh* mesh = new Mesh(ctx);
-    ctx->vaoDispose(mesh->vao);
-    ctx->bufferDispose(mesh->ebo);
-
-    mesh->vao = vao;
-    mesh->ebo = ebo;
-    mesh->vbos = vbos;
-    mesh->drawMode = drawMode;
-    mesh->drawType = drawType;
-    mesh->cloneOf = this;
-    mesh->indicesCount = indicesCount;
-
-    for (auto child : children) {
-        auto childMesh = static_cast<Mesh*>(child);
-        Mesh* cloneChildMesh = childMesh->clone();
-        mesh->addChild(cloneChildMesh);
-    }
-    return mesh;
 }
 
 Mesh* Mesh::plane(Context* ctx) {
@@ -157,7 +134,7 @@ Mesh* Mesh::fromFile(Context* ctx, const std::string& filename) {
     tinygltf::Model model;
     tinygltf::TinyGLTF loader;
     std::string err, warn;
-    Mesh* parent = new Mesh(ctx);
+    Mesh* root = new Mesh(ctx);
 
     bool ret = loader.LoadBinaryFromFile(&model, &err, &warn, filename);
     if (!warn.empty()) {
@@ -170,71 +147,106 @@ Mesh* Mesh::fromFile(Context* ctx, const std::string& filename) {
 
     if (!ret) {
         spdlog::error("Failed to parse {}", filename);
-        return parent;
+        return root;
     }
 
     // Get only geometry for now
     auto scene = model.scenes[model.defaultScene];
     for (auto nodeIndex : scene.nodes) {
         auto node = model.nodes[nodeIndex];
-        auto mesh = model.meshes[node.mesh];
-        for (auto primitive : mesh.primitives) {
-            Mesh* finalMesh = new Mesh(ctx);
-            ctx->vaoUse(finalMesh->vao);
-
-            // VBOs
-            for (auto& attribute : primitive.attributes) {
-                auto accessor = model.accessors[attribute.second];
-                auto bufferView = model.bufferViews[accessor.bufferView];
-                auto buffer = model.buffers[bufferView.buffer];
-                int stride = accessor.ByteStride(bufferView);
-
-                if (bufferView.target != (int)BufferUsage::ARRAY) {
-                    continue;
-                }
-
-                int index = -1;
-                if (attribute.first == "POSITION") {
-                    index = 0;
-                }
-                else if (attribute.first == "NORMAL") {
-                    index = 1;
-                }
-                else if (attribute.first == "TEXCOORD_0") {
-                    index = 2;
-                }
-
-                if (index >= 0) {
-                    auto it = finalMesh->vbos.find(index);
-                    if (it == finalMesh->vbos.end()) {
-                        finalMesh->vbos.insert(std::make_pair(index, ctx->bufferNew()));
-                        it = finalMesh->vbos.find(index);
-                        ctx->bufferUse<BufferUsage::ARRAY>(it->second);
-                        ctx->bufferData<BufferUsage::ARRAY, BufferTarget::STATIC_DRAW>((GLsizeiptr)(bufferView.byteLength), buffer.data.data() + bufferView.byteOffset);
-                    }
-
-                    ctx->bufferAttribute(index, (GLenum)accessor.componentType, (GLint)accessor.type, (GLsizei)stride, (GLvoid*)accessor.byteOffset);
-                }
-            }
-
-            // EBO (indices)
-            ctx->bufferUse<BufferUsage::ELEMENT>(finalMesh->ebo);
-            auto accessor = model.accessors[primitive.indices];
-            auto indicesBufferView = model.bufferViews[accessor.bufferView];
-            auto indicesBuffer = model.buffers[indicesBufferView.buffer];
-            ctx->bufferData<BufferUsage::ELEMENT, BufferTarget::STATIC_DRAW>((GLsizeiptr)(indicesBufferView.byteLength), indicesBuffer.data.data() + indicesBufferView.byteOffset);
-            ctx->bufferUse<BufferUsage::ELEMENT>(0);
-            ctx->vaoUse(0);
-
-            finalMesh->drawMode = primitive.mode;
-            finalMesh->indicesCount = accessor.count;
-            finalMesh->drawType = accessor.componentType;
-            parent->addChild(finalMesh);
-        }
+        root->processNode(model, model.nodes[nodeIndex]);
     }
 
     spdlog::info("Mesh {} loaded successfully", filename);
-    return parent;
+    return root;
+}
+
+void Mesh::processNode(tinygltf::Model model, tinygltf::Node node) {
+    if (node.mesh >= 0) {
+        processMesh(model, model.meshes[node.mesh]);
+    }
+
+    for (auto child : node.children) {
+        processNode(model, model.nodes[child]);
+    }
+}
+
+void Mesh::processMesh(tinygltf::Model model, tinygltf::Mesh mesh) {
+    for (auto primitive : mesh.primitives) {
+        Mesh* finalMesh = new Mesh(ctx);
+
+        // Material
+        int materialIndex = primitive.material;
+        if (materialIndex >= 0) {
+            auto mat = model.materials[materialIndex];
+            finalMesh->processMaterial(mat);
+        }
+
+        ctx->vaoUse(finalMesh->vao);
+
+        // VBOs
+        for (auto& attribute : primitive.attributes) {
+            auto accessor = model.accessors[attribute.second];
+            auto bufferView = model.bufferViews[accessor.bufferView];
+            auto buffer = model.buffers[bufferView.buffer];
+            int stride = accessor.ByteStride(bufferView);
+
+            if (bufferView.target != (int)BufferUsage::ARRAY) {
+                continue;
+            }
+
+            int index = -1;
+            if (attribute.first == "POSITION") {
+                index = 0;
+            }
+            else if (attribute.first == "NORMAL") {
+                index = 1;
+            }
+            else if (attribute.first == "TEXCOORD_0") {
+                index = 2;
+            }
+            else if (attribute.first == "COLOR_0") {
+                index = 3;
+            }
+
+            if (index >= 0) {
+                auto it = finalMesh->vbos.find(index);
+                if (it == finalMesh->vbos.end()) {
+                    finalMesh->vbos.insert(std::make_pair(index, ctx->bufferNew()));
+                    it = finalMesh->vbos.find(index);
+                    ctx->bufferUse<BufferUsage::ARRAY>(it->second);
+                    ctx->bufferData<BufferUsage::ARRAY, BufferTarget::STATIC_DRAW>((GLsizeiptr)(bufferView.byteLength), buffer.data.data() + bufferView.byteOffset);
+                }
+
+                ctx->bufferAttribute(index, (GLenum)accessor.componentType, (GLint)accessor.type, (GLsizei)stride, (GLvoid*)accessor.byteOffset);
+            }
+        }
+
+        // EBO (indices)
+        ctx->bufferUse<BufferUsage::ELEMENT>(finalMesh->ebo);
+        auto accessor = model.accessors[primitive.indices];
+        auto indicesBufferView = model.bufferViews[accessor.bufferView];
+        auto indicesBuffer = model.buffers[indicesBufferView.buffer];
+        ctx->bufferData<BufferUsage::ELEMENT, BufferTarget::STATIC_DRAW>((GLsizeiptr)(indicesBufferView.byteLength), indicesBuffer.data.data() + indicesBufferView.byteOffset);
+        ctx->bufferUse<BufferUsage::ELEMENT>(0);
+        ctx->vaoUse(0);
+
+        finalMesh->drawMode = primitive.mode;
+        finalMesh->indicesCount = accessor.count;
+        finalMesh->drawType = accessor.componentType;
+        addChild(finalMesh);
+    }
+}
+
+void Mesh::processMaterial(tinygltf::Material mat) {
+    material.alphaCutoff = static_cast<float>(mat.alphaCutoff);
+    auto baseColor = mat.pbrMetallicRoughness.baseColorFactor;
+    material.baseColor = Color((float)baseColor[0], (float)baseColor[1], (float)baseColor[2], (float)baseColor[3]);
+    material.metallicFactor = static_cast<float>(mat.pbrMetallicRoughness.metallicFactor);
+    material.emissiveFactor = Color((float)mat.emissiveFactor[0], (float)mat.emissiveFactor[1], (float)mat.emissiveFactor[2]);
+    material.doubleSided = mat.doubleSided;
+    material.roughnessFactor = static_cast<float>(mat.pbrMetallicRoughness.roughnessFactor);
+    material.name = mat.name;
 }
 
 void Mesh::render(float deltaTime) {
@@ -248,6 +260,11 @@ void Mesh::render(float deltaTime) {
     ctx->shaderUniform("modelMatrix", _transform);
     ctx->shaderUniform("normalMatrix", _transform.inverse().transpose());
     ctx->shaderUniform("isAxis", 0);
+    ctx->shaderUniform("material.baseColor", material.baseColor.toVec());
+    ctx->shaderUniform("material.metallicFactor", material.metallicFactor);
+    ctx->shaderUniform("material.roughnessFactor", material.roughnessFactor);
+    ctx->shaderUniform("material.emissiveFactor", material.emissiveFactor.toVec());
+
     ctx->vaoUse(vao);
     ctx->bufferUse<BufferUsage::ELEMENT>(ebo);
     if (isDebugMode) {
