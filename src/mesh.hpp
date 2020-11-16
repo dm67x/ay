@@ -47,6 +47,7 @@ class Mesh : public Object {
     VAO axisVao;
     Buffer axisBuffer; // x, y, z
     bool isDebugMode; // for debugging
+    Mat4 localTransformation;
 
 private:
     ///
@@ -102,6 +103,18 @@ public:
         }
     }
 
+    ///
+    /// @brief Get model matrix
+    /// @return Mat4
+    ///
+    inline Mat4 getTransform() const override {
+        Mat4 t = transform.getTransform() * localTransformation; // local transform
+        if (parent != nullptr) {
+            t = t * parent->getTransform();
+        }
+        return t;
+    }
+
 private:
     ///
     /// @brief Compute the normals
@@ -111,9 +124,24 @@ private:
     /// 
     static void computeNormals(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices, std::vector<Vertex>& output);
 
+    ///
+    /// @brief Process Node
+    /// @param model glTF model
+    /// @param node glTF node
+    /// 
     void processNode(tinygltf::Model model, tinygltf::Node node);
 
+    ///
+    /// @brief Process Mesh
+    /// @param model glTF model
+    /// @param mesh glTF mesh
+    /// 
     void processMesh(tinygltf::Model model, tinygltf::Mesh mesh);
 
-    void processMaterial(tinygltf::Material mat);
+    ///
+    /// @brief Process Material
+    /// @param model glTF model
+    /// @param mat glTF material
+    /// 
+    void processMaterial(tinygltf::Model model, tinygltf::Material mat);
 };

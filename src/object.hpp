@@ -65,4 +65,16 @@ public:
     /// @param deltaTime Elapsed time between each frame
     ///
     virtual void render(float deltaTime) = 0;
+
+    ///
+    /// @brief Get model matrix
+    /// @return Mat4
+    ///
+    virtual Mat4 getTransform() const {
+        Mat4 t = transform.getTransform(); // local transform
+        if (parent != nullptr) {
+            t = t * parent->transform.getTransform();
+        }
+        return t;
+    }
 };

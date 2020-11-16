@@ -5,6 +5,7 @@
 #include <limits>
 #include <cassert>
 #include <ostream>
+#include <vector>
 
 #define PI 3.14159265358979323846f
 
@@ -228,6 +229,20 @@ struct Mat4 {
         matrix.r2[1] = 1.f;
         matrix.r3[2] = 1.f;
         matrix.r4[3] = 1.f;
+        return matrix;
+    }
+
+    ///
+    /// @brief Create matrix from data
+    /// @param values Data
+    /// @return Matrix
+    ///
+    static Mat4 fromData(std::vector<float> values) {
+        Mat4 matrix;
+        std::memcpy(matrix.r1, &values[0], sizeof(float) * 4);
+        std::memcpy(matrix.r2, &values[4], sizeof(float) * 4);
+        std::memcpy(matrix.r3, &values[8], sizeof(float) * 4);
+        std::memcpy(matrix.r4, &values[12], sizeof(float) * 4);
         return matrix;
     }
 

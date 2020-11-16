@@ -1,6 +1,5 @@
 #include "mesh.hpp"
 #include "context.hpp"
-#include "tiny_gltf.h"
 #include <spdlog/spdlog.h>
 
 Mesh::Mesh(Context* ctx) 
@@ -14,7 +13,8 @@ Mesh::Mesh(Context* ctx)
     indicesCount(0),
     axisVao(0),
     axisBuffer(0),
-    isDebugMode(false)
+    isDebugMode(false),
+    localTransformation(Mat4::identity())
 {
     vao = ctx->vaoNew();
     ebo = ctx->bufferNew();
@@ -153,7 +153,6 @@ Mesh* Mesh::fromFile(Context* ctx, const std::string& filename) {
     // Get only geometry for now
     auto scene = model.scenes[model.defaultScene];
     for (auto nodeIndex : scene.nodes) {
-        auto node = model.nodes[nodeIndex];
         root->processNode(model, model.nodes[nodeIndex]);
     }
 
@@ -162,8 +161,48 @@ Mesh* Mesh::fromFile(Context* ctx, const std::string& filename) {
 }
 
 void Mesh::processNode(tinygltf::Model model, tinygltf::Node node) {
+    auto translation = node.translation;
+    auto rotation = node.rotation;
+    auto scale = node.scale;
+    auto matrix = node.matrix;
+
+    if (node.camera != -1) {
+        return;
+    }
+
+    Mesh* mesh = new Mesh(ctx);
+    addChild(mesh);
+
+    if (matrix.size() > 0) {
+        std::vector<float> values;
+        for (auto m : matrix) {
+            values.push_back(static_cast<float>(m));
+        }
+        mesh->localTransformation = Mat4::fromData(values);
+    }
+    else {
+        Mat4 translate = Mat4::identity();
+        Mat4 scaling = Mat4::identity();
+
+        if (translation.size() > 0) {
+            Vec3 t = Vec3((float)translation[0], (float)translation[1], (float)translation[2]);
+            translate = Mat4::translate(t);
+        }
+
+        if (scale.size() > 0) {
+            Vec3 s = Vec3((float)scale[0], (float)scale[1], (float)scale[2]);
+            scaling = Mat4::scale(s);
+        }
+
+        if (rotation.size() > 0) {
+            spdlog::info("rotation");
+        }
+
+        mesh->localTransformation = translate * scaling;
+    }
+
     if (node.mesh >= 0) {
-        processMesh(model, model.meshes[node.mesh]);
+        mesh->processMesh(model, model.meshes[node.mesh]);
     }
 
     for (auto child : node.children) {
@@ -179,7 +218,7 @@ void Mesh::processMesh(tinygltf::Model model, tinygltf::Mesh mesh) {
         int materialIndex = primitive.material;
         if (materialIndex >= 0) {
             auto mat = model.materials[materialIndex];
-            finalMesh->processMaterial(mat);
+            finalMesh->processMaterial(model, mat);
         }
 
         ctx->vaoUse(finalMesh->vao);
@@ -238,7 +277,9 @@ void Mesh::processMesh(tinygltf::Model model, tinygltf::Mesh mesh) {
     }
 }
 
-void Mesh::processMaterial(tinygltf::Material mat) {
+void Mesh::processMaterial(tinygltf::Model model, tinygltf::Material mat) {
+    (void)model;
+
     material.alphaCutoff = static_cast<float>(mat.alphaCutoff);
     auto baseColor = mat.pbrMetallicRoughness.baseColorFactor;
     material.baseColor = Color((float)baseColor[0], (float)baseColor[1], (float)baseColor[2], (float)baseColor[3]);
@@ -252,11 +293,7 @@ void Mesh::processMaterial(tinygltf::Material mat) {
 void Mesh::render(float deltaTime) {
     (void)deltaTime;
 
-    Mat4 _transform = transform.getTransform();
-    if (parent != nullptr) {
-        _transform = _transform * parent->transform.getTransform();
-    }
-
+    Mat4 _transform = getTransform();
     ctx->shaderUniform("modelMatrix", _transform);
     ctx->shaderUniform("normalMatrix", _transform.inverse().transpose());
     ctx->shaderUniform("isAxis", 0);

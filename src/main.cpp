@@ -7,10 +7,7 @@
 
 int main(void)
 {
-    const int WIDTH = 1280;
-    const int HEIGHT = 900;
-
-    Window window(WIDTH, HEIGHT);
+    Window window(1280, 900);
     Context* ctx = window.getContext();
     Scene scene(ctx);
 
@@ -52,6 +49,9 @@ int main(void)
         if (window.isKeyPressed(GLFW_KEY_ESCAPE)) {
             window.close();
         }
+
+        const int WIDTH = window.getSize().first;
+        const int HEIGHT = window.getSize().second;
 
         ctx->clear();
         ctx->viewport(0, 0, WIDTH, HEIGHT);
