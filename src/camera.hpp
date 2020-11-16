@@ -75,6 +75,7 @@ public:
     }
 
     void update(float deltaTime) override;
+
     inline void setAspectRatio(float aspectRatio) override { 
         this->aspect = aspectRatio;
     }

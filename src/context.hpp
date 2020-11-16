@@ -106,7 +106,10 @@ struct Texture2DParameters {
     int height = 0;
 };
 
+class Window;
+
 class Context {
+    const Window& window;
     std::map<std::string, Shader> shaders;
     std::map<std::string, Texture2D> textures;
     std::map<std::string, Renderbuffer> renderbuffers;
@@ -117,8 +120,9 @@ public:
     ///
     /// @brief Constructor of context
     ///
-    Context() 
-        : shaders(), 
+    Context(const Window& window) 
+        : window(window),
+        shaders(), 
         textures(), 
         renderbuffers(), 
         framebuffers(), 
@@ -136,6 +140,14 @@ public:
     /// @brief Destructor of context
     ///
     ~Context();
+
+    ///
+    /// @brief Get current window
+    /// @return Window reference
+    ///
+    inline const Window& getWindow() const {
+        return window;
+    }
 
     ///
     /// @brief Get OpenGL Version

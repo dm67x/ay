@@ -24,7 +24,7 @@ Window::Window(int width, int height) : window(nullptr), ctx(nullptr) {
     glfwMakeContextCurrent(window);
     glfwSwapInterval(0);
 
-    ctx = new Context();
+    ctx = new Context(*this);
     spdlog::info("{}", ctx->getVersion());
     spdlog::info("{}", ctx->getVendor());
 }
