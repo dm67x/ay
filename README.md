@@ -20,19 +20,19 @@ Thanks to all of them!
 
 ## TODO
 
--[X] Blinn-Phong
--[ ] glTF importer (wip)
--[X] Point Light
--[ ] Directional Light
--[ ] Spotlight
--[ ] Quaternions
--[X] Forward Rendering
--[ ] Deferred Rendering
--[ ] Camera transformation (movement, ...)
--[ ] PBR Rendering
--[ ] Image Based Lighting
--[ ] Skydome
--[ ] Particles
--[ ] RenderGraph (json scene format)
--[ ] DirectX and Vulkan API implementation
--[ ] RayTracing (Monte Carlo model)
+- [X] Blinn-Phong
+- [ ] glTF importer (wip)
+- [X] Point Light
+- [ ] Directional Light
+- [ ] Spotlight
+- [ ] Quaternions
+- [X] Forward Rendering
+- [ ] Deferred Rendering
+- [ ] Camera transformation (movement, ...)
+- [ ] PBR Rendering
+- [ ] Image Based Lighting
+- [ ] Skydome
+- [ ] Particles
+- [ ] RenderGraph (json scene format)
+- [ ] DirectX and Vulkan API implementation
+- [ ] RayTracing (Monte Carlo model)
