@@ -21,11 +21,9 @@ void OrthographicCamera::update(float deltaTime) {
 
 void FreeCamera::update(float deltaTime) {
     auto& window = ctx->getWindow();
-    auto front = window.isKeyPressed(GLFW_KEY_W) ? -1 : (window.isKeyPressed(GLFW_KEY_S) ? 1 : 0);
-    auto left = window.isKeyPressed(GLFW_KEY_A) ? 1 : (window.isKeyPressed(GLFW_KEY_D) ? -1 : 0);
+    float t = window.isKeyPressed(GLFW_KEY_W) ? -1.f : (window.isKeyPressed(GLFW_KEY_S) ? 1.f : 0.f);
+    float r = window.isKeyPressed(GLFW_KEY_A) ? 1.f : (window.isKeyPressed(GLFW_KEY_D) ? -1.f : 0.f);
 
-    position.z += speed * deltaTime * front;
-    position.x += speed * deltaTime * left;
-
+    position += (front * t + right * r) * (speed * deltaTime);
     PerspectiveCamera::update(deltaTime);
 }

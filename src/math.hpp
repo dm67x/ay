@@ -54,6 +54,30 @@ struct Vec3 {
     }
 
     ///
+    /// @brief Add the current vector with an other vector
+    /// @param v1 Vector
+    /// @return The reference to the current vector
+    ///
+    inline Vec3& operator+=(const Vec3& v1) {
+        x += v1.x;
+        y += v1.y;
+        z += v1.z;
+        return *this;
+    }
+
+    ///
+    /// @brief Add the current vector with an other vector
+    /// @param v1 Vector
+    /// @return The reference to the current vector
+    ///
+    inline Vec3& operator-=(const Vec3& v1) {
+        x -= v1.x;
+        y -= v1.y;
+        z -= v1.z;
+        return *this;
+    }
+
+    ///
     /// @brief Format for output values in console
     /// @param out Out stream
     /// @param v Vec3

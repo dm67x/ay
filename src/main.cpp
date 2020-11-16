@@ -58,7 +58,7 @@ int main(void)
         start = end;
 
         const float elapsedTime = diff.count();
-        spdlog::info("FPS: {}", 1.f / elapsedTime);
+        //spdlog::info("FPS: {}", 1.f / elapsedTime);
 
         scene.render(elapsedTime);
     }
