@@ -49,6 +49,10 @@ int main(void)
             mesh->setDebug(false);
         }
 
+        if (window.isKeyPressed(GLFW_KEY_ESCAPE)) {
+            window.close();
+        }
+
         ctx->clear();
         ctx->viewport(0, 0, WIDTH, HEIGHT);
         ctx->shaderUse("blinn-phong");

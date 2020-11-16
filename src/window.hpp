@@ -64,4 +64,11 @@ public:
     inline bool isKeyReleased(int key) const {
         return glfwGetKey(window, key) == GLFW_RELEASE;
     }
+
+    ///
+    /// @brief Close the window
+    ///
+    inline void close() const {
+        glfwSetWindowShouldClose(window, GLFW_TRUE);
+    }
 };
