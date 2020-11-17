@@ -363,27 +363,21 @@ public:
 
     ///
     /// @brief Draw call
+    /// @param method Draw method
     /// @param params Draw parameters
     ///
-    template<DrawMethod T>
-    inline void draw(DrawParameters params) const {}
+    inline void draw(DrawMethod method, DrawParameters params) const {
+        switch (method) {
+            case DrawMethod::ARRAY:
+                glCheckError(glDrawArrays(params.mode, params.first, params.count));
+                break;
 
-    ///
-    /// @brief Draw call (array)
-    /// @param params Draw parameters
-    ///
-    template<>
-    inline void draw<DrawMethod::ARRAY>(DrawParameters params) const {
-        glCheckError(glDrawArrays(params.mode, params.first, params.count));
-    }
+            case DrawMethod::ELEMENT:
+                glCheckError(glDrawElements(params.mode, params.count, params.elementType, params.offset));
+                break;
 
-    ///
-    /// @brief Draw call (element)
-    /// @param params Draw parameters
-    ///
-    template<>
-    inline void draw<DrawMethod::ELEMENT>(DrawParameters params) const {
-        glCheckError(glDrawElements(params.mode, params.count, params.elementType, params.offset));
+            default: break;
+        }
     }
 
     ///

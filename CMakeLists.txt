@@ -34,5 +34,5 @@ add_executable(ay
 target_link_libraries(ay PRIVATE glad glfw stb spdlog OpenGL::GL)
 target_compile_options(ay PRIVATE
     $<$<CXX_COMPILER_ID:MSVC>:/W4 /WX>
-    $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wall -Wextra -pedantic -Werror>
+    $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wall -Wextra>
 )

@@ -300,10 +300,10 @@ void Mesh::render(float deltaTime) {
     ctx->vaoUse(vao);
     ctx->bufferUse<BufferUsage::ELEMENT>(ebo);
     if (isDebugMode) {
-        ctx->draw<DrawMethod::ELEMENT>(DrawParameters(GL_LINES, (GLenum)drawType, (GLsizei)indicesCount, nullptr));
+        ctx->draw(DrawMethod::ELEMENT, DrawParameters(GL_LINES, (GLenum)drawType, (GLsizei)indicesCount, nullptr));
     }
     else {
-        ctx->draw<DrawMethod::ELEMENT>(DrawParameters((GLenum)drawMode, (GLenum)drawType, (GLsizei)indicesCount, nullptr));
+        ctx->draw(DrawMethod::ELEMENT, DrawParameters((GLenum)drawMode, (GLenum)drawType, (GLsizei)indicesCount, nullptr));
     }
     ctx->bufferUse<BufferUsage::ELEMENT>(0);
 
@@ -312,7 +312,7 @@ void Mesh::render(float deltaTime) {
         ctx->vaoUse(axisVao);
         ctx->shaderUniform("isAxis", 1);
         glCheckError(glLineWidth(3.f));
-        ctx->draw<DrawMethod::ARRAY>(DrawParameters(GL_LINES, 0, 6));
+        ctx->draw(DrawMethod::ARRAY, DrawParameters(GL_LINES, 0, 6));
         glCheckError(glLineWidth(1.f));
     }
 
