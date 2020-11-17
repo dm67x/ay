@@ -65,20 +65,28 @@ struct DrawParameters {
     };
     GLsizei count;
     GLvoid* offset;
+    GLsizei instanceCount;
 
     DrawParameters(GLenum mode, GLint first, GLsizei count)
         : mode(mode),
         first(first),
         count(count),
-        offset(nullptr)
+        offset(nullptr),
+        instanceCount(0)
     {
     }
 
     DrawParameters(GLenum mode, GLenum elementType, GLsizei count, GLvoid* offset)
+        : DrawParameters(mode, elementType, count, offset, 0)
+    {
+    }
+
+    DrawParameters(GLenum mode, GLenum elementType, GLsizei count, GLvoid* offset, GLsizei instanceCount)
         : mode(mode),
         elementType(elementType),
         count(count),
-        offset(offset)
+        offset(offset),
+        instanceCount(instanceCount)
     {
     }
 };
@@ -374,6 +382,10 @@ public:
 
             case DrawMethod::ELEMENT:
                 glCheckError(glDrawElements(params.mode, params.count, params.elementType, params.offset));
+                break;
+
+            case DrawMethod::INSTANCE:
+                glCheckError(glDrawElementsInstanced(params.mode, params.count, params.elementType, params.offset, params.instanceCount));
                 break;
 
             default: break;
