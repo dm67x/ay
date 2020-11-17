@@ -22,15 +22,15 @@ Thanks to all of them!
 ## TODO
 
 - [X] Blinn-Phong
-- [ ] *glTF importer*
+- [ ] **glTF importer**
 - [X] Point Light
 - [X] Directional Light
 - [ ] Spotlight
-- [ ] *Quaternions*
+- [ ] **Quaternions**
 - [X] ImGUI Integration
 - [X] Forward Rendering
 - [ ] Deferred Rendering
-- [ ] *Camera transformation (movement, ...)*
+- [ ] **Camera transformation (movement, ...)**
 - [ ] PBR Rendering
 - [ ] Image Based Lighting
 - [ ] Skydome
