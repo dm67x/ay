@@ -13,14 +13,25 @@ int main(void)
 
     ctx->shaderFromFile("blinn-phong", "../../assets/phong.vert.glsl", "../../assets/phong.frag.glsl");
 
-    Mesh* mesh = Mesh::fromFile(ctx, "../../assets/cube.glb");
-    mesh->transform.scale = Vec3(0.5f, 0.5f, 0.5f);
-    mesh->transform.position.z = 5.f;
+    Mesh* mesh = Mesh::fromFile(ctx, "../../assets/buddha.glb");
+    Mesh* plane = Mesh::plane(ctx);
+
+    mesh->transform.scale = glm::vec3(1.5f);
+    mesh->transform.position.z = -5.f;
+    mesh->transform.position.y = 0.f;
+    mesh->transform.rotation.x = glm::radians(90.f);
+
+    plane->transform.position.z = -5.f;
+    plane->transform.position.y = -.8f;
+    plane->transform.scale = glm::vec3(10.f);
+    plane->transform.rotation.x = glm::radians(90.f);
+    plane->transform.rotation.z = glm::radians(180.f);
 
     scene.createFreeCamera("mainCamera", 90.f, 0.1f, 100.f);
     scene.setMainCamera("mainCamera");
-    Light* light = scene.createDirectionalLight();
-    light->position = Vec3(-3.f, 3.f, -3.f);
+
+    Light* light = scene.createPointLight();
+    light->position = glm::vec3(0.f, 3.f, -5.f);
     light->color = Color::white();
     light->intensity = 8.f;
 
@@ -36,13 +47,15 @@ int main(void)
         }, flags);
         ctx->uiEnd();
 
-        //mesh->transform.rotation.y += 100.f * deltaTime;
+        mesh->transform.rotation.y += glm::radians(100.f * deltaTime);
         mesh->render(deltaTime);
+        plane->render(deltaTime);
     };
 
     scene.onDestroy = [&](Scene* scene) {
         (void)scene;
         delete mesh;
+        delete plane;
     };
 
     auto start = std::chrono::steady_clock::now();

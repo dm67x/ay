@@ -1,12 +1,15 @@
 #pragma once
 
-#include "math.hpp"
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/quaternion.hpp>
+#include <glm/gtx/quaternion.hpp>
 
 struct Transform {
-    Vec3 origin;
-    Vec3 position;
-    Vec3 scale;
-    Vec3 rotation;
+    glm::vec3 origin;
+    glm::vec3 position;
+    glm::vec3 scale;
+    glm::vec3 rotation;
 
     ///
     /// @brief Constructor
@@ -15,7 +18,7 @@ struct Transform {
         : origin(0.f, 0.f, 0.f),
         position(0.f, 0.f, 0.f),
         scale(1.f, 1.f, 1.f),
-        rotation(0.f, 0.f, 0.f)
+        rotation()
     {
     }
 
@@ -23,11 +26,11 @@ struct Transform {
     /// @brief Get model matrix
     /// @return Matrix4 result
     ///
-    inline Mat4 getTransform() const {
-        Mat4 toOrigin = Mat4::translate(-origin);
-        Mat4 translation = Mat4::translate(position);
-        Mat4 scaling = Mat4::scale(scale);
-        Mat4 rotate = Mat4::rotateX(radians(rotation.x)) * Mat4::rotateY(radians(rotation.y)) * Mat4::rotateZ(radians(rotation.z));
+    inline glm::mat4 getTransform() const {
+        glm::mat4 toOrigin = glm::translate(glm::mat4(1.f), -origin);
+        glm::mat4 translation = glm::translate(glm::mat4(1.f), position);
+        glm::mat4 scaling = glm::scale(glm::mat4(1.f), scale);
+        glm::mat4 rotate = glm::toMat4(glm::quat(rotation));
         return translation * rotate * scaling * toOrigin;
     }
 };

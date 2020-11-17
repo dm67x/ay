@@ -3,7 +3,6 @@
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_glfw.h"
 #include "imgui/imgui_impl_opengl3.h"
-#include "math.hpp"
 #include "window.hpp"
 #include <spdlog/spdlog.h>
 #include <glad.h>
@@ -12,6 +11,7 @@
 #include <map>
 #include <array>
 #include <sstream>
+#include <glm/glm.hpp>
 
 #ifdef NDEBUG
 #define glCheckError(expr) expr
@@ -315,10 +315,10 @@ public:
     /// @param name uniform name
     /// @param value uniform value
     ///
-    inline void shaderUniform(const std::string& name, const Vec3& value) const {
+    inline void shaderUniform(const std::string& name, const glm::vec3& value) const {
         GLint loc;
         glCheckError(loc = glGetUniformLocation(currentShader, name.c_str()));
-        glCheckError(glUniform3fv(loc, 1, value.toPtr()));
+        glCheckError(glUniform3fv(loc, 1, &value[0]));
     }
 
     ///
@@ -326,10 +326,10 @@ public:
     /// @param name uniform name
     /// @param value uniform value
     ///
-    inline void shaderUniform(const std::string& name, const Vec4& value) const {
+    inline void shaderUniform(const std::string& name, const glm::vec4& value) const {
         GLint loc;
         glCheckError(loc = glGetUniformLocation(currentShader, name.c_str()));
-        glCheckError(glUniform4fv(loc, 1, value.toPtr()));
+        glCheckError(glUniform4fv(loc, 1, &value[0]));
     }
 
     ///
@@ -337,10 +337,10 @@ public:
     /// @param name uniform name
     /// @param value uniform value
     ///
-    inline void shaderUniform(const std::string& name, const Mat4& value) const {
+    inline void shaderUniform(const std::string& name, const glm::mat4& value) const {
         GLint loc;
         glCheckError(loc = glGetUniformLocation(currentShader, name.c_str()));
-        glCheckError(glUniformMatrix4fv(loc, 1, GL_TRUE, value.toPtr()));
+        glCheckError(glUniformMatrix4fv(loc, 1, GL_FALSE, &value[0][0]));
     }
 
     ///

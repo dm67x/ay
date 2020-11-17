@@ -1,18 +1,18 @@
 #pragma once
 
-#include "math.hpp"
 #include "context.hpp"
 #include <string>
+#include <glm/glm.hpp>
 
 class Camera {
 protected:
     Context* ctx;
     float zNear;
     float zFar;
-    Vec3 position;
-    Vec3 front;
-    Vec3 up;
-    Vec3 right;
+    glm::vec3 position;
+    glm::vec3 front;
+    glm::vec3 up;
+    glm::vec3 right;
 
 protected:
     /// 

@@ -1,11 +1,11 @@
 #pragma once
 
-#include "math.hpp"
 #include "color.hpp"
 #include "object.hpp"
+#include <glm/glm.hpp>
 
 struct Light {
-    Vec3 position;
+    glm::vec3 position;
     Color color;
     float intensity;
 

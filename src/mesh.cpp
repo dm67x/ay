@@ -1,6 +1,7 @@
 #include "mesh.hpp"
 #include "context.hpp"
 #include <spdlog/spdlog.h>
+#include <glm/gtc/type_ptr.hpp>
 
 Mesh::Mesh(Context* ctx) 
     : Object(ctx), 
@@ -14,7 +15,7 @@ Mesh::Mesh(Context* ctx)
     axisVao(0),
     axisBuffer(0),
     isDebugMode(false),
-    localTransformation(Mat4::identity())
+    localTransformation(glm::mat4(1.f))
 {
     vao = ctx->vaoNew();
     ebo = ctx->bufferNew();
@@ -58,10 +59,10 @@ Mesh::~Mesh() {
 Mesh* Mesh::plane(Context* ctx) {
     Mesh* plane = new Mesh(ctx);
     std::vector<Vertex> vertices = {
-        Vertex(Vec3(-1.f, 1.f, 0.f), Vec3(0.f, 0.f, 1.f), 0.f, 0.f),
-        Vertex(Vec3(1.f, 1.f, 0.f), Vec3(0.f, 0.f, 1.f), 1.f, 0.f),
-        Vertex(Vec3(1.f, -1.f, 0.f), Vec3(0.f, 0.f, 1.f), 1.f, 1.f),
-        Vertex(Vec3(-1.f, -1.f, 0.f), Vec3(0.f, 0.f, 1.f), 0.f, 1.f)
+        Vertex(glm::vec3(-1.f, 1.f, 0.f), glm::vec3(0.f, 0.f, 1.f), glm::vec2(0.f, 0.f)),
+        Vertex(glm::vec3(1.f, 1.f, 0.f), glm::vec3(0.f, 0.f, 1.f), glm::vec2(1.f, 0.f)),
+        Vertex(glm::vec3(1.f, -1.f, 0.f), glm::vec3(0.f, 0.f, 1.f), glm::vec2(1.f, 1.f)),
+        Vertex(glm::vec3(-1.f, -1.f, 0.f), glm::vec3(0.f, 0.f, 1.f), glm::vec2(0.f, 1.f))
     };
     std::vector<unsigned int> indices = { 0, 2, 1, 0, 3, 2 };
 
@@ -73,7 +74,7 @@ Mesh* Mesh::plane(Context* ctx) {
     ctx->bufferData<BufferUsage::ARRAY, BufferTarget::STATIC_DRAW>((GLsizeiptr)(sizeof(Vertex) * vertices.size()), vertices.data());
     ctx->bufferAttribute(0, GL_FLOAT, (GLint)3, (GLsizei)sizeof(Vertex), (GLvoid*)offsetof(Vertex, position));
     ctx->bufferAttribute(1, GL_FLOAT, (GLint)3, (GLsizei)sizeof(Vertex), (GLvoid*)offsetof(Vertex, normal));
-    ctx->bufferAttribute(2, GL_FLOAT, (GLint)3, (GLsizei)sizeof(Vertex), (GLvoid*)offsetof(Vertex, u));
+    ctx->bufferAttribute(2, GL_FLOAT, (GLint)3, (GLsizei)sizeof(Vertex), (GLvoid*)offsetof(Vertex, uv));
     ctx->bufferUse<BufferUsage::ELEMENT>(plane->ebo);
     ctx->bufferData<BufferUsage::ELEMENT, BufferTarget::STATIC_DRAW>((GLsizeiptr)(sizeof(unsigned int) * indices.size()), indices.data());
     ctx->bufferUse<BufferUsage::ELEMENT>(0);
@@ -86,21 +87,21 @@ Mesh* Mesh::plane(Context* ctx) {
 Mesh* Mesh::cube(Context* ctx) {
     Mesh* cube = new Mesh(ctx);
     std::vector<Vertex> vertices = {
-        Vertex(Vec3(-1.f, 1.f, -1.f), Vec3(), 0.25f, 0.f), // v1
-        Vertex(Vec3(-1.f, 1.f, 1.f), Vec3(), 0.75f, 0.f), // v2
-        Vertex(Vec3(1.f, 1.f, 1.f), Vec3(), 0.75f, 0.25f), // v3
-        Vertex(Vec3(1.f, 1.f, -1.f), Vec3(), 0.25f, 0.25f), // v4
-        Vertex(Vec3(-1.f, -1.f, 1.f), Vec3(), 0.75f, 0.75f), // v5
-        Vertex(Vec3(-1.f, -1.f, -1.f), Vec3(), 0.25f, 0.75f), // v6
-        Vertex(Vec3(1.f, -1.f, -1.f), Vec3(), 0.25f, 0.5f), // v7
-        Vertex(Vec3(1.f, -1.f, 1.f), Vec3(), 0.75f, 0.5f), // v8
+        Vertex(glm::vec3(-1.f, 1.f, -1.f), glm::vec3(), glm::vec2(0.25f, 0.f)), // v1
+        Vertex(glm::vec3(-1.f, 1.f, 1.f), glm::vec3(), glm::vec2(0.75f, 0.f)), // v2
+        Vertex(glm::vec3(1.f, 1.f, 1.f), glm::vec3(), glm::vec2(0.75f, 0.25f)), // v3
+        Vertex(glm::vec3(1.f, 1.f, -1.f), glm::vec3(), glm::vec2(0.25f, 0.25f)), // v4
+        Vertex(glm::vec3(-1.f, -1.f, 1.f), glm::vec3(), glm::vec2(0.75f, 0.75f)), // v5
+        Vertex(glm::vec3(-1.f, -1.f, -1.f), glm::vec3(), glm::vec2(0.25f, 0.75f)), // v6
+        Vertex(glm::vec3(1.f, -1.f, -1.f), glm::vec3(), glm::vec2(0.25f, 0.5f)), // v7
+        Vertex(glm::vec3(1.f, -1.f, 1.f), glm::vec3(), glm::vec2(0.75f, 0.5f)), // v8
 
-        Vertex(Vec3(-1.f, 1.f, -1.f), Vec3(), 0.f, 0.25f), // v12
-        Vertex(Vec3(-1.f, 1.f, -1.f), Vec3(), 0.25f, 1.f), // v13
-        Vertex(Vec3(-1.f, 1.f, 1.f), Vec3(), 1.f, 0.25f), // v22
-        Vertex(Vec3(-1.f, 1.f, 1.f), Vec3(), 0.75f, 1.f), // v23
-        Vertex(Vec3(-1.f, -1.f, 1.f), Vec3(), 1.f, 0.5f), // v52
-        Vertex(Vec3(-1.f, -1.f, -1.f), Vec3(), 0.f, 0.5f) // v62
+        Vertex(glm::vec3(-1.f, 1.f, -1.f), glm::vec3(), glm::vec2(0.f, 0.25f)), // v12
+        Vertex(glm::vec3(-1.f, 1.f, -1.f), glm::vec3(), glm::vec2(0.25f, 1.f)), // v13
+        Vertex(glm::vec3(-1.f, 1.f, 1.f), glm::vec3(), glm::vec2(1.f, 0.25f)), // v22
+        Vertex(glm::vec3(-1.f, 1.f, 1.f), glm::vec3(), glm::vec2(0.75f, 1.f)), // v23
+        Vertex(glm::vec3(-1.f, -1.f, 1.f), glm::vec3(), glm::vec2(1.f, 0.5f)), // v52
+        Vertex(glm::vec3(-1.f, -1.f, -1.f), glm::vec3(), glm::vec2(0.f, 0.5f)) // v62
     };
     std::vector<unsigned int> indices = {
         0, 2, 1, 0, 3, 2,
@@ -120,7 +121,7 @@ Mesh* Mesh::cube(Context* ctx) {
     ctx->bufferData<BufferUsage::ARRAY, BufferTarget::STATIC_DRAW>((GLsizeiptr)(sizeof(Vertex) * vertices.size()), vertices.data());
     ctx->bufferAttribute(0, GL_FLOAT, (GLint)3, (GLsizei)sizeof(Vertex), (GLvoid*)offsetof(Vertex, position));
     ctx->bufferAttribute(1, GL_FLOAT, (GLint)3, (GLsizei)sizeof(Vertex), (GLvoid*)offsetof(Vertex, normal));
-    ctx->bufferAttribute(2, GL_FLOAT, (GLint)3, (GLsizei)sizeof(Vertex), (GLvoid*)offsetof(Vertex, u));
+    ctx->bufferAttribute(2, GL_FLOAT, (GLint)3, (GLsizei)sizeof(Vertex), (GLvoid*)offsetof(Vertex, uv));
     ctx->bufferUse<BufferUsage::ELEMENT>(cube->ebo);
     ctx->bufferData<BufferUsage::ELEMENT, BufferTarget::STATIC_DRAW>((GLsizeiptr)(sizeof(unsigned int) * indices.size()), indices.data());
     ctx->bufferUse<BufferUsage::ELEMENT>(0);
@@ -173,27 +174,29 @@ void Mesh::processNode(tinygltf::Model model, tinygltf::Node node) {
         for (auto m : matrix) {
             values.push_back(static_cast<float>(m));
         }
-        mesh->localTransformation = Mat4::fromData(values).transpose();
+        mesh->localTransformation = glm::make_mat4(values.data());
     }
     else {
-        Mat4 translate = Mat4::identity();
-        Mat4 scaling = Mat4::identity();
+        glm::mat4 translate = glm::mat4(1.f);
+        glm::mat4 scaling = glm::mat4(1.f);
+        glm::mat4 rotate = glm::mat4(1.f);
 
         if (translation.size() > 0) {
-            Vec3 t = Vec3((float)translation[0], (float)translation[1], (float)translation[2]);
-            translate = Mat4::translate(t);
+            glm::vec3 t((float)translation[0], (float)translation[1], (float)translation[2]);
+            translate = glm::translate(glm::mat4(1.f), t);
         }
 
         if (scale.size() > 0) {
-            Vec3 s = Vec3((float)scale[0], (float)scale[1], (float)scale[2]);
-            scaling = Mat4::scale(s);
+            glm::vec3 s((float)scale[0], (float)scale[1], (float)scale[2]);
+            scaling = glm::scale(glm::mat4(1.f), s);
         }
 
         if (rotation.size() > 0) {
-            
+            glm::vec3 r(glm::radians((float)rotation[0]), glm::radians((float)rotation[1]), glm::radians((float)rotation[2]));
+            rotate = glm::toMat4(glm::quat(r));
         }
 
-        mesh->localTransformation = translate * scaling;
+        mesh->localTransformation = translate * rotate * scaling;
     }
 
     if (node.mesh >= 0) {
@@ -288,9 +291,9 @@ void Mesh::processMaterial(tinygltf::Model model, tinygltf::Material mat) {
 void Mesh::render(float deltaTime) {
     (void)deltaTime;
 
-    Mat4 _transform = getTransform();
+    glm::mat4 _transform = getTransform();
     ctx->shaderUniform("modelMatrix", _transform);
-    ctx->shaderUniform("normalMatrix", _transform.inverse().transpose());
+    ctx->shaderUniform("normalMatrix", glm::transpose(glm::inverse(_transform)));
     ctx->shaderUniform("isAxis", 0);
     ctx->shaderUniform("material.baseColor", material.baseColor.toVec());
     ctx->shaderUniform("material.metallicFactor", material.metallicFactor);
@@ -308,7 +311,7 @@ void Mesh::render(float deltaTime) {
     ctx->bufferUse<BufferUsage::ELEMENT>(0);
 
     if (isDebugMode) {
-        ctx->shaderUniform("modelMatrix", _transform * Mat4::scale(Vec3(2.f, 2.f, 2.f)));
+        ctx->shaderUniform("modelMatrix", _transform * glm::scale(glm::mat4(1.f), glm::vec3(2.f, 2.f, 2.f)));
         ctx->vaoUse(axisVao);
         ctx->shaderUniform("isAxis", 1);
         glCheckError(glLineWidth(3.f));
@@ -336,14 +339,14 @@ void Mesh::computeNormals(
         unsigned int v2i = indices[i + 1];
         unsigned int v3i = indices[i + 2];
 
-        Vec3 v1 = vertices[v1i].position;
-        Vec3 v2 = vertices[v2i].position;
-        Vec3 v3 = vertices[v3i].position;
+        glm::vec3 v1 = vertices[v1i].position;
+        glm::vec3 v2 = vertices[v2i].position;
+        glm::vec3 v3 = vertices[v3i].position;
 
-        Vec3 v1v2 = v2 - v1;
-        Vec3 v1v3 = v3 - v1;
+        glm::vec3 v1v2 = v2 - v1;
+        glm::vec3 v1v3 = v3 - v1;
 
-        Vec3 normal = (v1v2 * v1v3).normalize();
+        glm::vec3 normal = glm::normalize(v1v2 * v1v3);
 
         output[v1i].normal = normal;
         output[v2i].normal = normal;

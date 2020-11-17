@@ -1,19 +1,18 @@
 #pragma once
 
 #include "object.hpp"
-#include "math.hpp"
 #include "context.hpp"
 #include "material.hpp"
 #include "tiny_gltf.h"
 #include <map>
 #include <string>
+#include <glm/glm.hpp>
 
 class Mesh : public Object {
     struct Vertex {
-        Vec3 position;
-        Vec3 normal;
-        float u;
-        float v;
+        glm::vec3 position;
+        glm::vec3 normal;
+        glm::vec2 uv;
 
         ///
         /// @brief Constructor
@@ -22,8 +21,8 @@ class Mesh : public Object {
         /// @param u Texture coordinates (u, v)
         /// @param v Texture coordinates (u, v)
         ///
-        Vertex(Vec3 position, Vec3 normal, float u, float v)
-            : position(position), normal(normal), u(u), v(v)
+        Vertex(glm::vec3 position, glm::vec3 normal, glm::vec2 uv)
+            : position(position), normal(normal), uv(uv)
         {
         }
 
@@ -33,7 +32,7 @@ class Mesh : public Object {
         /// @return True if equal false otherwise
         ///
         inline bool operator==(const Vertex& v1) {
-            return position == v1.position && normal == v1.normal && u == v1.u && v == v1.v;
+            return position == v1.position && normal == v1.normal && uv == v1.uv;
         }
     };
 
@@ -47,7 +46,7 @@ class Mesh : public Object {
     VAO axisVao;
     Buffer axisBuffer; // x, y, z
     bool isDebugMode; // for debugging
-    Mat4 localTransformation;
+    glm::mat4 localTransformation;
 
 private:
     ///
@@ -107,8 +106,8 @@ public:
     /// @brief Get model matrix
     /// @return Mat4
     ///
-    inline Mat4 getTransform() const override {
-        Mat4 t = transform.getTransform() * localTransformation; // local transform
+    inline glm::mat4 getTransform() const override {
+        glm::mat4 t = transform.getTransform() * localTransformation; // local transform
         if (parent != nullptr) {
             t = t * parent->getTransform();
         }

@@ -15,6 +15,7 @@ add_subdirectory(extern/glfw)
 add_subdirectory(extern/glad)
 add_subdirectory(extern/stb)
 add_subdirectory(extern/spdlog)
+add_subdirectory(extern/glm)
 
 include_directories(extern/glad)
 include_directories(extern/stb)
@@ -31,8 +32,8 @@ add_executable(ay
     "src/imgui/imgui_impl_glfw.cpp"
     "src/imgui/imgui_impl_opengl3.cpp"
     "src/imgui/imgui_widgets.cpp")
-target_link_libraries(ay PRIVATE glad glfw stb spdlog OpenGL::GL)
+target_link_libraries(ay PRIVATE glad glfw glm stb spdlog OpenGL::GL)
 target_compile_options(ay PRIVATE
-    $<$<CXX_COMPILER_ID:MSVC>:/W4 /WX>
+    $<$<CXX_COMPILER_ID:MSVC>:/W3 /WX>
     $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wall -Wextra>
 )

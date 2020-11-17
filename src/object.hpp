@@ -70,8 +70,8 @@ public:
     /// @brief Get model matrix
     /// @return Mat4
     ///
-    virtual Mat4 getTransform() const {
-        Mat4 t = transform.getTransform(); // local transform
+    virtual glm::mat4 getTransform() const {
+        glm::mat4 t = transform.getTransform(); // local transform
         if (parent != nullptr) {
             t = t * parent->transform.getTransform();
         }

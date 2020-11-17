@@ -1,6 +1,6 @@
 #pragma once
 
-#include "math.hpp"
+#include <glm/glm.hpp>
 
 struct Color {
     float r;
@@ -48,8 +48,8 @@ struct Color {
     /// @brief Convert color to a Vec4
     /// @return Vec4 Vec4
     ///  
-    inline Vec4 toVec() const {
-        return Vec4(r, g, b, a);
+    inline glm::vec4 toVec() const {
+        return glm::vec4(r, g, b, a);
     }
 
     ///
