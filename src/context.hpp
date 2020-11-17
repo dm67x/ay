@@ -1,8 +1,13 @@
 #pragma once
 
+#include "imgui/imgui.h"
+#include "imgui/imgui_impl_glfw.h"
+#include "imgui/imgui_impl_opengl3.h"
 #include "math.hpp"
+#include "window.hpp"
 #include <spdlog/spdlog.h>
 #include <glad.h>
+#define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 #include <map>
 #include <array>
@@ -134,6 +139,12 @@ public:
         }
 
         glCheckError(glEnable(GL_DEPTH_TEST));
+
+        IMGUI_CHECKVERSION();
+        ImGui::CreateContext();
+        ImGui::StyleColorsDark();
+        ImGui_ImplGlfw_InitForOpenGL(window.window, true);
+        ImGui_ImplOpenGL3_Init("#version 300 es");
     }
 
     ///
@@ -190,6 +201,43 @@ public:
     /// 
     inline void viewport(int x, int y, int w, int h) const {
         glCheckError(glViewport((GLint)x, (GLint)y, (GLsizei)w, (GLsizei)h));
+    }
+
+    ///
+    /// @brief Begin ImGUI UI
+    /// 
+    inline void uiBegin() const {
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+    }
+
+    ///
+    /// @brief Render ImGUI UI
+    /// 
+    inline void uiEnd() const {
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+    }
+
+    ///
+    /// @brief Create a new ImGUI Window
+    /// @param name Window name
+    /// @param flags Window Flags
+    /// @param draw Draw
+    /// 
+    inline void uiCreateWindow(
+        const std::string& name, 
+        std::function<void()> draw,
+        enum ImGuiWindowFlags_ flags = ImGuiWindowFlags_::ImGuiWindowFlags_None,
+        ImVec2 pos = ImVec2(),
+        ImVec2 size = ImVec2()) const
+    {
+        ImGui::SetNextWindowPos(pos);
+        ImGui::SetNextWindowSize(size);
+        ImGui::Begin(name.c_str(), nullptr, flags);
+        draw();
+        ImGui::End();
     }
 
     ///

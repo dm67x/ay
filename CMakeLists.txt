@@ -25,7 +25,12 @@ add_executable(ay
     "src/mesh.cpp" 
     "src/context.cpp" 
     "src/camera.cpp"
-    "src/tiny_gltf.cpp")
+    "src/tiny_gltf.cpp"
+    "src/imgui/imgui.cpp"
+    "src/imgui/imgui_draw.cpp"
+    "src/imgui/imgui_impl_glfw.cpp"
+    "src/imgui/imgui_impl_opengl3.cpp"
+    "src/imgui/imgui_widgets.cpp")
 target_link_libraries(ay PRIVATE glad glfw stb spdlog OpenGL::GL)
 target_compile_options(ay PRIVATE
     $<$<CXX_COMPILER_ID:MSVC>:/W4 /WX>

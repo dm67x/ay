@@ -13,19 +13,31 @@ int main(void)
 
     ctx->shaderFromFile("blinn-phong", "../../assets/phong.vert.glsl", "../../assets/phong.frag.glsl");
 
-    Mesh* mesh = Mesh::fromFile(ctx, "../../assets/scene.glb");
+    Mesh* mesh = Mesh::fromFile(ctx, "../../assets/cube.glb");
     mesh->transform.scale = Vec3(0.5f, 0.5f, 0.5f);
     mesh->transform.position.z = 5.f;
 
     scene.createFreeCamera("mainCamera", 90.f, 0.1f, 100.f);
     scene.setMainCamera("mainCamera");
-    Light* light = scene.createPointLight();
-    light->position = Vec3(0.f, 0.f, 0.f);
+    Light* light = scene.createDirectionalLight();
+    light->position = Vec3(-3.f, 3.f, -3.f);
     light->color = Color::white();
     light->intensity = 8.f;
 
     scene.onRender = [&](Scene* scene, float deltaTime) {
         (void)scene;
+        ctx->uiBegin();
+        enum ImGuiWindowFlags_ flags = static_cast<enum ImGuiWindowFlags_>(ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoTitleBar);
+        ctx->uiCreateWindow("Informations", [&] {
+            std::stringstream fps;
+            fps << "FPS: " << 1.f / deltaTime;
+            ImGui::TextColored(ImVec4(1, 1, 0, 1), fps.str().c_str());
+            float lightColor[4] = { light->color.r, light->color.g, light->color.b, light->color.a };
+            ImGui::ColorEdit4("Light color", lightColor);
+            light->color = Color(lightColor[0], lightColor[1], lightColor[2], lightColor[3]);
+        }, flags);
+        ctx->uiEnd();
+
         //mesh->transform.rotation.y += 100.f * deltaTime;
         mesh->render(deltaTime);
     };
@@ -62,8 +74,6 @@ int main(void)
         start = end;
 
         const float elapsedTime = diff.count();
-        spdlog::info("FPS: {}", 1.f / elapsedTime);
-
         scene.render(elapsedTime);
     }
 

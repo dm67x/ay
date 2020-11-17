@@ -10,6 +10,7 @@
 - SPDLOG (https://github.com/gabime/spdlog)
 - TINYGLTF (https://github.com/syoyo/tinygltf)
 - JSON for modern C++ (https://github.com/nlohmann/json)
+- IMGUI (https://github.com/ocornut/imgui)
 
 Thanks to all of them!
 
@@ -21,14 +22,15 @@ Thanks to all of them!
 ## TODO
 
 - [X] Blinn-Phong
-- [ ] glTF importer (wip)
+- [ ] *glTF importer*
 - [X] Point Light
-- [ ] Directional Light
+- [X] Directional Light
 - [ ] Spotlight
-- [ ] Quaternions
+- [ ] *Quaternions*
+- [X] ImGUI Integration
 - [X] Forward Rendering
 - [ ] Deferred Rendering
-- [ ] Camera transformation (movement, ...)
+- [ ] *Camera transformation (movement, ...)*
 - [ ] PBR Rendering
 - [ ] Image Based Lighting
 - [ ] Skydome

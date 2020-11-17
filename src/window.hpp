@@ -10,6 +10,8 @@ class Window {
     GLFWwindow* window;
     Context* ctx;
 
+    friend class Context;
+
 public:
     /// 
     /// @brief Constructor

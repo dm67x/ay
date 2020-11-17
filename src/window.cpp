@@ -3,9 +3,14 @@
 #include <iostream>
 #include <cstdlib>
 
+static void glfw_error_callback(int error, const char* description) {
+    spdlog::critical("Error [{}]: {}", error, description);
+}
+
 Window::Window(int width, int height) : window(nullptr), ctx(nullptr) {
+    glfwSetErrorCallback(glfw_error_callback);
+    
     if (!glfwInit()) {
-        spdlog::critical("cannot init GLFW");
         std::exit(EXIT_FAILURE);
     }
 
@@ -16,13 +21,11 @@ Window::Window(int width, int height) : window(nullptr), ctx(nullptr) {
 
     window = glfwCreateWindow(width, height, "Ay", nullptr, nullptr);
     if (!window) {
-        spdlog::critical("cannot create window");
-        glfwTerminate();
         std::exit(EXIT_FAILURE);
     }
 
     glfwMakeContextCurrent(window);
-    glfwSwapInterval(0);
+    glfwSwapInterval(1);
 
     ctx = new Context(*this);
     spdlog::info("{}", ctx->getVersion());
