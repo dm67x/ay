@@ -10,6 +10,7 @@ class Window {
     GLFWwindow* window;
     Context* ctx;
     bool cursorVisible;
+    bool cursorProcessed;
 
     friend class Context;
 

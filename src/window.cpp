@@ -7,7 +7,7 @@ static void glfw_error_callback(int error, const char* description) {
     spdlog::critical("Error [{}]: {}", error, description);
 }
 
-Window::Window(int width, int height) : window(nullptr), ctx(nullptr), cursorVisible(false) {
+Window::Window(int width, int height) : window(nullptr), ctx(nullptr), cursorVisible(false), cursorProcessed(false) {
     glfwSetErrorCallback(glfw_error_callback);
     
     if (!glfwInit()) {
@@ -43,7 +43,7 @@ bool Window::isOpen() {
     glfwPollEvents();
     glfwSwapBuffers(window);
 
-    if (isKeyPressed(GLFW_KEY_F1)) {
+    if (isKeyPressed(GLFW_KEY_F1) && !cursorProcessed) {
         cursorVisible = !cursorVisible;
         if (cursorVisible) {
             glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
@@ -51,6 +51,11 @@ bool Window::isOpen() {
         else {
             glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
         }
+        cursorProcessed = true;
+    }
+
+    if (isKeyReleased(GLFW_KEY_F1)) {
+        cursorProcessed = false;
     }
 
     if (isKeyPressed(GLFW_KEY_ESCAPE)) {

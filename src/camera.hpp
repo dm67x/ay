@@ -95,12 +95,13 @@ public:
     virtual void update(float deltaTime) override;
 };
 
-struct FreeCamera : public PerspectiveCamera {
+class FreeCamera : public PerspectiveCamera {
     float speed;
     float yaw;
     float pitch;
     glm::vec2 lastMousePosition;
     
+public:
     /// 
     /// @brief Constructor
     /// @param ctx Context
