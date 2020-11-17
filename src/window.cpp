@@ -7,7 +7,7 @@ static void glfw_error_callback(int error, const char* description) {
     spdlog::critical("Error [{}]: {}", error, description);
 }
 
-Window::Window(int width, int height) : window(nullptr), ctx(nullptr) {
+Window::Window(int width, int height) : window(nullptr), ctx(nullptr), cursorVisible(false) {
     glfwSetErrorCallback(glfw_error_callback);
     
     if (!glfwInit()) {
@@ -24,6 +24,7 @@ Window::Window(int width, int height) : window(nullptr), ctx(nullptr) {
         std::exit(EXIT_FAILURE);
     }
 
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1);
 
@@ -38,8 +39,23 @@ Window::~Window() {
     glfwTerminate();
 }
 
-bool Window::isOpen() const {
+bool Window::isOpen() {
     glfwPollEvents();
     glfwSwapBuffers(window);
+
+    if (isKeyPressed(GLFW_KEY_F1)) {
+        cursorVisible = !cursorVisible;
+        if (cursorVisible) {
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+        }
+        else {
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        }
+    }
+
+    if (isKeyPressed(GLFW_KEY_ESCAPE)) {
+        close();
+    }
+
     return !glfwWindowShouldClose(window);
 }

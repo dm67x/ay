@@ -69,10 +69,6 @@ int main(void)
             mesh->setDebug(false);
         }
 
-        if (window.isKeyPressed(GLFW_KEY_ESCAPE)) {
-            window.close();
-        }
-
         const int WIDTH = window.getSize().first;
         const int HEIGHT = window.getSize().second;
 

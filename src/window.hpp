@@ -9,6 +9,7 @@ class Context;
 class Window {
     GLFWwindow* window;
     Context* ctx;
+    bool cursorVisible;
 
     friend class Context;
 
@@ -29,7 +30,7 @@ public:
     /// @brief IsOpen
     /// @return True if window is open false otherwise
     /// 
-    bool isOpen() const;
+    bool isOpen();
 
     ///
     /// @brief Get context
@@ -65,6 +66,16 @@ public:
     ///
     inline bool isKeyReleased(int key) const {
         return glfwGetKey(window, key) == GLFW_RELEASE;
+    }
+
+    ///
+    /// @brief getMousePosition
+    /// @return Mouse position
+    ///
+    inline std::pair<float, float> getMousePosition() const {
+        double x, y;
+        glfwGetCursorPos(window, &x, &y);
+        return std::make_pair(static_cast<float>(x), static_cast<float>(y));
     }
 
     ///

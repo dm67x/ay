@@ -12,7 +12,6 @@ protected:
     glm::vec3 position;
     glm::vec3 front;
     glm::vec3 up;
-    glm::vec3 right;
 
 protected:
     /// 
@@ -27,8 +26,7 @@ protected:
         zFar(far), 
         position(), 
         front(0.f, 0.f, 1.f), 
-        up(0.f, 1.f, 0.f),
-        right(1.f, 0.f, 0.f)
+        up(0.f, 1.f, 0.f)
     {
     }
 
@@ -99,6 +97,9 @@ public:
 
 struct FreeCamera : public PerspectiveCamera {
     float speed;
+    float yaw;
+    float pitch;
+    glm::vec2 lastMousePosition;
     
     /// 
     /// @brief Constructor
@@ -108,7 +109,7 @@ struct FreeCamera : public PerspectiveCamera {
     /// @param far Far clip
     /// 
     FreeCamera(Context* ctx, float fov, float near, float far)
-        : PerspectiveCamera(ctx, fov, near, far), speed(8.f)
+        : PerspectiveCamera(ctx, fov, near, far), speed(8.f), yaw(0.f), pitch(0.f), lastMousePosition()
     {
     }
 
