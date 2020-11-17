@@ -7,8 +7,9 @@ void PerspectiveCamera::update(float deltaTime) {
     const float aspect = static_cast<float>(window.getSize().first) / static_cast<float>(window.getSize().second);
 
     Mat4 projection = Mat4::perspective(radians(fov), aspect, zNear, zFar);
+    Mat4 view = Mat4::translate(position);
     ctx->shaderUniform("projectionMatrix", projection.transpose());
-    ctx->shaderUniform("viewMatrix", Mat4::translate(position));
+    ctx->shaderUniform("viewMatrix", view);
     ctx->shaderUniform("cameraPosition", position);
 }
 

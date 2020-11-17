@@ -15,7 +15,7 @@ struct Material {
     Texture2D occlusionTexture;
     Texture2D emissiveTexture;
     Color emissiveFactor;
-    enum {
+    enum class AlphaMode {
         OPAQUE_MODE,
         MASK_MODE,
         BLEND_MODE
@@ -34,7 +34,7 @@ struct Material {
         occlusionTexture(0),
         emissiveTexture(0),
         emissiveFactor(Color::black()),
-        alphaMode(OPAQUE_MODE),
+        alphaMode(AlphaMode::OPAQUE_MODE),
         alphaCutoff(0.5f),
         doubleSided(false)
     {

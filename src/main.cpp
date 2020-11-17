@@ -19,14 +19,14 @@ int main(void)
 
     scene.createFreeCamera("mainCamera", 90.f, 0.1f, 100.f);
     scene.setMainCamera("mainCamera");
-    Light* light = scene.createLight();
-    light->position = Vec3(0.f, 0.f, -2.f);
+    Light* light = scene.createPointLight();
+    light->position = Vec3(0.f, 0.f, 0.f);
     light->color = Color::white();
-    light->power = 20.f;
+    light->intensity = 8.f;
 
     scene.onRender = [&](Scene* scene, float deltaTime) {
         (void)scene;
-        mesh->transform.rotation.y += 100.f * deltaTime;
+        //mesh->transform.rotation.y += 100.f * deltaTime;
         mesh->render(deltaTime);
     };
 
@@ -62,7 +62,7 @@ int main(void)
         start = end;
 
         const float elapsedTime = diff.count();
-        //spdlog::info("FPS: {}", 1.f / elapsedTime);
+        spdlog::info("FPS: {}", 1.f / elapsedTime);
 
         scene.render(elapsedTime);
     }

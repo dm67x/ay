@@ -150,7 +150,6 @@ Mesh* Mesh::fromFile(Context* ctx, const std::string& filename) {
         return root;
     }
 
-    // Get only geometry for now
     auto scene = model.scenes[model.defaultScene];
     for (auto nodeIndex : scene.nodes) {
         root->processNode(model, model.nodes[nodeIndex]);
@@ -166,10 +165,6 @@ void Mesh::processNode(tinygltf::Model model, tinygltf::Node node) {
     auto scale = node.scale;
     auto matrix = node.matrix;
 
-    if (node.camera != -1) {
-        return;
-    }
-
     Mesh* mesh = new Mesh(ctx);
     addChild(mesh);
 
@@ -178,7 +173,7 @@ void Mesh::processNode(tinygltf::Model model, tinygltf::Node node) {
         for (auto m : matrix) {
             values.push_back(static_cast<float>(m));
         }
-        mesh->localTransformation = Mat4::fromData(values);
+        mesh->localTransformation = Mat4::fromData(values).transpose();
     }
     else {
         Mat4 translate = Mat4::identity();
@@ -195,7 +190,7 @@ void Mesh::processNode(tinygltf::Model model, tinygltf::Node node) {
         }
 
         if (rotation.size() > 0) {
-            spdlog::info("rotation");
+            
         }
 
         mesh->localTransformation = translate * scaling;
@@ -313,9 +308,12 @@ void Mesh::render(float deltaTime) {
     ctx->bufferUse<BufferUsage::ELEMENT>(0);
 
     if (isDebugMode) {
+        ctx->shaderUniform("modelMatrix", _transform * Mat4::scale(Vec3(2.f, 2.f, 2.f)));
         ctx->vaoUse(axisVao);
         ctx->shaderUniform("isAxis", 1);
+        glCheckError(glLineWidth(3.f));
         ctx->draw<DrawMethod::ARRAY>(DrawParameters(GL_LINES, 0, 6));
+        glCheckError(glLineWidth(1.f));
     }
 
     ctx->vaoUse(0);

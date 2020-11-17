@@ -10,8 +10,10 @@
 class Scene : public Object {
     std::map<std::string, Camera*> cameras;
     Camera* mainCamera;
-    std::array<Light*, 16> lights;
-    size_t numberOfLights;
+    std::array<Light*, 16> pointsLights;
+    std::array<Light*, 8> directionalLights;
+    size_t numberOfPointLights;
+    size_t numberOfDirectionalLights;
 
 public:
     std::function<void(Scene*, float)> onRender;
@@ -26,8 +28,10 @@ public:
         : Object(ctx), 
         cameras(), 
         mainCamera(nullptr), 
-        lights(), 
-        numberOfLights(0), 
+        pointsLights(),
+        directionalLights(),
+        numberOfPointLights(0),
+        numberOfDirectionalLights(0),
         onRender([](Scene*, float) {}),
         onDestroy([](Scene*) {})
     {
@@ -41,7 +45,11 @@ public:
             delete camera.second;
         }
 
-        for (auto light : lights) {
+        for (auto light : pointsLights) {
+            delete light;
+        }
+
+        for (auto light : directionalLights) {
             delete light;
         }
 
@@ -105,17 +113,32 @@ public:
     }
 
     ///
-    /// @brief Create a new light source
+    /// @brief Create a new point light source
     /// @return Light Light
     ///
-    inline Light* createLight() {
-        if (lights.size() <= numberOfLights) {
-            spdlog::error("You created more than 16 lights");
+    inline Light* createPointLight() {
+        if (pointsLights.size() <= numberOfPointLights) {
+            spdlog::error("You created more than 16 points lights");
             return nullptr;
         }
 
         Light* light = new Light();
-        lights.at(numberOfLights++) = light;
+        pointsLights.at(numberOfPointLights++) = light;
+        return light;
+    }
+
+    ///
+    /// @brief Create a new directional light source
+    /// @return Light Light
+    ///
+    inline Light* createDirectionalLight() {
+        if (directionalLights.size() <= numberOfDirectionalLights) {
+            spdlog::error("You created more than 8 directional lights");
+            return nullptr;
+        }
+
+        Light* light = new Light();
+        directionalLights.at(numberOfDirectionalLights++) = light;
         return light;
     }
 
@@ -129,14 +152,24 @@ public:
         onRender(this, deltaTime);
 
         // lights
-        for (size_t i = 0; i < numberOfLights; i++) {
-            auto light = lights[i];
+        for (size_t i = 0; i < numberOfDirectionalLights; i++) {
+            auto light = directionalLights[i];
             std::stringstream ss;
-            ss << "lights[" << i << "]";
+            ss << "directionalLights[" << i << "]";
             ctx->shaderUniform(ss.str() + ".color", light->color.toVec());
             ctx->shaderUniform(ss.str() + ".position", light->position);
-            ctx->shaderUniform(ss.str() + ".power", light->power);
+            ctx->shaderUniform(ss.str() + ".intensity", light->intensity);
         }
-        ctx->shaderUniform("lightsCount", static_cast<int>(numberOfLights));
+        ctx->shaderUniform("directionalLightsCount", static_cast<int>(numberOfDirectionalLights));
+
+        for (size_t i = 0; i < numberOfPointLights; i++) {
+            auto light = pointsLights[i];
+            std::stringstream ss;
+            ss << "pointLights[" << i << "]";
+            ctx->shaderUniform(ss.str() + ".color", light->color.toVec());
+            ctx->shaderUniform(ss.str() + ".position", light->position);
+            ctx->shaderUniform(ss.str() + ".intensity", light->intensity);
+        }
+        ctx->shaderUniform("pointLightsCount", static_cast<int>(numberOfPointLights));
     }
 };
