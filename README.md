@@ -11,6 +11,7 @@
 - TINYGLTF (https://github.com/syoyo/tinygltf)
 - JSON for modern C++ (https://github.com/nlohmann/json)
 - IMGUI (https://github.com/ocornut/imgui)
+- GLM (https://github.com/g-truc/glm)
 
 Thanks to all of them!
 
@@ -26,7 +27,6 @@ Thanks to all of them!
 - [X] Point Light
 - [X] Directional Light
 - [ ] Spotlight
-- [ ] **Quaternions**
 - [X] ImGUI Integration
 - [X] Forward Rendering
 - [ ] Deferred Rendering
