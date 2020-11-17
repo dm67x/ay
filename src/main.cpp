@@ -32,9 +32,7 @@ int main(void)
             std::stringstream fps;
             fps << "FPS: " << 1.f / deltaTime;
             ImGui::TextColored(ImVec4(1, 1, 0, 1), fps.str().c_str());
-            float lightColor[4] = { light->color.r, light->color.g, light->color.b, light->color.a };
-            ImGui::ColorEdit4("Light color", lightColor);
-            light->color = Color(lightColor[0], lightColor[1], lightColor[2], lightColor[3]);
+            ImGui::ColorEdit4("Light color", light->color.toPtr());
         }, flags);
         ctx->uiEnd();
 

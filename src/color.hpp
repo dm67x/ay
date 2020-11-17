@@ -29,6 +29,22 @@ struct Color {
     }
 
     ///
+    /// @brief Convert to a pointer
+    /// @return Float pointer
+    ///  
+    inline const float* toPtr() const {
+        return &this->r;
+    }
+
+    ///
+    /// @brief Convert to a pointer
+    /// @return Float pointer
+    ///  
+    inline float* toPtr() {
+        return &this->r;
+    }
+
+    ///
     /// @brief Convert color to a Vec4
     /// @return Vec4 Vec4
     ///  

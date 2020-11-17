@@ -310,7 +310,7 @@ public:
     inline void shaderUniform(const std::string& name, const Vec3& value) const {
         GLint loc;
         glCheckError(loc = glGetUniformLocation(currentShader, name.c_str()));
-        glCheckError(glUniform3fv(loc, 1, new float[3]{ value.x, value.y, value.z }));
+        glCheckError(glUniform3fv(loc, 1, value.toPtr()));
     }
 
     ///
@@ -321,7 +321,7 @@ public:
     inline void shaderUniform(const std::string& name, const Vec4& value) const {
         GLint loc;
         glCheckError(loc = glGetUniformLocation(currentShader, name.c_str()));
-        glCheckError(glUniform4fv(loc, 1, new float[4]{ value.x, value.y, value.z, value.w }));
+        glCheckError(glUniform4fv(loc, 1, value.toPtr()));
     }
 
     ///
@@ -332,14 +332,7 @@ public:
     inline void shaderUniform(const std::string& name, const Mat4& value) const {
         GLint loc;
         glCheckError(loc = glGetUniformLocation(currentShader, name.c_str()));
-
-        float values[16];
-        std::memcpy(values, value.r1, sizeof(value.r1));
-        std::memcpy(values + 4, value.r2, sizeof(value.r2));
-        std::memcpy(values + 8, value.r3, sizeof(value.r3));
-        std::memcpy(values + 12, value.r4, sizeof(value.r4));
-
-        glCheckError(glUniformMatrix4fv(loc, 1, GL_TRUE, values));
+        glCheckError(glUniformMatrix4fv(loc, 1, GL_TRUE, value.toPtr()));
     }
 
     ///

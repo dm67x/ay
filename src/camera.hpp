@@ -36,7 +36,7 @@ public:
     /// 
     /// @brief Destructor
     /// 
-    virtual ~Camera() {}
+    virtual ~Camera() = default;
 
     /// 
     /// @brief Update (move, render, ...)

@@ -46,6 +46,22 @@ struct Vec3 {
     Vec3(float x, float y, float z) : x(x), y(y), z(z) {}
 
     ///
+    /// @brief Convert to a pointer
+    /// @return Float pointer
+    ///  
+    inline const float* toPtr() const {
+        return &this->x;
+    }
+
+    ///
+    /// @brief Convert to a pointer
+    /// @return Float pointer
+    ///  
+    inline float* toPtr() {
+        return &this->x;
+    }
+
+    ///
     /// @brief Equal operator
     /// @param v Vec3
     /// @return True if equal false otherwise
@@ -189,6 +205,22 @@ struct Vec4 {
     Vec4(float x, float y, float z, float w) : x(x), y(y), z(z), w(w) {}
 
     ///
+    /// @brief Convert to a pointer
+    /// @return Float pointer
+    ///  
+    inline const float* toPtr() const {
+        return &this->x;
+    }
+
+    ///
+    /// @brief Convert to a pointer
+    /// @return Float pointer
+    ///  
+    inline float* toPtr() {
+        return &this->x;
+    }
+
+    ///
     /// @brief Convert to a Vec3
     /// @return Converted Vec3
     ///
@@ -244,6 +276,22 @@ struct Mat4 {
         std::memcpy(matrix.r3, &values[8], sizeof(float) * 4);
         std::memcpy(matrix.r4, &values[12], sizeof(float) * 4);
         return matrix;
+    }
+
+    ///
+    /// @brief Convert to a pointer
+    /// @return Float pointer
+    ///  
+    inline const float* toPtr() const {
+        return &this->r1[0];
+    }
+
+    ///
+    /// @brief Convert to a pointer
+    /// @return Float pointer
+    ///  
+    inline float* toPtr() {
+        return &this->r1[0];
     }
 
     ///
