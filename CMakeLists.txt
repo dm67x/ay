@@ -20,8 +20,8 @@ add_subdirectory(extern/glm)
 include_directories(extern/glad)
 include_directories(extern/stb)
 
-add_executable(ay 
-    "src/main.cpp" 
+add_library(ay SHARED 
+    "src/lib.cpp" 
     "src/window.cpp" 
     "src/mesh.cpp" 
     "src/context.cpp" 
@@ -36,4 +36,8 @@ target_link_libraries(ay PRIVATE glad glfw glm stb spdlog OpenGL::GL)
 target_compile_options(ay PRIVATE
     $<$<CXX_COMPILER_ID:MSVC>:/W3 /WX>
     $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wall -Wextra>
+)
+set_target_properties(ay
+    PROPERTIES
+    DEFINE_SYMBOL "AY_EXPORTS"
 )
