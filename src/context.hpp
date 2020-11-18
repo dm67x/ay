@@ -152,7 +152,7 @@ public:
     /// @brief Get OpenGL Version
     /// @return Version
     ///
-    inline const std::string getVersion() {
+    inline const std::string getVersion() const {
         std::stringstream version;
         version << glGetString(GL_VERSION);
         return version.str();
@@ -162,7 +162,7 @@ public:
     /// @brief Get Vendor
     /// @return Vendor
     ///
-    inline const std::string getVendor() {
+    inline const std::string getVendor() const {
         std::stringstream vendor;
         vendor << glGetString(GL_VENDOR);
         return vendor.str();
