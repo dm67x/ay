@@ -1,6 +1,5 @@
 ﻿using System;
 using Ay;
-using GlmNet;
 
 namespace Example
 {

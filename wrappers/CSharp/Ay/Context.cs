@@ -1,6 +1,5 @@
 using System;
 using System.Runtime.InteropServices;
-using GlmNet;
 
 namespace Ay
 {
@@ -91,7 +90,7 @@ namespace Ay
             contextClear(instance, colorPtr);
         }
 
-        public void Viewport(int x, int y, int w, int h)
+        public void Viewport(int x, int y, int w, int h) 
         {
             contextViewport(instance, x, y, w, h);
         }
@@ -106,12 +105,12 @@ namespace Ay
             contextUiEnd(instance);
         }
 
-        public void UICreateWindow(string name, DrawUI method, ImGuiWindowFlags flags, vec2 position, vec2 size)
+        public void UICreateWindow(string name, DrawUI method, ImGuiWindowFlags flags, Vector2 position, Vector2 size)
         {
             contextUiCreateWindow(instance, name, method, flags, position.x, position.y, size.x, size.y);
         }
 
-        public void UICreateWindow(string name, DrawUI method, ImGuiWindowFlags flags, vec2 position)
+        public void UICreateWindow(string name, DrawUI method, ImGuiWindowFlags flags, Vector2 position)
         {
             contextUiCreateWindow(instance, name, method, flags, position.x, position.y, 0, 0);
         }
