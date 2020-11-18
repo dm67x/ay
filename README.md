@@ -31,7 +31,9 @@ Thanks to all of them!
 - [X] ImGUI Integration
 - [X] Forward Rendering
 - [ ] Deferred Rendering
-- [ ] **Camera transformation (movement, ...)**
+- [X] FreeCamera
+- [ ] FPS Camera
+- [ ] TPS Camera
 - [ ] PBR Rendering
 - [ ] Image Based Lighting
 - [ ] Skydome
