@@ -10,6 +10,8 @@ project(ay
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+option(EXPORT_LIB "Export the library" ON)
+
 find_package(OpenGL REQUIRED)
 add_subdirectory(extern/glfw)
 add_subdirectory(extern/glad)
@@ -37,7 +39,10 @@ target_compile_options(ay PRIVATE
     $<$<CXX_COMPILER_ID:MSVC>:/W3 /WX>
     $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wall -Wextra>
 )
-set_target_properties(ay
-    PROPERTIES
-    DEFINE_SYMBOL "AY_EXPORTS"
-)
+
+if (EXPORT_LIB)
+    set_target_properties(ay
+        PROPERTIES
+        DEFINE_SYMBOL "AY_EXPORTS"
+    )
+endif ()
