@@ -59,6 +59,14 @@ AY_LIB void windowClose(const Window* window) {
     window->close();
 }
 
+AY_LIB Color* colorCreate(float r, float g, float b, float a) {
+    return new Color(r, g, b, a);
+}
+
+AY_LIB Color* colorCreateFromHex(unsigned int hex) {
+    return new Color(hex);
+}
+
 AY_LIB const Window* contextGetWindow(const Context* ctx) {
     assert(ctx);
     return &ctx->getWindow();
@@ -74,9 +82,10 @@ AY_LIB const char* contextGetVendor(const Context* ctx) {
     return ctx->getVendor().c_str();
 }
 
-AY_LIB void contextClear(const Context* ctx, float r, float g, float b, float a) {
+AY_LIB void contextClear(const Context* ctx, const Color* color) {
     assert(ctx);
-    ctx->clear(r, g, b, a);
+    assert(color);
+    ctx->clear(color->r, color->g, color->b, color->a);
 }
 
 AY_LIB void contextViewport(const Context* ctx, int x, int y, int w, int h) {
@@ -92,4 +101,28 @@ AY_LIB void contextUiBegin(const Context* ctx) {
 AY_LIB void contextUiEnd(const Context* ctx) {
     assert(ctx);
     ctx->uiEnd();
+}
+
+AY_LIB void contextUiCreateWindow(
+    const Context* ctx,
+    const char* name,
+    void (*draw)(),
+    int flags,
+    float posX, float posY,
+    float sizeX, float sizeY)
+{
+    assert(ctx);
+    ctx->uiCreateWindow(std::string(name), draw, static_cast<ImGuiWindowFlags_>(flags), ImVec2(posX, posY), ImVec2(sizeX, sizeY));
+}
+
+AY_LIB void contextUiCreateText(const Context* ctx, const Color* color, const char* fmt) {
+    assert(ctx);
+    assert(color);
+    ctx->uiCreateText(std::string(fmt), *color);
+}
+
+AY_LIB void contextUiCreateColorEditor(const Context* ctx, Color* color, const char* fmt) {
+    assert(ctx);
+    assert(color);
+    ctx->uiCreateColorEditor(std::string(fmt), *color);
 }

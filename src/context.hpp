@@ -4,6 +4,7 @@
 #include "imgui/imgui_impl_glfw.h"
 #include "imgui/imgui_impl_opengl3.h"
 #include "window.hpp"
+#include "color.hpp"
 #include <spdlog/spdlog.h>
 #include <glad.h>
 #define GLFW_INCLUDE_NONE
@@ -226,6 +227,24 @@ public:
         ImGui::Begin(name.c_str(), nullptr, flags);
         draw();
         ImGui::End();
+    }
+
+    ///
+    /// @brief Create a new UI text
+    /// @param color Text color
+    /// @param fmt Text
+    ///
+    inline void uiCreateText(const std::string& fmt, const Color& color) const {
+        ImGui::TextColored(ImVec4(color.r, color.g, color.b, color.a), fmt.c_str());
+    }
+
+    ///
+    /// @brief Create a new UI color editor
+    /// @param color Color
+    /// @param fmt Text
+    ///
+    inline void uiCreateColorEditor(const std::string& fmt, Color& color) const {
+        ImGui::ColorEdit4(fmt.c_str(), color.toPtr());
     }
 
     ///

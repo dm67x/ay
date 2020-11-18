@@ -12,6 +12,7 @@
 
 #include "window.hpp"
 #include "context.hpp"
+#include "color.hpp"
 
 extern "C" {
     /// 
@@ -81,6 +82,23 @@ extern "C" {
     AY_LIB void windowClose(const Window* window);
 
     /// 
+    /// @brief Create a new color from rgba
+    /// @param r Red
+    /// @param g Green
+    /// @param b Blue
+    /// @param a Alpha
+    /// @return Color instance
+    /// 
+    AY_LIB Color* colorCreate(float r, float g, float b, float a);
+
+    /// 
+    /// @brief Create a new color from hex
+    /// @param hex Hexadecimal value
+    /// @return Color instance
+    /// 
+    AY_LIB Color* colorCreateFromHex(unsigned int hex);
+
+    /// 
     /// @brief Get window attached to context
     /// @param ctx Context instance
     /// @return Window instance
@@ -104,12 +122,9 @@ extern "C" {
     /// 
     /// @brief Clear screen
     /// @param ctx Context instance
-    /// @param r Red
-    /// @param g Green
-    /// @param b Blue
-    /// @param a Alpha
+    /// @param color Color
     /// 
-    AY_LIB void contextClear(const Context* ctx, float r, float g, float b, float a);
+    AY_LIB void contextClear(const Context* ctx, const Color* color);
 
     /// 
     /// @brief Set viewport
@@ -138,4 +153,39 @@ extern "C" {
     /// @param ctx Context instance
     /// 
     AY_LIB void contextUiEnd(const Context* ctx);
+
+    ///
+    /// @brief Create a new ImGUI Window
+    /// @param ctx Context instance
+    /// @param name Window name
+    /// @param flags Window Flags
+    /// @param draw Draw
+    /// @param posX Position X
+    /// @param posY Position Y
+    /// @param sizeX Size X
+    /// @param sizeY Size Y
+    /// 
+    AY_LIB void contextUiCreateWindow(
+        const Context* ctx, 
+        const char* name, 
+        void (*draw)(), 
+        int flags, 
+        float posX, float posY, 
+        float sizeX, float sizeY);
+
+    ///
+    /// @brief Create a new UI text
+    /// @param ctx Context instance
+    /// @param color Color instance
+    /// @param fmt Text
+    ///
+    AY_LIB void contextUiCreateText(const Context* ctx, const Color* color, const char* fmt);
+
+    ///
+    /// @brief Create a new UI color editor
+    /// @param ctx Context instance
+    /// @param color Color instance
+    /// @param fmt Text
+    ///
+    AY_LIB void contextUiCreateColorEditor(const Context* ctx, Color* color, const char* fmt);
 }
