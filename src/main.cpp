@@ -11,8 +11,6 @@ int main(void)
     Context* ctx = window.getContext();
     Scene scene(ctx);
 
-    ctx->shaderFromFile("blinn-phong", "../../assets/phong.vert.glsl", "../../assets/phong.frag.glsl");
-
     Mesh* mesh = Mesh::fromFile(ctx, "../../assets/buddha.glb");
     Mesh* plane = Mesh::plane(ctx);
 
@@ -74,7 +72,6 @@ int main(void)
 
         ctx->clear();
         ctx->viewport(0, 0, WIDTH, HEIGHT);
-        ctx->shaderUse("blinn-phong");
 
         auto end = std::chrono::steady_clock::now();
         std::chrono::duration<float> diff = end - start;

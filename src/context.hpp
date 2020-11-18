@@ -133,27 +133,7 @@ public:
     ///
     /// @brief Constructor of context
     ///
-    Context(const Window& window) 
-        : window(window),
-        shaders(), 
-        textures(), 
-        renderbuffers(), 
-        framebuffers(), 
-        currentShader(0) 
-    {
-        if (!gladLoadGLES2Loader((GLADloadproc)glfwGetProcAddress)) {
-            spdlog::critical("cannot initialize glad");
-            std::exit(EXIT_FAILURE);
-        }
-
-        glCheckError(glEnable(GL_DEPTH_TEST));
-
-        IMGUI_CHECKVERSION();
-        ImGui::CreateContext();
-        ImGui::StyleColorsDark();
-        ImGui_ImplGlfw_InitForOpenGL(window.window, true);
-        ImGui_ImplOpenGL3_Init("#version 300 es");
-    }
+    Context(const Window& window);
 
     ///
     /// @brief Destructor of context
