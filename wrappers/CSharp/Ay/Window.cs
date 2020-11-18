@@ -5,6 +5,7 @@ namespace Ay
 {
     public class Window : IDisposable
     {
+        #region Imports
         [DllImport(Lib.Name, CharSet = CharSet.Unicode)]
         private extern static IntPtr windowNew(int width, int height);
 
@@ -31,9 +32,28 @@ namespace Ay
 
         [DllImport(Lib.Name, CharSet = CharSet.Unicode)]
         private extern static void windowClose(IntPtr window);
+        #endregion
 
+        #region Member Attributes
         private IntPtr instance;
+        #endregion
+
+        #region Member Properties
         public Context Context { get; private set; }
+        public bool IsOpen => windowIsOpen(instance);
+        public Tuple<int, int> Size {
+            get {
+                windowGetSize(instance, out int w, out int h);
+                return Tuple.Create(w, h);
+            }
+        }
+        public Tuple<float, float> MousePosition {
+            get {
+                windowGetMousePosition(instance, out float x, out float y);
+                return Tuple.Create(x, y);
+            }
+        }
+        #endregion
 
         public Window(int width, int height)
         {
@@ -46,17 +66,6 @@ namespace Ay
             windowDispose(instance);
         }
 
-        public bool IsOpen()
-        {
-            return windowIsOpen(instance);
-        }
-
-        public Tuple<int, int> GetSize()
-        {
-            windowGetSize(instance, out int w, out int h);
-            return Tuple.Create(w, h);
-        }
-
         public bool IsKeyPressed(int key)
         {
             return windowKeyPressed(instance, key);
@@ -65,12 +74,6 @@ namespace Ay
         public bool IsKeyReleased(int key)
         {
             return windowKeyReleased(instance, key);
-        }
-
-        public Tuple<float, float> GetMousePosition()
-        {
-            windowGetMousePosition(instance, out float x, out float y);
-            return Tuple.Create(x, y);
         }
 
         public void Close()

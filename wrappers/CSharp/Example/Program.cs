@@ -1,4 +1,5 @@
-﻿using Ay;
+﻿using System;
+using Ay;
 using GlmNet;
 
 namespace Example
@@ -9,16 +10,22 @@ namespace Example
         {
             using Window window = new Window(1280, 900);
             Context ctx = window.Context;
-            Color lightColor = Color.White;
+            Color clearColor = Color.Black;
 
-            while (window.IsOpen()) {
-                ctx.Clear(Color.Black);
+            var oldTime = DateTime.Now;
+
+            while (window.IsOpen) {
+                ctx.Clear(clearColor);
                 ctx.Viewport(0, 0, 1280, 900);
+                
+                var currentTime = DateTime.Now;
+                var elapsedTime = (currentTime - oldTime).TotalSeconds;
+                oldTime = currentTime;
 
                 ctx.UIBegin();
-                ctx.UICreateWindow("info", () => {
-                    ctx.UICreateText("FPS: ", Color.Red);
-                    ctx.UICreateColorEditor("Light color", ref lightColor);
+                ctx.UICreateWindow("Informations", () => {
+                    ctx.UICreateText($"FPS: {(1.0 / elapsedTime).ToString("0.00")}", Color.White);
+                    ctx.UICreateColorEditor("Screen color", ref clearColor);
                 });
                 ctx.UIEnd();
             }

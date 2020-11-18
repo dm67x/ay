@@ -68,23 +68,20 @@ namespace Ay
         private extern static void contextUiCreateColorEditor(IntPtr context, IntPtr color, [MarshalAs(UnmanagedType.LPStr)] string fmt);
         #endregion
 
+        #region Member Attributes
         private IntPtr instance;
+        #endregion
+
+        #region Member Properties
         public Window Window { get; private set; }
+        public string Version => contextGetVersion(instance);
+        public string Vendor => contextGetVendor(instance);
+        #endregion
 
         public Context(IntPtr instance, Window window)
         {
             this.instance = instance;
             Window = window;
-        }
-
-        public string GetVersion()
-        {
-            return contextGetVersion(instance);
-        }
-
-        public string GetVendor()
-        {
-            return contextGetVendor(instance);
         }
 
         public void Clear(Color color)
