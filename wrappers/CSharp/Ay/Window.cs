@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 
 namespace Ay
 {
-    public class Window : IDisposable
+    public sealed class Window : IDisposable
     {
         #region Imports
         [DllImport(Lib.Name, CharSet = CharSet.Unicode)]

@@ -188,4 +188,76 @@ extern "C" {
     /// @param fmt Text
     ///
     AY_LIB void contextUiCreateColorEditor(const Context* ctx, Color* color, const char* fmt);
+
+    ///
+    /// @brief Create shader from memory
+    /// @param ctx Context instance
+    /// @param name shader name
+    /// @param vertex vertex shader
+    /// @param fragment fragment shader
+    /// 
+    AY_LIB void contextShaderFromMemory(Context* ctx, const char* name, const char* vertex, const char* fragment);
+
+    ///
+    /// @brief Create shader from file
+    /// @param ctx Context instance
+    /// @param name shader name
+    /// @param vertex vertex shader
+    /// @param fragment fragment shader
+    /// 
+    AY_LIB void contextShaderFromFile(Context* ctx, const char* name, const char* vertex, const char* fragment);
+
+    /// 
+    /// @brief Destroy the shader
+    /// @param ctx Context instance
+    /// @param name Shader name
+    /// 
+    AY_LIB void contextShaderDispose(Context* ctx, const char* name);
+
+    /// 
+    /// @brief Use the shader
+    /// @param ctx Context instance
+    /// @param name Shader name
+    /// 
+    AY_LIB void contextShaderUse(Context* ctx, const char* name);
+
+    ///
+    /// @brief Shader uniform1f
+    /// @param ctx Context instance
+    /// @param name uniform name
+    /// @param value uniform value
+    ///
+    AY_LIB void contextShaderUniform1f(Context* ctx, const char* name, float value);
+
+    ///
+    /// @brief Shader uniform1i
+    /// @param ctx Context instance
+    /// @param name uniform name
+    /// @param value uniform value
+    ///
+    AY_LIB void contextShaderUniform1i(Context* ctx, const char* name, int value);
+
+    ///
+    /// @brief Shader uniform3fv
+    /// @param ctx Context instance
+    /// @param name uniform name
+    /// @param value uniform value
+    ///
+    AY_LIB void contextShaderUniform3f(Context* ctx, const char* name, const glm::vec3* value);
+
+    ///
+    /// @brief Shader uniform4fv
+    /// @param ctx Context instance
+    /// @param name uniform name
+    /// @param value uniform value
+    ///
+    AY_LIB void contextShaderUniform4f(Context* ctx, const char* name, const glm::vec4* value);
+
+    ///
+    /// @brief Shader uniformMatrix
+    /// @param ctx Context instance
+    /// @param name uniform name
+    /// @param value uniform value
+    ///
+    AY_LIB void contextShaderUniformMatrix(Context* ctx, const char* name, const glm::mat4* value);
 }

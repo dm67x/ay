@@ -2,7 +2,7 @@ using System;
 
 namespace Ay
 {
-    public class Vector2
+    public sealed class Vector2
     {
         public float x;
         public float y;
@@ -66,7 +66,7 @@ namespace Ay
         #endregion
     }
 
-    public class Vector3
+    public sealed class Vector3
     {
         public float x;
         public float y;
@@ -134,7 +134,7 @@ namespace Ay
         #endregion
     }
 
-    public class Vector4
+    public sealed class Vector4
     {
         public float x;
         public float y;
@@ -158,5 +158,21 @@ namespace Ay
         }
 
         public Vector3 ToVec3() => new Vector3(x / w, y / w, z / w);
+    }
+
+    public sealed class Matrix4
+    {
+        public float[,] cols;
+
+        public Matrix4()
+        {
+            cols = new float[4, 4] 
+            {
+                { 1, 0, 0, 0 },
+                { 0, 1, 0, 0 },
+                { 0, 0, 1, 0 },
+                { 0, 0, 0, 1 }
+            };
+        }
     }
 }

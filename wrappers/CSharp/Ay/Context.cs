@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 
 namespace Ay
 {
-    public class Context
+    public sealed class Context
     {
         #region Delegates
         public delegate void DrawUI();
@@ -65,6 +65,33 @@ namespace Ay
 
         [DllImport(Lib.Name, CharSet = CharSet.Unicode)]
         private extern static void contextUiCreateColorEditor(IntPtr context, IntPtr color, [MarshalAs(UnmanagedType.LPStr)] string fmt);
+
+        [DllImport(Lib.Name, CharSet = CharSet.Unicode)]
+        private extern static void contextShaderFromMemory(IntPtr context, [MarshalAs(UnmanagedType.LPStr)] string name, [MarshalAs(UnmanagedType.LPStr)] string vertex, [MarshalAs(UnmanagedType.LPStr)] string fragment);
+
+        [DllImport(Lib.Name, CharSet = CharSet.Unicode)]
+        private extern static void contextShaderFromFile(IntPtr context, [MarshalAs(UnmanagedType.LPStr)] string name, [MarshalAs(UnmanagedType.LPStr)] string vertex, [MarshalAs(UnmanagedType.LPStr)] string fragment);
+        
+        [DllImport(Lib.Name, CharSet = CharSet.Unicode)]
+        private extern static void contextShaderDispose(IntPtr context, [MarshalAs(UnmanagedType.LPStr)] string name);
+        
+        [DllImport(Lib.Name, CharSet = CharSet.Unicode)]
+        private extern static void contextShaderUse(IntPtr context, [MarshalAs(UnmanagedType.LPStr)] string name);
+        
+        [DllImport(Lib.Name, CharSet = CharSet.Unicode)]
+        private extern static void contextShaderUniform1i(IntPtr context, [MarshalAs(UnmanagedType.LPStr)] string name, UInt32 value);
+        
+        [DllImport(Lib.Name, CharSet = CharSet.Unicode)]
+        private extern static void contextShaderUniform1f(IntPtr context, [MarshalAs(UnmanagedType.LPStr)] string name, float value);
+        
+        [DllImport(Lib.Name, CharSet = CharSet.Unicode)]
+        private extern static void contextShaderUniform3f(IntPtr context, [MarshalAs(UnmanagedType.LPStr)] string name, IntPtr value);
+        
+        [DllImport(Lib.Name, CharSet = CharSet.Unicode)]
+        private extern static void contextShaderUniform4f(IntPtr context, [MarshalAs(UnmanagedType.LPStr)] string name, IntPtr value);
+
+        [DllImport(Lib.Name, CharSet = CharSet.Unicode)]
+        private extern static void contextShaderUniformMatrix(IntPtr context, [MarshalAs(UnmanagedType.LPStr)] string name, IntPtr value);
         #endregion
 
         #region Member Attributes
@@ -135,6 +162,69 @@ namespace Ay
         public void UICreateColorEditor(string text, ref Color color)
         {
             contextUiCreateColorEditor(instance, color.Ptr, text);
+        }
+
+        public void ShaderFromMemory(string name, string vertex, string fragment)
+        {
+            contextShaderFromMemory(instance, name, vertex, fragment);
+        }
+
+        public void ShaderFromFile(string name, string vertex, string fragment)
+        {
+            contextShaderFromFile(instance, name, vertex, fragment);
+        }
+
+        public void ShaderDispose(string name)
+        {
+            contextShaderDispose(instance, name);
+        }
+
+        public void ShaderUse(string name)
+        {
+            contextShaderUse(instance, name);
+        }
+
+        public void ShaderUniform(string name, UInt32 value) 
+        {
+            contextShaderUniform1i(instance, name, value);
+        }
+
+        public void ShaderUniform(string name, float value) 
+        {
+            contextShaderUniform1f(instance, name, value);
+        }
+
+        public void ShaderUniform(string name, Vector3 value) 
+        {
+            float[] values = new float[] { value.x, value.y, value.z };
+            var size = Marshal.SizeOf<float>() * values.Length;
+            IntPtr ptrValue = Marshal.AllocHGlobal(size);
+            Marshal.Copy(values, 0, ptrValue, values.Length);
+            contextShaderUniform3f(instance, name, ptrValue);
+        }
+
+        public void ShaderUniform(string name, Vector4 value) 
+        {
+            float[] values = new float[] { value.x, value.y, value.z, value.w };
+            var size = Marshal.SizeOf<float>() * values.Length;
+            IntPtr ptrValue = Marshal.AllocHGlobal(size);
+            Marshal.Copy(values, 0, ptrValue, values.Length);
+            contextShaderUniform4f(instance, name, ptrValue);
+        }
+
+        public void ShaderUniform(string name, Matrix4 value) 
+        {
+            float[] values = new float[] 
+            {
+                value.cols[0, 0], value.cols[0, 1], value.cols[0, 2], value.cols[0, 3],
+                value.cols[1, 0], value.cols[1, 1], value.cols[1, 2], value.cols[1, 3],
+                value.cols[2, 0], value.cols[2, 1], value.cols[2, 2], value.cols[2, 3],
+                value.cols[3, 0], value.cols[3, 1], value.cols[3, 2], value.cols[3, 3],
+            };
+            var size = Marshal.SizeOf<float>() * values.Length;
+            IntPtr ptrValue = Marshal.AllocHGlobal(size);
+            Marshal.Copy(values, 0, ptrValue, values.Length);
+            contextShaderUniformMatrix(instance, name, ptrValue);
         }
     }
 }

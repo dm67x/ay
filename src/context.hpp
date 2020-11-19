@@ -252,7 +252,7 @@ public:
     /// @param name shader name
     /// @param vertex vertex shader
     /// @param fragment fragment shader
-    /// @return ShaderProgram instance
+    /// 
     void shaderFromMemory(const std::string& name, const std::string& vertex, const std::string& fragment);
 
     ///
@@ -260,7 +260,7 @@ public:
     /// @param name shader name
     /// @param vertex vertex shader
     /// @param fragment fragment shader
-    /// @return ShaderProgram instance
+    /// 
     void shaderFromFile(const std::string& name, const std::string& vertex, const std::string& fragment);
 
     /// 

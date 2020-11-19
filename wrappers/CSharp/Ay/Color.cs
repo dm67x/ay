@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 
 namespace Ay
 {
-    public class Color
+    public sealed class Color
     {
         #region Structs
         [StructLayout(LayoutKind.Sequential)]
