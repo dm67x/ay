@@ -1,146 +1,148 @@
 #pragma once
 
-#include "object.hpp"
+#include "types.hpp"
 #include "context.hpp"
-#include "material.hpp"
-#include "tiny_gltf.h"
-#include <map>
+#include "transform.hpp"
 #include <string>
-#include <glm/glm.hpp>
+#include <array>
+#include <vector>
 
-class Mesh : public Object {
-    struct Vertex {
-        glm::vec3 position;
-        glm::vec3 normal;
-        glm::vec2 uv;
+class Mesh {
+    friend class Model;
+    friend class ModelNode;
 
-        ///
-        /// @brief Constructor
-        /// @param position Vec3
-        /// @param normal Vec3
-        /// @param u Texture coordinates (u, v)
-        /// @param v Texture coordinates (u, v)
-        ///
-        Vertex(glm::vec3 position, glm::vec3 normal, glm::vec2 uv)
-            : position(position), normal(normal), uv(uv)
-        {
-        }
-
-        ///
-        /// @brief Equal operator
-        /// @param v Vertex
-        /// @return True if equal false otherwise
-        ///
-        inline bool operator==(const Vertex& v1) {
-            return position == v1.position && normal == v1.normal && uv == v1.uv;
-        }
-    };
-
+    Context* ctx;
+    Transform transform;
     VAO vao;
-    Buffer ebo;
-    std::map<int, Buffer> vbos;
-    Material material;
-    int drawMode;
-    int drawType;
-    size_t indicesCount;
-    VAO axisVao;
-    Buffer axisBuffer; // x, y, z
-    bool isDebugMode; // for debugging
-    glm::mat4 localTransformation;
+    std::array<Buffer, 5> buffers;
+    u32 verticesCount;
+    u32 normalsCount;
+    u32 texcoordsCount;
+    u32 colorsCount;
+    u32 indicesCount;
+    GLenum drawMode;
+    GLenum drawType;
 
-private:
+public:
     ///
     /// @brief Constructor
     /// @param ctx Context pointer
     ///
-    Mesh(Context* ctx);
+    Mesh(Context* ctx)
+        : ctx(ctx),
+        transform(),
+        vao(0),
+        buffers(),
+        verticesCount(0),
+        normalsCount(0),
+        texcoordsCount(0),
+        colorsCount(0),
+        indicesCount(0),
+        drawMode(GL_TRIANGLES),
+        drawType(GL_UNSIGNED_INT)
+    {
+        vao = ctx->vaoNew();
+        buffers[0] = ctx->bufferNew(); // indices
+        buffers[1] = ctx->bufferNew(); // positions
+        buffers[2] = ctx->bufferNew(); // normals
+        buffers[3] = ctx->bufferNew(); // uvs
+        buffers[4] = ctx->bufferNew(); // colors
+    }
 
-public:
     ///
     /// @brief Destructor
     ///
-    ~Mesh() override;
-
-    ///
-    /// @brief Create a new plane mesh
-    /// @param ctx Context
-    /// @return Plane mesh
-    ///
-    static Mesh* plane(Context* ctx);
-
-    ///
-    /// @brief Create a new cube mesh
-    /// @param ctx Context
-    /// @return Cube mesh
-    ///
-    static Mesh* cube(Context* ctx);
-
-    ///
-    /// @brief Create a new mesh from file (obj)
-    /// @param ctx Context
-    /// @param filename Filename
-    /// @return Mesh
-    ///
-    static Mesh* fromFile(Context* ctx, const std::string& filename);
+    ~Mesh() {
+        ctx->vaoDispose(vao);
+        for (auto buffer : buffers) {
+            ctx->bufferDispose(buffer);
+        }
+    }
 
     ///
     /// @brief Render called each frame
-    /// @param deltaTime Elapsed time between each frame
     ///
-    void render(float deltaTime) override;
+    inline void render(const Transform& parent) {
+        auto _transform = getTransform() * parent.getTransform();
+        ctx->shaderUniform("modelMatrix", _transform);
+        ctx->shaderUniform("normalMatrix", glm::transpose(glm::inverse(_transform)));
 
-    ///
-    /// @brief Activate or deactivate debug mode
-    /// @param value Bool
-    ///
-    inline void setDebug(bool value) {
-        isDebugMode = value;
-
-        for (auto child : children) {
-            auto childMesh = static_cast<Mesh*>(child);
-            childMesh->setDebug(value);
-        }
+        ctx->vaoUse(vao);
+        ctx->bufferUse<BufferUsage::ELEMENT>(buffers[0]);
+        ctx->draw(DrawMethod::ELEMENT, DrawParameters(drawMode, drawType, indicesCount, nullptr));
+        ctx->bufferUse<BufferUsage::ELEMENT>(0);
+        ctx->vaoUse(0);
     }
 
     ///
     /// @brief Get model matrix
     /// @return Mat4
     ///
-    inline glm::mat4 getTransform() const override {
-        glm::mat4 t = transform.getTransform() * localTransformation; // local transform
-        if (parent != nullptr) {
-            t = t * parent->getTransform();
-        }
-        return t;
+    inline glm::mat4 getTransform() const {
+        return transform.getTransform();
     }
 
-private:
     ///
     /// @brief Compute the normals
-    /// @param vertices (In) vertices
-    /// @param indices (In) indices
-    /// @param output (Out) updated vertices
     /// 
-    static void computeNormals(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices, std::vector<Vertex>& output);
+    inline void computeNormals() {
+        // Normals
+        std::vector<f32> normals;
+        normals.resize(3 * (size_t)normalsCount);
 
-    ///
-    /// @brief Process Node
-    /// @param model glTF model
-    /// @param node glTF node
-    /// 
-    void processNode(tinygltf::Model model, tinygltf::Node node);
+        // Indices
+        ctx->bufferUse<BufferUsage::ELEMENT>(buffers[0]);
+        u32* dataIndex = reinterpret_cast<u32*>(ctx->bufferGetSubData<BufferUsage::ELEMENT>(0, indicesCount * sizeof(u32)));
 
-    ///
-    /// @brief Process Mesh
-    /// @param model glTF model
-    /// @param mesh glTF mesh
-    /// 
-    void processMesh(tinygltf::Model model, tinygltf::Mesh mesh);
+        // Positions
+        ctx->bufferUse<BufferUsage::ARRAY>(buffers[1]);
+        f32* dataPosition = reinterpret_cast<f32*>(ctx->bufferGetSubData<BufferUsage::ARRAY>(0, verticesCount * sizeof(f32) * 3));
 
-    ///
-    /// @brief Process Material
-    /// @param model glTF model
-    /// @param mat glTF material
-    /// 
-    void processMaterial(tinygltf::Model model, tinygltf::Material mat);
+        for (size_t i = 0; i < indicesCount; i += 3) {
+            const size_t i1 = (size_t)dataIndex[i];
+            const size_t i2 = (size_t)dataIndex[i + 1];
+            const size_t i3 = (size_t)dataIndex[i + 2];
+
+            const f32 x1 = dataPosition[i1 * 3];
+            const f32 y1 = dataPosition[i1 * 3 + 1];
+            const f32 z1 = dataPosition[i1 * 3 + 2];
+
+            const f32 x2 = dataPosition[i2 * 3];
+            const f32 y2 = dataPosition[i2 * 3 + 1];
+            const f32 z2 = dataPosition[i2 * 3 + 2];
+
+            const f32 x3 = dataPosition[i3 * 3];
+            const f32 y3 = dataPosition[i3 * 3 + 1];
+            const f32 z3 = dataPosition[i3 * 3 + 2];
+
+            glm::vec3 v1 = glm::vec3(x1, y1, z1);
+            glm::vec3 v2 = glm::vec3(x2, y2, z2);
+            glm::vec3 v3 = glm::vec3(x3, y3, z3);
+            glm::vec3 u = v2 - v1;
+            glm::vec3 v = v3 - v1;
+            glm::vec3 normal = glm::normalize(glm::cross(u, v));
+
+            normals[i1 * 3] = normal.x;
+            normals[i1 * 3 + 1] = normal.y;
+            normals[i1 * 3 + 2] = normal.z;
+
+            normals[i2 * 3] = normal.x;
+            normals[i2 * 3 + 1] = normal.y;
+            normals[i2 * 3 + 2] = normal.z;
+
+            normals[i3 * 3] = normal.x;
+            normals[i3 * 3 + 1] = normal.y;
+            normals[i3 * 3 + 2] = normal.z;
+        }
+
+        // Clean all and save data
+        ctx->bufferUnmap<BufferUsage::ARRAY>();
+        ctx->bufferUse<BufferUsage::ARRAY>(buffers[2]);
+        f32* ptr = reinterpret_cast<f32*>(ctx->bufferSetSubData<BufferUsage::ARRAY>(0, normalsCount * sizeof(f32) * 3));
+        std::copy(normals.begin(), normals.end(), ptr);
+        ctx->bufferUnmap<BufferUsage::ARRAY>();
+        ctx->bufferUse<BufferUsage::ELEMENT>(buffers[0]);
+        ctx->bufferUnmap<BufferUsage::ELEMENT>();
+        ctx->bufferUse<BufferUsage::ELEMENT>(0);
+    }
 };

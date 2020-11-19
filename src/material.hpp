@@ -39,4 +39,24 @@ struct Material {
         doubleSided(false)
     {
     }
+
+    /// 
+    /// @brief Comparaison operator
+    /// @param m Material
+    /// 
+    inline bool operator==(const Material& m) {
+        return name == m.name &&
+            baseColor == m.baseColor &&
+            baseColorTexture == m.baseColorTexture &&
+            metallicFactor == m.metallicFactor &&
+            roughnessFactor == m.roughnessFactor &&
+            metallicRoughnessTexture == m.metallicRoughnessTexture &&
+            normalTexture == m.normalTexture &&
+            occlusionTexture == m.occlusionTexture &&
+            emissiveTexture == m.emissiveTexture &&
+            emissiveFactor == m.emissiveFactor &&
+            alphaMode == m.alphaMode &&
+            alphaCutoff == m.alphaCutoff &&
+            doubleSided == m.doubleSided;
+    }
 };

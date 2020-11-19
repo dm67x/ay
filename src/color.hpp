@@ -28,6 +28,14 @@ struct Color {
         a = static_cast<float>((hex & 0x000000ff)) / 255.f;
     }
 
+    /// 
+    /// @brief Comparaison operator
+    /// @param c Color
+    /// 
+    inline bool operator==(const Color& c) {
+        return r == c.r && g == c.g && b == c.b && a == c.a;
+    }
+
     ///
     /// @brief Convert to a pointer
     /// @return Float pointer

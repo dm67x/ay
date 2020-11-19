@@ -1,5 +1,6 @@
 #pragma once
 
+#include "types.hpp"
 #include "object.hpp"
 #include "camera.hpp"
 #include "light.hpp"
@@ -16,7 +17,7 @@ class Scene : public Object {
     size_t numberOfDirectionalLights;
 
 public:
-    std::function<void(Scene*, float)> onRender;
+    std::function<void(Scene*, f32)> onRender;
     std::function<void(Scene*)> onDestroy;
 
 public:
@@ -32,7 +33,7 @@ public:
         directionalLights(),
         numberOfPointLights(0),
         numberOfDirectionalLights(0),
-        onRender([](Scene*, float) {}),
+        onRender([](Scene*, f32) {}),
         onDestroy([](Scene*) {})
     {
     }
@@ -64,7 +65,7 @@ public:
     /// @param zFar zFar
     /// @return Created camera
     ///
-    inline Camera* createPerspectiveCamera(const std::string& name, float fov, float zNear, float zFar) {
+    inline Camera* createPerspectiveCamera(const std::string& name, f32 fov, f32 zNear, f32 zFar) {
         Camera* camera = new PerspectiveCamera(ctx, fov, zNear, zFar);
         cameras.insert(std::make_pair(name, camera));
         return camera;
@@ -81,7 +82,7 @@ public:
     /// @param zFar zFar
     /// @return Created camera
     ///
-    inline Camera* createOrthographicCamera(const std::string& name, float left, float right, float bottom, float top, float zNear, float zFar) {
+    inline Camera* createOrthographicCamera(const std::string& name, f32 left, f32 right, f32 bottom, f32 top, f32 zNear, f32 zFar) {
         Camera* camera = new OrthographicCamera(ctx, left, right, bottom, top, zNear, zFar);
         cameras.insert(std::make_pair(name, camera));
         return camera;
@@ -95,7 +96,7 @@ public:
     /// @param zFar zFar
     /// @return Created camera
     ///
-    inline Camera* createFreeCamera(const std::string& name, float fov, float zNear, float zFar) {
+    inline Camera* createFreeCamera(const std::string& name, f32 fov, f32 zNear, f32 zFar) {
         Camera* camera = new FreeCamera(ctx, fov, zNear, zFar);
         cameras.insert(std::make_pair(name, camera));
         return camera;
@@ -146,7 +147,7 @@ public:
     /// @brief Render called each frame
     /// @param deltaTime Elapsed time between each frame
     ///
-    void render(float deltaTime) override {
+    void render(f32 deltaTime) override {
         mainCamera->update(deltaTime);
 
         onRender(this, deltaTime);
@@ -160,7 +161,7 @@ public:
             ctx->shaderUniform(ss.str() + ".position", light->position);
             ctx->shaderUniform(ss.str() + ".intensity", light->intensity);
         }
-        ctx->shaderUniform("directionalLightsCount", static_cast<int>(numberOfDirectionalLights));
+        ctx->shaderUniform("directionalLightsCount", (i32)numberOfDirectionalLights);
 
         for (size_t i = 0; i < numberOfPointLights; i++) {
             auto light = pointsLights[i];
@@ -170,6 +171,6 @@ public:
             ctx->shaderUniform(ss.str() + ".position", light->position);
             ctx->shaderUniform(ss.str() + ".intensity", light->intensity);
         }
-        ctx->shaderUniform("pointLightsCount", static_cast<int>(numberOfPointLights));
+        ctx->shaderUniform("pointLightsCount", (i32)numberOfPointLights);
     }
 };

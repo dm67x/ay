@@ -1,8 +1,8 @@
 #pragma once
 
+#include "transform.hpp"
 #include <vector>
 #include <algorithm>
-#include "transform.hpp"
 
 class Context;
 
@@ -73,7 +73,7 @@ public:
     virtual glm::mat4 getTransform() const {
         glm::mat4 t = transform.getTransform(); // local transform
         if (parent != nullptr) {
-            t = t * parent->transform.getTransform();
+            t = t * parent->getTransform();
         }
         return t;
     }

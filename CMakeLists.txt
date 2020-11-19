@@ -10,8 +10,6 @@ project(ay
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-option(EXPORT_LIB "Export the library" ON)
-
 find_package(OpenGL REQUIRED)
 add_subdirectory(extern/glfw)
 add_subdirectory(extern/glad)
@@ -22,10 +20,10 @@ add_subdirectory(extern/glm)
 include_directories(extern/glad)
 include_directories(extern/stb)
 
-add_library(ay SHARED 
-    "src/lib.cpp" 
+add_executable(ay  
+    "src/main.cpp"
     "src/window.cpp" 
-    "src/mesh.cpp" 
+    "src/model.cpp" 
     "src/context.cpp" 
     "src/camera.cpp"
     "src/tiny_gltf.cpp"
@@ -39,10 +37,3 @@ target_compile_options(ay PRIVATE
     $<$<CXX_COMPILER_ID:MSVC>:/W3 /WX>
     $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wall -Wextra>
 )
-
-if (EXPORT_LIB)
-    set_target_properties(ay
-        PROPERTIES
-        DEFINE_SYMBOL "AY_EXPORTS"
-    )
-endif ()

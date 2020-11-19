@@ -1,6 +1,6 @@
 #include "window.hpp"
 #include "context.hpp"
-#include "mesh.hpp"
+#include "model.hpp"
 #include "camera.hpp"
 #include "scene.hpp"
 #include <chrono>
@@ -11,25 +11,20 @@ int main(void)
     Context* ctx = window.getContext();
     Scene scene(ctx);
 
-    Mesh* mesh = Mesh::fromFile(ctx, "../../assets/buddha.glb");
-    Mesh* plane = Mesh::plane(ctx);
+    Model* model = Model::fromFile(ctx, "../assets/Duck.glb");
+    //Model* cube = Model::cube(ctx);
 
-    mesh->transform.scale = glm::vec3(1.5f);
-    mesh->transform.position.z = -5.f;
-    mesh->transform.position.y = 0.f;
-    mesh->transform.rotation.x = glm::radians(90.f);
-
-    plane->transform.position.z = -5.f;
-    plane->transform.position.y = -.8f;
-    plane->transform.scale = glm::vec3(10.f);
-    plane->transform.rotation.x = glm::radians(90.f);
-    plane->transform.rotation.z = glm::radians(180.f);
+    model->transform.position.z = 5.f;
+    model->transform.scale = glm::vec3(5.f);
+    model->transform.rotation.x = glm::radians(45.f);
+    /*model->transform.position.y = 0.f;
+    model->transform.rotation.x = glm::radians(45.f);*/
 
     scene.createFreeCamera("mainCamera", 90.f, 0.1f, 100.f);
     scene.setMainCamera("mainCamera");
 
-    Light* light = scene.createPointLight();
-    light->position = glm::vec3(0.f, 3.f, -5.f);
+    Light* light = scene.createDirectionalLight();
+    light->position = glm::vec3(0.f, 5.f, 5.f);
     light->color = Color::white();
     light->intensity = 8.f;
 
@@ -41,32 +36,20 @@ int main(void)
             std::stringstream fps;
             fps << "FPS: " << 1.f / deltaTime;
             ImGui::TextColored(ImVec4(1, 1, 0, 1), fps.str().c_str());
-            ImGui::ColorEdit4("Light color", light->color.toPtr());
         }, flags);
         ctx->uiEnd();
 
-        mesh->transform.rotation.y += glm::radians(100.f * deltaTime);
-        mesh->render(deltaTime);
-        plane->render(deltaTime);
+        model->render(deltaTime);
     };
 
     scene.onDestroy = [&](Scene* scene) {
         (void)scene;
-        delete mesh;
-        delete plane;
+        delete model;
     };
 
     auto start = std::chrono::steady_clock::now();
 
     while (window.isOpen()) {
-        if (window.isKeyPressed(GLFW_KEY_B)) {
-            mesh->setDebug(true);
-        }
-
-        if (window.isKeyPressed(GLFW_KEY_N)) {
-            mesh->setDebug(false);
-        }
-
         const int WIDTH = window.getSize().first;
         const int HEIGHT = window.getSize().second;
 

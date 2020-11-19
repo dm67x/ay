@@ -435,8 +435,31 @@ public:
     /// @param data Data
     ///
     template<BufferUsage T>
-    inline void bufferSubData(GLintptr offset, GLsizeiptr size, GLvoid* data) const {
-        glCheckError(glBufferSubData((GLenum)T, offset, size, data));
+    inline GLvoid* bufferSetSubData(GLintptr offset, GLsizeiptr size) const {
+        GLvoid* data;
+        glCheckError(data = glMapBufferRange((GLenum)T, offset, size, GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_RANGE_BIT));
+        return data;
+    }
+
+    ///
+    /// @brief Buffer get data (map)
+    /// @param offset Offset
+    /// @param size Size
+    /// @return Data
+    ///
+    template<BufferUsage T>
+    inline GLvoid* bufferGetSubData(GLintptr offset, GLsizeiptr size) const {
+        GLvoid* data;
+        glCheckError(data = glMapBufferRange((GLenum)T, offset, size, GL_MAP_READ_BIT));
+        return data;
+    }
+
+    ///
+    /// @brief Buffer get data (unmap)
+    ///
+    template<BufferUsage T>
+    inline void bufferUnmap() const {
+        glCheckError(glUnmapBuffer((GLenum)T));
     }
 
     ///

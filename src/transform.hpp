@@ -4,12 +4,13 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtx/quaternion.hpp>
+#include <glm/gtx/matrix_decompose.hpp>
 
 struct Transform {
     glm::vec3 origin;
     glm::vec3 position;
     glm::vec3 scale;
-    glm::vec3 rotation;
+    glm::quat rotation;
 
     ///
     /// @brief Constructor
@@ -23,6 +24,18 @@ struct Transform {
     }
 
     ///
+    /// @brief Constructor
+    /// @param matrix Matrix4
+    /// 
+    Transform(const glm::mat4& matrix)
+        : Transform()
+    {
+        glm::vec3 skew;
+        glm::vec4 perspective;
+        glm::decompose(matrix, scale, rotation, position, skew, perspective);
+    }
+
+    ///
     /// @brief Get model matrix
     /// @return Matrix4 result
     ///
@@ -30,7 +43,17 @@ struct Transform {
         glm::mat4 toOrigin = glm::translate(glm::mat4(1.f), -origin);
         glm::mat4 translation = glm::translate(glm::mat4(1.f), position);
         glm::mat4 scaling = glm::scale(glm::mat4(1.f), scale);
-        glm::mat4 rotate = glm::toMat4(glm::quat(rotation));
+        glm::mat4 rotate = glm::toMat4(rotation);
         return translation * rotate * scaling * toOrigin;
+    }
+
+    ///
+    /// @brief Combine two transforms
+    /// @param t1 Transform
+    /// @param t2 Transform
+    /// @return Transform
+    /// 
+    friend Transform operator*(const Transform& t1, const Transform& t2) {
+        return Transform(t1.getTransform() * t2.getTransform());
     }
 };

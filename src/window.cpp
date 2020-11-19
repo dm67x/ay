@@ -7,7 +7,12 @@ static void glfw_error_callback(int error, const char* description) {
     spdlog::critical("Error [{}]: {}", error, description);
 }
 
-Window::Window(int width, int height) : window(nullptr), ctx(nullptr), cursorVisible(false), cursorProcessed(false) {
+Window::Window(i32 width, i32 height) 
+    : window(nullptr), 
+    ctx(nullptr), 
+    cursorVisible(false), 
+    cursorProcessed(false) 
+{
     glfwSetErrorCallback(glfw_error_callback);
     
     if (!glfwInit()) {

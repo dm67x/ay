@@ -1,5 +1,6 @@
 #pragma once
 
+#include "types.hpp"
 #include <utility>
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
@@ -20,7 +21,7 @@ public:
     /// @param width Window width
     /// @param height Window height
     /// 
-    explicit Window(int width, int height);
+    explicit Window(i32 width, i32 height);
     
     /// 
     /// @brief Destructor
@@ -45,8 +46,8 @@ public:
     /// @brief Get window size
     /// @return (Width, Height)
     ///
-    inline std::pair<int, int> getSize() const {
-        int w, h;
+    inline std::pair<i32, i32> getSize() const {
+        i32 w, h;
         glfwGetWindowSize(window, &w, &h);
         return std::make_pair(w, h);
     }
@@ -56,7 +57,7 @@ public:
     /// @param key Keycode
     /// @return True if key pressed false otherwise
     ///
-    inline bool isKeyPressed(int key) const {
+    inline bool isKeyPressed(i32 key) const {
         return glfwGetKey(window, key) == GLFW_PRESS;
     }
 
@@ -65,7 +66,7 @@ public:
     /// @param key Keycode
     /// @return True if key released false otherwise
     ///
-    inline bool isKeyReleased(int key) const {
+    inline bool isKeyReleased(i32 key) const {
         return glfwGetKey(window, key) == GLFW_RELEASE;
     }
 
@@ -73,10 +74,10 @@ public:
     /// @brief getMousePosition
     /// @return Mouse position
     ///
-    inline std::pair<float, float> getMousePosition() const {
-        double x, y;
+    inline std::pair<f32, f32> getMousePosition() const {
+        f64 x, y;
         glfwGetCursorPos(window, &x, &y);
-        return std::make_pair(static_cast<float>(x), static_cast<float>(y));
+        return std::make_pair((f32)x, (f32)y);
     }
 
     ///
