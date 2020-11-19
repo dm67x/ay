@@ -115,6 +115,7 @@ namespace Ay
             IntPtr colorPtr = Marshal.AllocHGlobal(Marshal.SizeOf(color.Instance));
             Marshal.StructureToPtr(color.Instance, colorPtr, true);
             contextClear(instance, colorPtr);
+            Marshal.FreeHGlobal(colorPtr);
         }
 
         public void Viewport(int x, int y, int w, int h) 
@@ -157,6 +158,7 @@ namespace Ay
             IntPtr colorPtr = Marshal.AllocHGlobal(Marshal.SizeOf(color.Instance));
             Marshal.StructureToPtr(color.Instance, colorPtr, true);
             contextUiCreateText(instance, colorPtr, text);
+            Marshal.FreeHGlobal(colorPtr);
         }
 
         public void UICreateColorEditor(string text, ref Color color)
