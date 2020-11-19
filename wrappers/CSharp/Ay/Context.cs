@@ -201,6 +201,7 @@ namespace Ay
             IntPtr ptrValue = Marshal.AllocHGlobal(size);
             Marshal.Copy(values, 0, ptrValue, values.Length);
             contextShaderUniform3f(instance, name, ptrValue);
+            Marshal.FreeHGlobal(ptrValue);
         }
 
         public void ShaderUniform(string name, Vector4 value) 
@@ -210,6 +211,7 @@ namespace Ay
             IntPtr ptrValue = Marshal.AllocHGlobal(size);
             Marshal.Copy(values, 0, ptrValue, values.Length);
             contextShaderUniform4f(instance, name, ptrValue);
+            Marshal.FreeHGlobal(ptrValue);
         }
 
         public void ShaderUniform(string name, Matrix4 value) 
@@ -225,6 +227,7 @@ namespace Ay
             IntPtr ptrValue = Marshal.AllocHGlobal(size);
             Marshal.Copy(values, 0, ptrValue, values.Length);
             contextShaderUniformMatrix(instance, name, ptrValue);
+            Marshal.FreeHGlobal(ptrValue);
         }
     }
 }
