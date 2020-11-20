@@ -12,7 +12,6 @@ class Mesh {
     friend class ModelNode;
 
     Context* ctx;
-    Transform transform;
     VAO vao;
     std::array<Buffer, 5> buffers;
     u32 verticesCount;
@@ -30,7 +29,6 @@ public:
     ///
     Mesh(Context* ctx)
         : ctx(ctx),
-        transform(),
         vao(0),
         buffers(),
         verticesCount(0),
@@ -62,24 +60,12 @@ public:
     ///
     /// @brief Render called each frame
     ///
-    inline void render(const Transform& parent) {
-        auto _transform = getTransform() * parent.getTransform();
-        ctx->shaderUniform("modelMatrix", _transform);
-        ctx->shaderUniform("normalMatrix", glm::transpose(glm::inverse(_transform)));
-
+    inline void render() {
         ctx->vaoUse(vao);
         ctx->bufferUse<BufferUsage::ELEMENT>(buffers[0]);
         ctx->draw(DrawMethod::ELEMENT, DrawParameters(drawMode, drawType, indicesCount, nullptr));
         ctx->bufferUse<BufferUsage::ELEMENT>(0);
         ctx->vaoUse(0);
-    }
-
-    ///
-    /// @brief Get model matrix
-    /// @return Mat4
-    ///
-    inline glm::mat4 getTransform() const {
-        return transform.getTransform();
     }
 
     ///

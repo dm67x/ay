@@ -17,7 +17,11 @@ void ModelNode::render() const {
         model.ctx->shaderUniform("material.roughnessFactor", material->roughnessFactor);
         model.ctx->shaderUniform("material.emissiveFactor", material->emissiveFactor.toVec());
 
-        meshes[i]->render(transform * parent->transform);
+        auto _transform = getTransform();
+        model.ctx->shaderUniform("modelMatrix", _transform);
+        model.ctx->shaderUniform("normalMatrix", glm::transpose(glm::inverse(_transform)));
+
+        meshes[i]->render();
     }
 
     for (auto child : children) {
@@ -343,7 +347,7 @@ void ModelNode::processMesh(tinygltf::Model tmodel, tinygltf::Mesh tmesh) {
 
             model.ctx->bufferUse<BufferUsage::ARRAY>(mesh->buffers[(size_t)(index)+1]);
             model.ctx->bufferData<BufferUsage::ARRAY, BufferTarget::STATIC_DRAW>(bufferView.byteLength, buffer.data.data() + bufferView.byteOffset);
-            model.ctx->bufferAttribute((Attribute)index, (GLenum)accessor.componentType, (GLint)accessor.type, (GLsizei)stride, nullptr);
+            model.ctx->bufferAttribute((Attribute)index, (GLenum)accessor.componentType, (GLint)accessor.type, (GLsizei)stride, (GLvoid*)accessor.byteOffset);
             
             if (index == 0) {
                 mesh->verticesCount = (u32)accessor.count;

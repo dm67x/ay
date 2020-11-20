@@ -19,8 +19,15 @@ class ModelNode {
     std::vector<Mesh*> meshes;
     std::vector<i32> materials;
 
+    ///
+    /// @brief Constructor
+    /// @param model Model
+    /// 
     ModelNode(Model& model) : model(model), parent(nullptr), children(), transform(), meshes(), materials() {}
 
+    ///
+    /// @brief Destructor
+    /// 
     ~ModelNode() {
         for (auto mesh : meshes) {
             delete mesh;
@@ -31,11 +38,30 @@ class ModelNode {
         }
     }
 
+    ///
+    /// @brief Add child
+    /// @param n Child node
+    /// 
     inline void addChild(ModelNode* n) {
         children.push_back(n);
         n->parent = this;
     }
 
+    ///
+    /// @brief Get transform
+    /// @return Transform
+    ///
+    inline glm::mat4 getTransform() const {
+        glm::mat4 t = transform.getTransform(); // local transform
+        if (parent != nullptr) {
+            t *= parent->getTransform();
+        }
+        return t;
+    }
+
+    ///
+    /// @brief Render
+    /// 
     void render() const;
 
     ///

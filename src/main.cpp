@@ -11,14 +11,10 @@ int main(void)
     Context* ctx = window.getContext();
     Scene scene(ctx);
 
-    Model* model = Model::fromFile(ctx, "../assets/Duck.glb");
-    //Model* cube = Model::cube(ctx);
+    Model* model = Model::fromFile(ctx, "../assets/xbox.glb");
 
     model->transform.position.z = 5.f;
-    model->transform.scale = glm::vec3(5.f);
-    model->transform.rotation.x = glm::radians(45.f);
-    /*model->transform.position.y = 0.f;
-    model->transform.rotation.x = glm::radians(45.f);*/
+    model->transform.scale = glm::vec3(.5f);
 
     scene.createFreeCamera("mainCamera", 90.f, 0.1f, 100.f);
     scene.setMainCamera("mainCamera");
@@ -27,6 +23,8 @@ int main(void)
     light->position = glm::vec3(0.f, 5.f, 5.f);
     light->color = Color::white();
     light->intensity = 8.f;
+
+    float angle = 0.f;
 
     scene.onRender = [&](Scene* scene, float deltaTime) {
         (void)scene;
@@ -39,6 +37,9 @@ int main(void)
         }, flags);
         ctx->uiEnd();
 
+        angle += deltaTime * 100.f;
+
+        model->transform.rotation = glm::quat(glm::vec3(0.f, glm::radians(angle), 0.f));
         model->render(deltaTime);
     };
 

@@ -46,14 +46,4 @@ struct Transform {
         glm::mat4 rotate = glm::toMat4(rotation);
         return translation * rotate * scaling * toOrigin;
     }
-
-    ///
-    /// @brief Combine two transforms
-    /// @param t1 Transform
-    /// @param t2 Transform
-    /// @return Transform
-    /// 
-    friend Transform operator*(const Transform& t1, const Transform& t2) {
-        return Transform(t1.getTransform() * t2.getTransform());
-    }
 };
