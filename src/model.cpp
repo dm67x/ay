@@ -346,8 +346,17 @@ void ModelNode::processMesh(tinygltf::Model tmodel, tinygltf::Mesh tmesh) {
             i32 stride = accessor.ByteStride(bufferView);
 
             model.ctx->bufferUse<BufferUsage::ARRAY>(mesh->buffers[(size_t)(index)+1]);
-            model.ctx->bufferData<BufferUsage::ARRAY, BufferTarget::STATIC_DRAW>(bufferView.byteLength, buffer.data.data() + bufferView.byteOffset);
-            model.ctx->bufferAttribute((Attribute)index, (GLenum)accessor.componentType, (GLint)accessor.type, (GLsizei)stride, (GLvoid*)accessor.byteOffset);
+
+            GLsizeiptr bufferSize = 0;
+            if (bufferView.byteLength + bufferView.byteOffset + accessor.byteOffset >= buffer.data.size()) {
+                bufferSize = buffer.data.size() - (bufferView.byteOffset + accessor.byteOffset);
+            }
+            else {
+                bufferSize = bufferView.byteLength;
+            }
+
+            model.ctx->bufferData<BufferUsage::ARRAY, BufferTarget::STATIC_DRAW>(bufferSize, buffer.data.data() + bufferView.byteOffset + accessor.byteOffset);
+            model.ctx->bufferAttribute((Attribute)index, (GLenum)accessor.componentType, (GLint)accessor.type, (GLsizei)stride, nullptr);
             
             if (index == 0) {
                 mesh->verticesCount = (u32)accessor.count;

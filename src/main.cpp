@@ -11,7 +11,7 @@ int main(void)
     Context* ctx = window.getContext();
     Scene scene(ctx);
 
-    Model* model = Model::fromFile(ctx, "../assets/xbox.glb");
+    Model* model = Model::fromFile(ctx, "../assets/Duck.glb");
 
     model->transform.position.z = 5.f;
     model->transform.scale = glm::vec3(.5f);
