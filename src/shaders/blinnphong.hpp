@@ -2,8 +2,7 @@
 
 #include <string>
 
-const std::string BLINN_PHONG_VERTEX = " \
-    #version 320 es\n \
+const std::string BLINN_PHONG_VERTEX = "#version 320 es\n \
     layout(location = 0) in vec3 position; \
     layout(location = 1) in vec3 normal; \
     layout(location = 2) in vec2 uv; \
@@ -31,8 +30,7 @@ const std::string BLINN_PHONG_VERTEX = " \
     } \
 ";
 
-const std::string BLINN_PHONG_FRAGMENT = " \
-    #version 320 es\n \
+const std::string BLINN_PHONG_FRAGMENT = "#version 320 es\n \
     precision mediump float; \
     \
     out vec4 fragOut; \
