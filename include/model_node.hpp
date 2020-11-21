@@ -3,10 +3,10 @@
 #include "types.hpp"
 #include "tiny_gltf.h"
 #include "transform.hpp"
-#include "mesh.hpp"
 #include <vector>
 
 class Model;
+class Mesh;
 
 class ModelNode {
 private:
@@ -22,15 +22,7 @@ private:
     ///
     /// @brief Destructor
     /// 
-    ~ModelNode() {
-        for (auto mesh : meshes) {
-            delete mesh;
-        }
-
-        for (auto child : children) {
-            delete child;
-        }
-    }
+    ~ModelNode();
 
     ///
     /// @brief Add child

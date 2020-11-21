@@ -5,6 +5,16 @@
 #include "context.hpp"
 #include <glm/gtc/type_ptr.hpp>
 
+ModelNode::~ModelNode() {
+    for (auto mesh : meshes) {
+        delete mesh;
+    }
+
+    for (auto child : children) {
+        delete child;
+    }
+}
+
 void ModelNode::render() const {
     for (size_t i = 0; i < meshes.size(); i++) {
         // default material

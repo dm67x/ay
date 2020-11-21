@@ -3,6 +3,7 @@
 #include "types.hpp"
 #include "transform.hpp"
 #include <map>
+#include <string>
 
 class Context;
 class Material;

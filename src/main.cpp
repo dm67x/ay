@@ -25,7 +25,7 @@ void renderScene(Scene* scene, f32 deltaTime) {
 }
 
 void destroyScene(Scene* scene) {
-    delete scene->getModel("Duck");
+    
 }
 
 int main(void)
