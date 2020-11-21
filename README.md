@@ -18,7 +18,6 @@ Thanks to all of them!
 ## Examples
 
 ![Xbox Controller](images/xbox.gif)
-![Buddha](images/buddha.png)
 
 ## TODO
 
