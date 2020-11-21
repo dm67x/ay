@@ -8,20 +8,6 @@
 #include <vector>
 
 class Mesh {
-    friend class Model;
-    friend class ModelNode;
-
-    Context* ctx;
-    VAO vao;
-    std::array<Buffer, 5> buffers;
-    u32 verticesCount;
-    u32 normalsCount;
-    u32 texcoordsCount;
-    u32 colorsCount;
-    u32 indicesCount;
-    GLenum drawMode;
-    GLenum drawType;
-
 public:
     ///
     /// @brief Constructor
@@ -131,4 +117,20 @@ public:
         ctx->bufferUnmap<BufferUsage::ELEMENT>();
         ctx->bufferUse<BufferUsage::ELEMENT>(0);
     }
+
+private:
+    friend class Model;
+    friend class ModelNode;
+
+private:
+    Context* ctx;
+    VAO vao;
+    std::array<Buffer, 5> buffers;
+    u32 verticesCount;
+    u32 normalsCount;
+    u32 texcoordsCount;
+    u32 colorsCount;
+    u32 indicesCount;
+    GLenum drawMode;
+    GLenum drawType;
 };

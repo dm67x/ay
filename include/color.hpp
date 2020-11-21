@@ -1,13 +1,10 @@
 #pragma once
 
+#include "types.hpp"
 #include <glm/glm.hpp>
 
-struct Color {
-    float r;
-    float g;
-    float b;
-    float a;
-
+class Color {
+public:
     ///
     /// @brief New color from (r, g, b, a)
     /// @param r Red
@@ -15,17 +12,20 @@ struct Color {
     /// @param b Blue
     /// @param a Alpha
     ///  
-    Color(float r, float g, float b, float a = 1.f) : r(r), g(g), b(b), a(a) {}
+    Color(f32 r, f32 g, f32 b, f32 a = 1.f) 
+        : r(r), g(g), b(b), a(a) 
+    {
+    }
     
     ///
     /// @brief New color from hex
     /// @param hex Hexadecimal value
     ///  
-    Color(unsigned int hex) {
-        r = static_cast<float>((hex & 0xff000000) >> 24) / 255.f;
-        g = static_cast<float>((hex & 0x00ff0000) >> 16) / 255.f;
-        b = static_cast<float>((hex & 0x0000ff00) >> 8) / 255.f;
-        a = static_cast<float>((hex & 0x000000ff)) / 255.f;
+    Color(u32 hex) {
+        r = static_cast<f32>((hex & 0xff000000) >> 24) / 255.f;
+        g = static_cast<f32>((hex & 0x00ff0000) >> 16) / 255.f;
+        b = static_cast<f32>((hex & 0x0000ff00) >> 8) / 255.f;
+        a = static_cast<f32>((hex & 0x000000ff)) / 255.f;
     }
 
     /// 
@@ -40,7 +40,7 @@ struct Color {
     /// @brief Convert to a pointer
     /// @return Float pointer
     ///  
-    inline const float* toPtr() const {
+    inline const f32* toPtr() const {
         return &this->r;
     }
 
@@ -48,7 +48,7 @@ struct Color {
     /// @brief Convert to a pointer
     /// @return Float pointer
     ///  
-    inline float* toPtr() {
+    inline f32* toPtr() {
         return &this->r;
     }
 
@@ -128,7 +128,13 @@ struct Color {
     /// @param n Number
     /// @return Color
     ///
-    friend Color operator*(const Color& c1, float n) {
+    friend Color operator*(const Color& c1, f32 n) {
         return Color(c1.r * n, c1.g * n, c1.b * n, c1.a);
     }
+
+public:
+    f32 r;
+    f32 g;
+    f32 b;
+    f32 a;
 };

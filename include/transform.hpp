@@ -6,12 +6,8 @@
 #include <glm/gtx/quaternion.hpp>
 #include <glm/gtx/matrix_decompose.hpp>
 
-struct Transform {
-    glm::vec3 origin;
-    glm::vec3 position;
-    glm::vec3 scale;
-    glm::quat rotation;
-
+class Transform {
+public:
     ///
     /// @brief Constructor
     ///
@@ -46,4 +42,10 @@ struct Transform {
         glm::mat4 rotate = glm::toMat4(rotation);
         return translation * rotate * scaling * toOrigin;
     }
+
+public:
+    glm::vec3 origin;
+    glm::vec3 position;
+    glm::vec3 scale;
+    glm::quat rotation;
 };

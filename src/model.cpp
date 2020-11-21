@@ -30,9 +30,10 @@ void ModelNode::render() const {
 }
 
 Model::Model(Context* ctx)
-    : Object(ctx),
+    : ctx(ctx),
     root(nullptr),
-    materials()
+    materials(),
+    transform()
 {
     root = new ModelNode(*this);
 
@@ -244,7 +245,7 @@ Model* Model::fromFile(Context* ctx, const std::string& filename) {
     tinygltf::Model model;
     tinygltf::TinyGLTF loader;
     std::string err, warn;
-    Model* root = new Model(ctx);
+    Model* myModel = new Model(ctx);
 
     bool ret = loader.LoadBinaryFromFile(&model, &err, &warn, filename);
     if (!warn.empty()) {
@@ -257,19 +258,19 @@ Model* Model::fromFile(Context* ctx, const std::string& filename) {
 
     if (!ret) {
         spdlog::error("Failed to parse {}", filename);
-        return root;
+        return myModel;
     }
 
     auto scene = model.scenes[model.defaultScene];
     for (auto node : scene.nodes) {
-        root->root->addChild(root->processNode(model, model.nodes[node]));
+        myModel->root->addChild(myModel->root->processNode(model, model.nodes[node]));
     }
 
     spdlog::info("Mesh {} loaded successfully", filename);
-    return root;
+    return myModel;
 }
 
-ModelNode* Model::processNode(tinygltf::Model model, tinygltf::Node node) {
+ModelNode* ModelNode::processNode(tinygltf::Model model, tinygltf::Node node) {
     auto translation = node.translation;
     auto rotation = node.rotation;
     auto scale = node.scale;

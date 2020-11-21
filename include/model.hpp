@@ -1,7 +1,7 @@
 #pragma once
 
 #include "types.hpp"
-#include "object.hpp"
+#include "transform.hpp"
 #include "context.hpp"
 #include "mesh.hpp"
 #include "material.hpp"
@@ -10,20 +10,15 @@
 #include <map>
 
 class ModelNode {
-    friend class Model;
-
-    Model& model;
-    ModelNode* parent;
-    std::vector<ModelNode*> children;
-    Transform transform;
-    std::vector<Mesh*> meshes;
-    std::vector<i32> materials;
-
+private:
     ///
     /// @brief Constructor
     /// @param model Model
     /// 
-    ModelNode(Model& model) : model(model), parent(nullptr), children(), transform(), meshes(), materials() {}
+    ModelNode(Model& model) 
+        : model(model), parent(nullptr), children(), transform(), meshes(), materials() 
+    {
+    }
 
     ///
     /// @brief Destructor
@@ -65,31 +60,37 @@ class ModelNode {
     void render() const;
 
     ///
+    /// @brief Process Node
+    /// @param model glTF model
+    /// @param node glTF node
+    /// 
+    ModelNode* processNode(tinygltf::Model model, tinygltf::Node node);
+
+    ///
     /// @brief Process Mesh
     /// @param model glTF model
     /// @param mesh glTF mesh
     /// 
     void processMesh(tinygltf::Model tmodel, tinygltf::Mesh tmesh);
-};
-
-class Model : public Object {
-    friend class ModelNode;
-
-    ModelNode* root;
-    std::map<i32, Material*> materials;
 
 private:
-    ///
-    /// @brief Constructor
-    /// @param ctx Context
-    ///
-    Model(Context* ctx);
+    friend class Model;
 
+private:
+    Model& model;
+    ModelNode* parent;
+    std::vector<ModelNode*> children;
+    Transform transform;
+    std::vector<Mesh*> meshes;
+    std::vector<i32> materials;
+};
+
+class Model {
 public:
     ///
     /// @brief Destructor
     ///
-    ~Model() override;
+    ~Model();
 
     ///
     /// @brief Create a new plane mesh
@@ -117,20 +118,23 @@ public:
     /// @brief Render called each frame
     /// @param deltaTime Elapsed time between each frame
     ///
-    void render(f32 deltaTime) override;
+    void render(f32 deltaTime);
 
 private:
     ///
-    /// @brief Process Node
-    /// @param model glTF model
-    /// @param node glTF node
-    /// 
-    ModelNode* processNode(tinygltf::Model model, tinygltf::Node node);
-
+    /// @brief Constructor
+    /// @param ctx Context
     ///
-    /// @brief Process Mesh
-    /// @param model glTF model
-    /// @param mesh glTF mesh
-    /// 
-    void processMesh(tinygltf::Model model, tinygltf::Mesh mesh);
+    Model(Context* ctx);
+
+private:
+    friend class ModelNode;
+
+private:
+    Context* ctx;
+    ModelNode* root;
+    std::map<i32, Material*> materials;
+
+public:
+    Transform transform;
 };

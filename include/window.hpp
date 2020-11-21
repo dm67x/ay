@@ -8,13 +8,6 @@
 class Context;
 
 class Window {
-    GLFWwindow* window;
-    Context* ctx;
-    bool cursorVisible;
-    bool cursorProcessed;
-
-    friend class Context;
-
 public:
     /// 
     /// @brief Constructor
@@ -86,4 +79,13 @@ public:
     inline void close() const {
         glfwSetWindowShouldClose(window, GLFW_TRUE);
     }
+
+private:
+    friend class Context;
+
+private:
+    GLFWwindow* window;
+    Context* ctx;
+    bool cursorVisible;
+    bool cursorProcessed;
 };

@@ -5,7 +5,7 @@ project(ay
     LANGUAGES CXX C
     HOMEPAGE_URL "https://github.com/dm67x/ay"
     DESCRIPTION "3D Render Engine"
-    VERSION "0.2")
+    VERSION "0.3")
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -23,7 +23,7 @@ include_directories(extern/stb)
 add_executable(ay  
     "src/main.cpp"
     "src/window.cpp" 
-    "src/model.cpp" 
+    "src/model.cpp"
     "src/context.cpp" 
     "src/camera.cpp"
     "src/tiny_gltf.cpp"
@@ -33,6 +33,7 @@ add_executable(ay
     "src/imgui/imgui_impl_opengl3.cpp"
     "src/imgui/imgui_widgets.cpp")
 target_link_libraries(ay PRIVATE glad glfw glm stb spdlog OpenGL::GL)
+target_include_directories(ay PUBLIC include)
 target_compile_options(ay PRIVATE
     $<$<CXX_COMPILER_ID:MSVC>:/W3 /WX>
     $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wall -Wextra>

@@ -5,13 +5,17 @@
 #include <glm/glm.hpp>
 
 class Camera {
-protected:
-    Context* ctx;
-    float zNear;
-    float zFar;
-    glm::vec3 position;
-    glm::vec3 front;
-    glm::vec3 up;
+public:
+    /// 
+    /// @brief Destructor
+    /// 
+    virtual ~Camera() = default;
+
+    /// 
+    /// @brief Update (move, render, ...)
+    /// @param deltaTime Elapsed time between each frame
+    /// 
+    virtual void update(float deltaTime) = 0;
 
 protected:
     /// 
@@ -30,22 +34,16 @@ protected:
     {
     }
 
-public:
-    /// 
-    /// @brief Destructor
-    /// 
-    virtual ~Camera() = default;
-
-    /// 
-    /// @brief Update (move, render, ...)
-    /// @param deltaTime Elapsed time between each frame
-    /// 
-    virtual void update(float deltaTime) = 0;
+protected:
+    Context* ctx;
+    float zNear;
+    float zFar;
+    glm::vec3 position;
+    glm::vec3 front;
+    glm::vec3 up;
 };
 
 class PerspectiveCamera : public Camera {
-    float fov;
-
 public:
     /// 
     /// @brief Constructor
@@ -64,14 +62,12 @@ public:
     /// @param deltaTime Elapsed time between each frame
     /// 
     virtual void update(float deltaTime) override;
+
+private:
+    float fov;
 };
 
 class OrthographicCamera : public Camera {
-    float left;
-    float right;
-    float bottom;
-    float top;
-
 public:
     /// 
     /// @brief Constructor
@@ -93,14 +89,15 @@ public:
     /// @param deltaTime Elapsed time between each frame
     /// 
     virtual void update(float deltaTime) override;
+
+private:
+    float left;
+    float right;
+    float bottom;
+    float top;
 };
 
-class FreeCamera : public PerspectiveCamera {
-    float speed;
-    float yaw;
-    float pitch;
-    glm::vec2 lastMousePosition;
-    
+class FreeCamera : public PerspectiveCamera { 
 public:
     /// 
     /// @brief Constructor
@@ -119,4 +116,10 @@ public:
     /// @param deltaTime Elapsed time between each frame
     /// 
     void update(float deltaTime) override;
+
+private:
+    float speed;
+    float yaw;
+    float pitch;
+    glm::vec2 lastMousePosition;
 };

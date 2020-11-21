@@ -58,16 +58,8 @@ enum class DrawMethod {
     INSTANCE
 };
 
-struct DrawParameters {
-    GLenum mode;
-    union {
-        GLint first;
-        GLenum elementType;
-    };
-    GLsizei count;
-    GLvoid* offset;
-    GLsizei instanceCount;
-
+class DrawParameters {
+public:
     DrawParameters(GLenum mode, GLint first, GLsizei count)
         : mode(mode),
         first(first),
@@ -90,6 +82,19 @@ struct DrawParameters {
         instanceCount(instanceCount)
     {
     }
+
+private:
+    friend class Context;
+
+private:
+    GLenum mode;
+    union {
+        GLint first;
+        GLenum elementType;
+    };
+    GLsizei count;
+    GLvoid* offset;
+    GLsizei instanceCount;
 };
 
 enum class BufferUsage {
@@ -123,13 +128,6 @@ struct Texture2DParameters {
 class Window;
 
 class Context {
-    const Window& window;
-    std::map<std::string, Shader> shaders;
-    std::map<std::string, Texture2D> textures;
-    std::map<std::string, Renderbuffer> renderbuffers;
-    std::map<std::string, Framebuffer> framebuffers;
-    Shader currentShader;
-
 public:
     ///
     /// @brief Constructor of context
@@ -623,4 +621,12 @@ public:
         }
         return 0;
     }
+
+private:
+    const Window& window;
+    std::map<std::string, Shader> shaders;
+    std::map<std::string, Texture2D> textures;
+    std::map<std::string, Renderbuffer> renderbuffers;
+    std::map<std::string, Framebuffer> framebuffers;
+    Shader currentShader;
 };

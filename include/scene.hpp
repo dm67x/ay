@@ -1,47 +1,38 @@
 #pragma once
 
 #include "types.hpp"
-#include "object.hpp"
+#include "context.hpp"
 #include "camera.hpp"
 #include "light.hpp"
+#include "model.hpp"
 #include <map>
 #include <string>
 #include <functional>
 
-class Scene : public Object {
-    std::map<std::string, Camera*> cameras;
-    Camera* mainCamera;
-    std::array<Light*, 16> pointsLights;
-    std::array<Light*, 8> directionalLights;
-    size_t numberOfPointLights;
-    size_t numberOfDirectionalLights;
-
-public:
-    std::function<void(Scene*, f32)> onRender;
-    std::function<void(Scene*)> onDestroy;
-
+class Scene {
 public:
     ///
     /// @brief Create a new scene
     /// @param ctx The context
     ///
     Scene(Context* ctx) 
-        : Object(ctx), 
+        : onRender([](Scene*, f32) {}),
+        onDestroy([](Scene*) {}),
+        ctx(ctx),
         cameras(), 
         mainCamera(nullptr), 
         pointsLights(),
         directionalLights(),
         numberOfPointLights(0),
         numberOfDirectionalLights(0),
-        onRender([](Scene*, f32) {}),
-        onDestroy([](Scene*) {})
+        models()
     {
     }
 
     ///
     /// @brief Destructor
     ///
-    ~Scene() override {
+    ~Scene() {
         for (auto camera : cameras) {
             delete camera.second;
         }
@@ -54,7 +45,47 @@ public:
             delete light;
         }
 
+        for (auto model : models) {
+            delete model.second;
+        }
+
         onDestroy(this);
+    }
+
+    ///
+    /// @brief Get the context
+    /// @return Context instance
+    ///
+    inline Context* getContext() const {
+        return ctx;
+    }
+
+    ///
+    /// @brief Create a new model from file
+    /// @param name Model name
+    /// @return Model instance
+    ///
+    inline Model* createModel(const std::string& name, const std::string& filename) {
+        auto it = models.find(name);
+        if (it == models.end()) {
+            Model* model = Model::fromFile(ctx, filename);
+            models.insert(std::make_pair(name, model));
+            return model;
+        }
+        return it->second;
+    }
+
+    ///
+    /// @brief Get the model
+    /// @param name Model name
+    /// @return Model instance
+    ///
+    inline Model* getModel(const std::string& name) {
+        auto it = models.find(name);
+        if (it != models.end()) {
+            return it->second;
+        }
+        return nullptr;
     }
 
     ///
@@ -66,9 +97,13 @@ public:
     /// @return Created camera
     ///
     inline Camera* createPerspectiveCamera(const std::string& name, f32 fov, f32 zNear, f32 zFar) {
-        Camera* camera = new PerspectiveCamera(ctx, fov, zNear, zFar);
-        cameras.insert(std::make_pair(name, camera));
-        return camera;
+        auto it = cameras.find(name);
+        if (it == cameras.end()) {
+            Camera* camera = new PerspectiveCamera(ctx, fov, zNear, zFar);
+            cameras.insert(std::make_pair(name, camera));
+            return camera;
+        }
+        return it->second;
     }
 
     ///
@@ -83,9 +118,13 @@ public:
     /// @return Created camera
     ///
     inline Camera* createOrthographicCamera(const std::string& name, f32 left, f32 right, f32 bottom, f32 top, f32 zNear, f32 zFar) {
-        Camera* camera = new OrthographicCamera(ctx, left, right, bottom, top, zNear, zFar);
-        cameras.insert(std::make_pair(name, camera));
-        return camera;
+        auto it = cameras.find(name);
+        if (it == cameras.end()) {
+            Camera* camera = new OrthographicCamera(ctx, left, right, bottom, top, zNear, zFar);
+            cameras.insert(std::make_pair(name, camera));
+            return camera;
+        }
+        return it->second;
     }
 
     ///
@@ -97,9 +136,13 @@ public:
     /// @return Created camera
     ///
     inline Camera* createFreeCamera(const std::string& name, f32 fov, f32 zNear, f32 zFar) {
-        Camera* camera = new FreeCamera(ctx, fov, zNear, zFar);
-        cameras.insert(std::make_pair(name, camera));
-        return camera;
+        auto it = cameras.find(name);
+        if (it == cameras.end()) {
+            Camera* camera = new FreeCamera(ctx, fov, zNear, zFar);
+            cameras.insert(std::make_pair(name, camera));
+            return camera;
+        }
+        return it->second;
     }
 
     ///
@@ -147,7 +190,7 @@ public:
     /// @brief Render called each frame
     /// @param deltaTime Elapsed time between each frame
     ///
-    void render(f32 deltaTime) override {
+    void render(f32 deltaTime) {
         mainCamera->update(deltaTime);
 
         onRender(this, deltaTime);
@@ -173,4 +216,18 @@ public:
         }
         ctx->shaderUniform("pointLightsCount", (i32)numberOfPointLights);
     }
+
+public:
+    std::function<void(Scene*, f32)> onRender;
+    std::function<void(Scene*)> onDestroy;
+
+private:
+    Context* ctx;
+    std::map<std::string, Camera*> cameras;
+    Camera* mainCamera;
+    std::array<Light*, 16> pointsLights;
+    std::array<Light*, 8> directionalLights;
+    size_t numberOfPointLights;
+    size_t numberOfDirectionalLights;
+    std::map<std::string, Model*> models;
 };

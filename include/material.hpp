@@ -1,28 +1,15 @@
 #pragma once
 
+#include "types.hpp"
 #include "color.hpp"
 #include "context.hpp"
 #include <string>
 
-struct Material {
-    std::string name;
-    Color baseColor;
-    Texture2D baseColorTexture;
-    float metallicFactor;
-    float roughnessFactor;
-    Texture2D metallicRoughnessTexture;
-    Texture2D normalTexture;
-    Texture2D occlusionTexture;
-    Texture2D emissiveTexture;
-    Color emissiveFactor;
-    enum class AlphaMode {
-        OPAQUE_MODE,
-        MASK_MODE,
-        BLEND_MODE
-    } alphaMode;
-    float alphaCutoff;
-    bool doubleSided;
-
+class Material {
+public:
+    ///
+    /// @brief Constructor
+    ///
     Material()
         : name(""),
         baseColor(Color::white()),
@@ -59,4 +46,23 @@ struct Material {
             alphaCutoff == m.alphaCutoff &&
             doubleSided == m.doubleSided;
     }
+
+public:
+    std::string name;
+    Color baseColor;
+    Texture2D baseColorTexture;
+    f32 metallicFactor;
+    f32 roughnessFactor;
+    Texture2D metallicRoughnessTexture;
+    Texture2D normalTexture;
+    Texture2D occlusionTexture;
+    Texture2D emissiveTexture;
+    Color emissiveFactor;
+    enum class AlphaMode {
+        OPAQUE_MODE,
+        MASK_MODE,
+        BLEND_MODE
+    } alphaMode;
+    f32 alphaCutoff;
+    bool doubleSided;
 };
