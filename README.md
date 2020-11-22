@@ -36,5 +36,5 @@ Thanks to all of them!
 - [ ] Image Based Lighting
 - [ ] Skydome
 - [ ] Particles
-- [ ] RenderGraph (json scene format)
+- [ ] RenderGraph
 - [ ] RayTracing (Monte Carlo model)
