@@ -5,73 +5,76 @@
 #include "transform.hpp"
 #include <vector>
 
-class Model;
-class Mesh;
+namespace ay
+{
+    class Model;
+    class Mesh;
 
-class ModelNode {
-private:
-    ///
-    /// @brief Constructor
-    /// @param model Model
-    /// 
-    ModelNode(Model& model) 
-        : model(model), parent(nullptr), children(), transform(), meshes(), materials() 
-    {
-    }
-
-    ///
-    /// @brief Destructor
-    /// 
-    ~ModelNode();
-
-    ///
-    /// @brief Add child
-    /// @param n Child node
-    /// 
-    inline void addChild(ModelNode* n) {
-        children.push_back(n);
-        n->parent = this;
-    }
-
-    ///
-    /// @brief Get transform
-    /// @return Transform
-    ///
-    inline glm::mat4 getTransform() const {
-        glm::mat4 t = transform.getTransform(); // local transform
-        if (parent != nullptr) {
-            t *= parent->getTransform();
+    class ModelNode {
+    private:
+        ///
+        /// @brief Constructor
+        /// @param model Model
+        /// 
+        ModelNode(Model& model)
+            : model(model), parent(nullptr), children(), transform(), meshes(), materials()
+        {
         }
-        return t;
-    }
 
-    ///
-    /// @brief Render
-    /// 
-    void render() const;
+        ///
+        /// @brief Destructor
+        /// 
+        ~ModelNode();
 
-    ///
-    /// @brief Process Node
-    /// @param model glTF model
-    /// @param node glTF node
-    /// 
-    ModelNode* processNode(tinygltf::Model model, tinygltf::Node node);
+        ///
+        /// @brief Add child
+        /// @param n Child node
+        /// 
+        inline void addChild(ModelNode* n) {
+            children.push_back(n);
+            n->parent = this;
+        }
 
-    ///
-    /// @brief Process Mesh
-    /// @param model glTF model
-    /// @param mesh glTF mesh
-    /// 
-    void processMesh(tinygltf::Model tmodel, tinygltf::Mesh tmesh);
+        ///
+        /// @brief Get transform
+        /// @return Transform
+        ///
+        inline glm::mat4 getTransform() const {
+            glm::mat4 t = transform.getTransform(); // local transform
+            if (parent != nullptr) {
+                t *= parent->getTransform();
+            }
+            return t;
+        }
 
-private:
-    friend class Model;
+        ///
+        /// @brief Render
+        /// 
+        void render() const;
 
-private:
-    Model& model;
-    ModelNode* parent;
-    std::vector<ModelNode*> children;
-    Transform transform;
-    std::vector<Mesh*> meshes;
-    std::vector<i32> materials;
-};
+        ///
+        /// @brief Process Node
+        /// @param model glTF model
+        /// @param node glTF node
+        /// 
+        ModelNode* processNode(tinygltf::Model model, tinygltf::Node node);
+
+        ///
+        /// @brief Process Mesh
+        /// @param model glTF model
+        /// @param mesh glTF mesh
+        /// 
+        void processMesh(tinygltf::Model tmodel, tinygltf::Mesh tmesh);
+
+    private:
+        friend class Model;
+
+    private:
+        Model& model;
+        ModelNode* parent;
+        std::vector<ModelNode*> children;
+        Transform transform;
+        std::vector<Mesh*> meshes;
+        std::vector<i32> materials;
+    };
+}

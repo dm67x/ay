@@ -17,23 +17,21 @@ add_subdirectory(extern/stb)
 add_subdirectory(extern/spdlog)
 add_subdirectory(extern/glm)
 
+include_directories(extern/glfw/include)
 include_directories(extern/glad)
 include_directories(extern/stb)
 
+add_subdirectory(src/imgui)
+
 add_executable(ay  
     "src/main.cpp"
-    "src/window.cpp" 
+    "src/camera.cpp"
     "src/model.cpp"
     "src/model_node.cpp"
-    "src/context.cpp" 
-    "src/camera.cpp"
-    "src/tiny_gltf.cpp"
-    "src/imgui.cpp"
-    "src/imgui_draw.cpp"
-    "src/imgui_impl_glfw.cpp"
-    "src/imgui_impl_opengl3.cpp"
-    "src/imgui_widgets.cpp")
-target_link_libraries(ay PRIVATE glad glfw glm stb spdlog OpenGL::GL)
+    "src/window.cpp" 
+    "src/context.cpp"
+    "src/tiny_gltf.cpp")
+target_link_libraries(ay PRIVATE imgui glad glfw glm stb spdlog OpenGL::GL)
 target_include_directories(ay PUBLIC include)
 target_compile_options(ay PRIVATE
     $<$<CXX_COMPILER_ID:MSVC>:/W3 /WX>

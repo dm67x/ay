@@ -1,6 +1,8 @@
 #include "ay.hpp"
 #include <chrono>
 
+using namespace ay;
+
 void renderScene(Scene* scene, f32 deltaTime) {
     auto ctx = scene->getContext();
     static f32 angle;
