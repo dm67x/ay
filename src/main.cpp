@@ -1,4 +1,5 @@
-#include "ay.hpp"
+#include "scene.hpp"
+#include "window.hpp"
 #include <chrono>
 
 using namespace ay;
@@ -36,7 +37,7 @@ int main(void)
     Context* ctx = window.getContext();
     Scene scene(ctx);
 
-    Model* model = scene.createModel("Duck", "../assets/Duck.glb");
+    Model* model = scene.createModel("Duck", "../../assets/Duck.glb");
     model->transform.position.z = 5.f;
     model->transform.scale = glm::vec3(.5f);
 
